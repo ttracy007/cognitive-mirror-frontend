@@ -4,19 +4,36 @@ const App = () => {
   const [entry, setEntry] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
+  const [entryHistory, setEntryHistory] = useState([]);
   const [tone, setTone] = useState("warm-therapist"); // default tone
 
+function detectLoop(entries) {
+  const loopTriggers = ["stuck", "numb", "hopeless", "can't focus", "pointless", "exhausted"];
+  const counts = {};
 
+  entries.forEach(text => {
+    loopTriggers.forEach(trigger => {
+      if (text.toLowerCase().includes(trigger)) {
+        counts[trigger] = (counts[trigger] || 0) + 1;
+      }
+    });
+  });
+
+  const frequent = Object.entries(counts).filter(([_, count]) => count >= 3);
+  return frequent.map(([word]) => word);
+}
   const handleSubmit = async () => {
     setLoading(true);
     setResponse('');
     try {
+      const loopWords = detectLoop(entryHistory);
+      const isLoop = loopWords.length > 0;
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ entry, tone }),
+      body: JSON.stringify({ entry, tone, isLoop }),
       });
 
       if (!res.ok) {
@@ -26,6 +43,7 @@ const App = () => {
 
       const data = await res.json();
       setResponse(data.response || 'No message from GPT.');
+      setEntryHistory(prev => [...prev, entry]);
     } catch (error) {
       setResponse(`⚠️ Error: ${error.message}`);
     } finally {
