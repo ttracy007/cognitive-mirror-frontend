@@ -50,7 +50,8 @@ const App = () => {
       }
 
       const data = await res.json();
-      setResponse(data.response || 'No message from GPT.');
+      const cleanResponse = data.response?.replace(/🌀 isLoop: (true|false)/, '').trim();
+      setResponse(cleanResponse || 'No message from GPT.');
       setEntryHistory(prev => [...prev, entry]);
       setHistory(prev => [...prev, { entry, tone }]);
     } catch (error) {
