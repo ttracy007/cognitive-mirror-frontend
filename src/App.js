@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 
 const SHOW_INTRO = true; // Toggle this to false to remove splash screen
 
@@ -7,7 +7,7 @@ const App = () => {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [entryHistory, setEntryHistory] = useState([]);
-  const [tone, setTone] = useState("warm-therapist"); // default tone
+  const [tone, setTone] = useState("warm-therapist");
   const [showIntro, setShowIntro] = useState(true);
 
 function detectLoop(entries) {
