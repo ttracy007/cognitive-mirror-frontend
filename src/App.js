@@ -1,6 +1,6 @@
-const SHOW_INTRO = true; // Toggle this to false to remove splash screen
-
 import React, { useState } from 'react'; 
+
+const SHOW_INTRO = true; // Toggle this to false to remove splash screen
 
 const App = () => {
   const [entry, setEntry] = useState('');
