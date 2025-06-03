@@ -12,7 +12,6 @@ const App = () => {
   const [history, setHistory] = useState([]);
   const [summary, setSummary] = useState('');
 
-
   function detectLoop(entries) {
     const loopTriggers = ["stuck", "numb", "hopeless", "can't focus", "pointless", "exhausted"];
     const counts = {};
@@ -59,32 +58,33 @@ const App = () => {
       setLoading(false);
     }
   };
-const handleSummarize = async () => {
-  if (history.length === 0) {
-    setSummary('No journal entries available to summarize.');
-    return;
-  }
 
-  try {
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/clinical-summary', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ history }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Server error (${res.status}): ${text}`);
+  const handleSummarize = async () => {
+    if (history.length === 0) {
+      setSummary('No journal entries available to summarize.');
+      return;
     }
 
-    const data = await res.json();
-    setSummary(data.summary || 'No summary received.');
-  } catch (error) {
-    setSummary(`⚠️ Error: ${error.message}`);
-  }
-};
+    try {
+      const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/clinical-summary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ history }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Server error (${res.status}): ${text}`);
+      }
+
+      const data = await res.json();
+      setSummary(data.summary || 'No summary received.');
+    } catch (error) {
+      setSummary(`⚠️ Error: ${error.message}`);
+    }
+  };
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -129,14 +129,17 @@ const handleSummarize = async () => {
           <button onClick={handleSubmit} disabled={loading}>
             {loading ? 'Thinking...' : 'Reflect'}
           </button>
-            <br /><br />
-            <button onClick={handleSummarize} disabled={history.length === 0}>
-              Summarize for Therapist
+
+          <br /><br />
+          <button onClick={handleSummarize} disabled={history.length === 0}>
+            Summarize for Therapist
           </button>
-            <div style={{ marginTop: '2rem' }}>
-              <strong>Therapist Summary:</strong>
-              <p>{summary}</p>
-            </div>
+
+          <div style={{ marginTop: '2rem' }}>
+            <strong>Therapist Summary:</strong>
+            <p>{summary}</p>
+          </div>
+
           <div style={{ marginTop: '2rem' }}>
             <strong>AI Response:</strong>
             <p>{response}</p>
