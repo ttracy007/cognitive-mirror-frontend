@@ -31,6 +31,7 @@ const App = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setResponse('');
+    setSummary('');
     try {
       const loopWords = detectLoop(entryHistory);
       const isLoop = loopWords.length > 0;
