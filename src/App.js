@@ -86,6 +86,24 @@ const App = () => {
     }
   };
 
+  const handleCopySummary = () => {
+    const emailBody = `
+Subject: Weekly Reflections from Cognitive Mirror
+
+Hi [Therapist Name],
+
+Here’s a brief summary generated from my journal entries this week:
+
+${summary}
+
+Thanks for reviewing. Let me know if anything stands out.
+    `.trim();
+
+    navigator.clipboard.writeText(emailBody)
+      .then(() => alert("Summary copied to clipboard!"))
+      .catch(() => alert("Failed to copy summary."));
+  };
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       {SHOW_INTRO && showIntro ? (
@@ -138,6 +156,12 @@ const App = () => {
           <div style={{ marginTop: '2rem' }}>
             <strong>Therapist Summary:</strong>
             <p>{summary}</p>
+
+            {summary && (
+              <button onClick={handleCopySummary} style={{ marginTop: '1rem' }}>
+                Copy Summary to Clipboard
+              </button>
+            )}
           </div>
 
           <div style={{ marginTop: '2rem' }}>
