@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-const SHOW_INTRO = true; // Toggle to false to skip splash screen
+const SHOW_INTRO = true;
 
 const App = () => {
   const [entry, setEntry] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [entryHistory, setEntryHistory] = useState([]);
-  const [tone, setTone] = useState("warm-therapist");
+  const [tone, setTone] = useState("stoic-mentor");
   const [showIntro, setShowIntro] = useState(true);
   const [history, setHistory] = useState([]);
   const [summary, setSummary] = useState('');
@@ -31,7 +31,6 @@ const App = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setResponse('');
-    setSummary('');
     try {
       const loopWords = detectLoop(entryHistory);
       const isLoop = loopWords.length > 0;
@@ -50,8 +49,7 @@ const App = () => {
       }
 
       const data = await res.json();
-      const cleanResponse = data.response?.replace(/🌀 isLoop: (true|false)/, '').trim();
-      setResponse(cleanResponse || 'No message from GPT.');
+      setResponse(data.response || 'No message from GPT.');
       setEntryHistory(prev => [...prev, entry]);
       setHistory(prev => [...prev, { entry, tone }]);
     } catch (error) {
@@ -88,41 +86,13 @@ const App = () => {
     }
   };
 
-  const handleCopySummary = () => {
-    const emailBody = `
-Subject: Weekly Reflections from Cognitive Mirror
-
-Hi [Therapist Name],
-
-Here’s a brief summary generated from my journal entries this week:
-
-${summary}
-
-Thanks for reviewing. Let me know if anything stands out.
-    `.trim();
-
-    navigator.clipboard.writeText(emailBody)
-      .then(() => alert("Summary copied to clipboard!"))
-      .catch(() => alert("Failed to copy summary."));
-  };
-
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       {SHOW_INTRO && showIntro ? (
         <div>
           <h1>Welcome to Cognitive Mirror</h1>
-          <p>
-            This is a journaling app powered by GPT-4 that reflects your emotional tone,
-            notices recurring patterns, and helps you develop greater self-awareness.
-          </p>
-          <p>
-            This is not a therapy replacement. Mirror doesn’t diagnose, treat, or advise.
-            It simply listens deeply and responds reflectively.
-          </p>
-          <p>
-            For clinicians or funders: the system can track emotional loops, adjust its tone
-            based on user preference, and generate insights that support emotional clarity.
-          </p>
+          <p>This is a journaling app powered by GPT-4 that reflects your emotional tone, notices recurring patterns, and helps you develop greater self-awareness.</p>
+          <p>This is not a therapy replacement. Mirror doesn’t diagnose, treat, or advise. It simply listens deeply and responds reflectively.</p>
           <button onClick={() => setShowIntro(false)}>Begin Journaling</button>
         </div>
       ) : (
@@ -131,7 +101,6 @@ Thanks for reviewing. Let me know if anything stands out.
 
           <label style={{ marginBottom: '0.5rem', display: 'block' }}>Choose Your Voice:</label>
           <select value={tone} onChange={(e) => setTone(e.target.value)}>
-            <option value="warm-therapist">Warm Therapist</option>
             <option value="stoic-mentor">Stoic Mentor</option>
             <option value="frank-friend">Frank-but-Kind Friend</option>
           </select>
@@ -149,26 +118,17 @@ Thanks for reviewing. Let me know if anything stands out.
           <button onClick={handleSubmit} disabled={loading}>
             {loading ? 'Thinking...' : 'Reflect'}
           </button>
-
           <br /><br />
           <button onClick={handleSummarize} disabled={history.length === 0}>
             Summarize for Therapist
           </button>
-
           <div style={{ marginTop: '2rem' }}>
             <strong>AI Response:</strong>
             <p>{response}</p>
           </div>
-
           <div style={{ marginTop: '2rem' }}>
             <strong>Therapist Summary:</strong>
             <p>{summary}</p>
-
-            {summary && (
-              <button onClick={handleCopySummary} style={{ marginTop: '1rem' }}>
-                Copy Summary to Clipboard
-              </button>
-            )}
           </div>
         </div>
       )}
