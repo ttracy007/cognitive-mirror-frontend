@@ -7,7 +7,7 @@ const App = () => {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [entryHistory, setEntryHistory] = useState([]);
-  const [tone, setTone] = useState("stoic-mentor");
+  const [tone, setTone] = useState("warm-therapist");
   const [showIntro, setShowIntro] = useState(true);
   const [history, setHistory] = useState([]);
   const [summary, setSummary] = useState('');
@@ -31,6 +31,7 @@ const App = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setResponse('');
+    setSummary('');
     try {
       const loopWords = detectLoop(entryHistory);
       const isLoop = loopWords.length > 0;
@@ -93,6 +94,7 @@ const App = () => {
           <h1>Welcome to Cognitive Mirror</h1>
           <p>This is a journaling app powered by GPT-4 that reflects your emotional tone, notices recurring patterns, and helps you develop greater self-awareness.</p>
           <p>This is not a therapy replacement. Mirror doesn’t diagnose, treat, or advise. It simply listens deeply and responds reflectively.</p>
+          <p>For clinicians or funders: the system can track emotional loops, adjust its tone based on user preference, and generate insights that support emotional clarity.</p>
           <button onClick={() => setShowIntro(false)}>Begin Journaling</button>
         </div>
       ) : (
@@ -101,7 +103,7 @@ const App = () => {
 
           <label style={{ marginBottom: '0.5rem', display: 'block' }}>Choose Your Voice:</label>
           <select value={tone} onChange={(e) => setTone(e.target.value)}>
-            <option value="therapist-mode">Warm Therapist</option>
+            <option value="warm-therapist">Warm Therapist</option>
             <option value="stoic-mentor">Stoic Mentor</option>
             <option value="frank-friend">Frank-but-Kind Friend</option>
           </select>
@@ -123,10 +125,12 @@ const App = () => {
           <button onClick={handleSummarize} disabled={history.length === 0}>
             Summarize for Therapist
           </button>
+
           <div style={{ marginTop: '2rem' }}>
             <strong>AI Response:</strong>
             <p>{response}</p>
           </div>
+
           <div style={{ marginTop: '2rem' }}>
             <strong>Therapist Summary:</strong>
             <p>{summary}</p>
