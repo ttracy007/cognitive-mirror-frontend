@@ -35,8 +35,8 @@ const App = () => {
     if (error) {
       console.error('Fetch error:', error.message);
     } else {
-      console.log('Fetched history:', data); // 🔍 Log to confirm fetch
-      setHistory(data);
+      console.log('Fetched history:', data);
+      setHistory(data || []);
     }
   };
 
@@ -78,7 +78,7 @@ const App = () => {
     }
 
     setEntry('');
-    setTimeout(fetchHistory, 300); // short delay to ensure write completes
+    setTimeout(fetchHistory, 300);
   };
 
   if (!session) return <AuthForm />;
@@ -111,24 +111,32 @@ const App = () => {
         <div style={{ flex: 1 }}>
           <h3>📝 Reflections</h3>
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {history.map((item, index) => (
-              <div key={index} style={{ marginBottom: '1rem' }}>
-                <p>{String(item.entry_text || '')}</p>
-                <hr />
-              </div>
-            ))}
+            {Array.isArray(history) && history.length > 0 ? (
+              history.map((item, index) => (
+                <div key={index} style={{ marginBottom: '1rem' }}>
+                  <p>{String(item.entry_text || '(No entry text)')}</p>
+                  <hr />
+                </div>
+              ))
+            ) : (
+              <p style={{ color: '#777' }}><em>No entries yet.</em></p>
+            )}
           </div>
         </div>
 
         <div style={{ flex: 1 }}>
           <h3>🪞 Cognitive Mirror</h3>
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {history.map((item, index) => (
-              <div key={index} style={{ marginBottom: '1rem' }}>
-                <p>{String(item.response_text || '')}</p>
-                <hr />
-              </div>
-            ))}
+            {Array.isArray(history) && history.length > 0 ? (
+              history.map((item, index) => (
+                <div key={index} style={{ marginBottom: '1rem' }}>
+                  <p>{String(item.response_text || '(No reflection yet)')}</p>
+                  <hr />
+                </div>
+              ))
+            ) : (
+              <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+            )}
           </div>
         </div>
       </div>
