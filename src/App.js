@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SHOW_INTRO = true;
+const SHOW_INTRO = false;
 
 const App = () => {
   const [entry, setEntry] = useState('');
