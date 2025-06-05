@@ -1,11 +1,27 @@
-import React from 'react';
-import AuthForm from './AuthForm'; // ✅ this pulls in your login/signup form
+import React, { useEffect, useState } from 'react';
+import AuthForm from './AuthForm';
+import { supabase } from './supabaseClient';
 
 const App = () => {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      {/* ✅ Show only the Supabase login/signup form for now */}
-      <AuthForm />
+      {!session ? <AuthForm /> : <p>✅ Logged in as {session.user.email}</p>}
     </div>
   );
 };
