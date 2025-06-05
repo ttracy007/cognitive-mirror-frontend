@@ -101,6 +101,7 @@ const App = () => {
 
           <label style={{ marginBottom: '0.5rem', display: 'block' }}>Choose Your Voice:</label>
           <select value={tone} onChange={(e) => setTone(e.target.value)}>
+            <option value="therapist-mode">Warm Therapist</option>
             <option value="stoic-mentor">Stoic Mentor</option>
             <option value="frank-friend">Frank-but-Kind Friend</option>
           </select>
