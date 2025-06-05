@@ -60,6 +60,13 @@ const App = () => {
 
     const responseText = data.response || 'No response received.';
 
+    console.log('Saving to Supabase:', {
+      user_id: user.id,
+      entry_text: entry,
+      tone_mode: tone,
+      response_text: responseText,
+    });
+
     const { error } = await supabase.from('journals').insert([
       {
         user_id: user.id,
