@@ -81,7 +81,8 @@ const App = () => {
     }
 
     setEntry('');
-    fetchHistory();
+    setTimeout(fetchHistory, 300); // give Supabase a short delay to finish write
+
   };
 
   if (!session) return <AuthForm />;
