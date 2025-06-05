@@ -35,6 +35,7 @@ const App = () => {
     if (error) {
       console.error('Fetch error:', error.message);
     } else {
+      console.log('Fetched history:', data); // 🔍 Log to confirm fetch
       setHistory(data);
     }
   };
@@ -60,29 +61,24 @@ const App = () => {
 
     const responseText = data.response || 'No response received.';
 
-    console.log('Saving to Supabase:', {
-      user_id: user.id,
-      entry_text: entry,
-      tone_mode: tone,
-      response_text: responseText,
-    });
-
-    const { error } = await supabase.from('journals').insert([
-      {
+    const { data: saved, error } = await supabase
+      .from('journals')
+      .insert({
         user_id: user.id,
         entry_text: entry,
         tone_mode: tone,
         response_text: responseText,
-      },
-    ]);
+      })
+      .select();
 
     if (error) {
       console.error('Save error:', error.message);
+    } else {
+      console.log('Saved entry:', saved);
     }
 
     setEntry('');
-    setTimeout(fetchHistory, 300); // give Supabase a short delay to finish write
-
+    setTimeout(fetchHistory, 300); // short delay to ensure write completes
   };
 
   if (!session) return <AuthForm />;
