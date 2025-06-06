@@ -6,7 +6,8 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
-  const [forcedTone, setForcedTone] = useState('mirror');
+  const [forcedTone, setForcedTone] = useState("frank"); // or "stoic" as default
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
