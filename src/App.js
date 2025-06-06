@@ -316,8 +316,8 @@ const App = () => {
                 </div>
                 <hr style={{ marginTop: '2rem' }} />
               </div>
-            ))
-          ) : (
+           );
+        })}
             <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
           )}
         </div>
