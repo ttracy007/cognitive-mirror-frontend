@@ -178,7 +178,7 @@ const App = () => {
           <option value="frank">🔴 Frank Friend</option>
           <option value="stoic">🟢 Stoic Mentor</option>
         </select>
-
+  
   <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
   ✍️ You’ve logged <strong>{reflectionCount}</strong> of <strong>{requiredReflections}</strong> reflections needed for your first clinical summary.
 </div>
@@ -197,7 +197,26 @@ const App = () => {
     transition: 'width 0.4s ease'
   }}></div>
 </div>
-
+<button
+  onClick={async () => {
+    await supabase.auth.signOut();
+    setSession(null); // this triggers return to LoginPage
+  }}
+  style={{
+    position: 'absolute',
+    top: '1rem',
+    right: '1rem',
+    backgroundColor: '#eee',
+    color: '#333',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+  }}
+>
+  Log Out
+</button>
 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
   <button
     onClick={() => {
