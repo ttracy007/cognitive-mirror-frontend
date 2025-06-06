@@ -93,41 +93,59 @@ const handleSubmit = async () => {
 
 
   if (!session) return <AuthForm />;
+ const canGenerateSummary = Array.isArray(history) && history.length >= 5;
 
-  const canGenerateSummary = history.length >= 5;
-  
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <p>✅ Logged in as {session.user.email}</p>
+{Array.isArray(history) && !canGenerateSummary && (
+  <div style={{
+    backgroundColor: '#fff7e6',
+    padding: '1.5rem',
+    borderRadius: '8px',
+    borderLeft: '6px solid #ffae42',
+    marginBottom: '2rem',
+    lineHeight: '1.5'
+  }}>
+    <h3 style={{ marginTop: 0 }}>🔎 <strong>“Not Quite Yet”</strong></h3>
+    <p><strong>Cognitive Mirror</strong> works best when it sees you over time—not just in a single moment.</p>
+    <p>We need at <strong>least five days</strong> of journaling to form a meaningful reflection summary.</p>
+    <p>That gives the mirror a chance to detect emotional patterns, shifts, and turning points—not just passing moods.</p>
+    <p>The more you write, the clearer the picture gets.<br />
+      Keep going. You’re not just venting—you’re building self-understanding.</p>
+    <br />
+    <button style={{
+      padding: '0.4rem 0.75rem',
+      fontSize: '0.9rem',
+      backgroundColor: '#ffae42',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      color: '#fff'
+    }} onClick={() => alert('🧪 Previewing a sample summary...')}>
+      ⏩ Generate Preview Summary →
+    </button>
+  </div>
+)}
 
-      <br /><br />
+{canGenerateSummary && (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+    <label style={{ marginRight: '0.5rem' }}>Voice (required):</label>
+    <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
+      <option value="frank">🔴 Frank Friend</option>
+      <option value="stoic">🟢 Stoic Mentor</option>
+    </select>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-  <label style={{ marginRight: '0.5rem' }}>Voice (required):</label>
-  <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
-    <option value="frank">🔴 Frank Friend</option>
-    <option value="stoic">🟢 Stoic Mentor</option>
-  </select>
+    <button
+      style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
+      onClick={() => alert('🧠 Summary feature coming soon.')}>
+      🔍 Generate Summary
+    </button>
 
- <button
-  style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
-  onClick={() => {
-    if (!canGenerateSummary) {
-      alert(`🧠 Not quite yet.\n\nCognitive Mirror works best when it sees you over time—not just in a single moment.\n\nWe need at least five days of journaling to form a meaningful reflection summary. That gives the mirror a chance to detect emotional patterns, shifts, and turning points—not just passing moods.\n\nThe more you write, the clearer the picture gets. Keep going. You’re not just venting—you’re building self-understanding.`);
-    } else {
-      alert('🧠 Summary feature coming soon.');
-    }
-  }}
->
-  🔍 Generate Summary
-</button>
-
-  <button
-    style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
-    onClick={() => alert('🧪 Previewing a sample summary...')}>
-    🧪 Preview Summary
-  </button>
-</div>
+    <button
+      style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
+      onClick={() => alert('🧪 Previewing a sample summary...')}>
+      🧪 Preview Summary
+    </button>
+  </div>
+)}
 
 
       <br /><br />
