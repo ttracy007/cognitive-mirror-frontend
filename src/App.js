@@ -56,8 +56,7 @@ const App = () => {
     setLoadingSummary(true);
 
     try {
-      const response = await fetch('https://cognitive-mirror-backend.onrender.com/clinical-summary
-'), {
+      const response = await fetch('https://cognitive-mirror-backend.onrender.com/clinical-summary', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
