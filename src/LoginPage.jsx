@@ -16,7 +16,7 @@ const LoginPage = ({ onAuthSuccess }) => {
     }
 
     // Email is optional
-    const fallbackEmail = `${username}@demo.cognitivemirror.app`;
+    email: email.trim(),
     const authData = {
       email: email?.trim() || fallbackEmail,
       password,
@@ -68,6 +68,9 @@ const LoginPage = ({ onAuthSuccess }) => {
           onChange={(e) => setUsername(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
+        <small style={{ color: '#888' }}>
+          We’ll only use this to help you recover your password. Never shared or used for marketing.
+        </small>
 
         <label>Password (required)</label><br />
         <input
@@ -77,9 +80,10 @@ const LoginPage = ({ onAuthSuccess }) => {
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
 
-        <label>Email (optional)</label><br />
+        <label>Email (required for password recovery)</label><br />
         <input
           type="email"
+          required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
