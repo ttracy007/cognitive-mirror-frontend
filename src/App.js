@@ -8,6 +8,7 @@ const App = () => {
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("frank");
+  const [latestEntryId, setLatestEntryId] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,42 +46,48 @@ const App = () => {
     if (session) fetchHistory();
   }, [session]);
 
-  const handleSubmit = async () => {
-    const user = session?.user;
-    if (!user || !entry.trim()) return;
+const handleSubmit = async () => {
+  const user = session?.user;
+  if (!user || !entry.trim()) return;
 
-    console.log('Submitting:', entry);
+  console.log('Submitting:', entry);
 
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry, forcedTone }),
-    });
+  // Step 1: Fetch GPT response
+  const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ entry, forcedTone }),
+  });
 
-    const data = await res.json();
-    console.log('GPT Response:', data);
+  const data = await res.json();
+  console.log('GPT Response:', data);
 
-    const responseText = data.response || 'No response received.';
+  const responseText = data.response || 'No response received.';
 
-    const { data: saved, error } = await supabase
-      .from('journals')
-      .insert({
-        user_id: user.id,
-        entry_text: entry,
-        response_text: responseText,
-        tone_mode: data.tone_mode,
-      })
-      .select();
+  // Step 2: Save to Supabase
+  const { data: saved, error } = await supabase
+    .from('journals')
+    .insert({
+      user_id: user.id,
+      entry_text: entry,
+      response_text: responseText,
+      tone_mode: data.tone_mode,
+    })
+    .select();
 
-    if (error) {
-      console.error('Save error:', error.message);
-    } else {
-      console.log('Saved entry:', saved);
+  if (error) {
+    console.error('Save error:', error.message);
+  } else {
+    console.log('Saved entry:', saved);
+    if (saved && saved[0]) {
+      setLatestEntryId(saved[0].id); // ✅ For animation
     }
+  }
 
-    setEntry('');
-    setTimeout(fetchHistory, 300);
-  };
+  setEntry('');
+  setTimeout(fetchHistory, 300);
+};
+
 
   if (!session) return <AuthForm />;
 
