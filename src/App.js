@@ -111,6 +111,9 @@ const App = () => {
 
       <div style={{ marginTop: '2rem' }}>
         <h3>🧠 Your Reflection Thread</h3>
+           <div className="fade-in" style={{ backgroundColor: '#d1e7dd', padding: '1rem', marginBottom: '1rem', borderRadius: '6px' }}>
+    <strong>✅ This is a test block with fade-in animation</strong>
+  </div>
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {Array.isArray(history) && history.length > 0 ? (
             history.map((item, index) => (
