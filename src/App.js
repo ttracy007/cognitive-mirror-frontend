@@ -29,7 +29,7 @@ const App = () => {
 
     const { data, error } = await supabase
       .from('journals')
-      .select('entry_text, response_text, timestamp')
+      .select('entry_text, response_text, tone_mode, timestamp')
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
 
