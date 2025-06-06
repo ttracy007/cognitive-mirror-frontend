@@ -172,16 +172,32 @@ const App = () => {
           <option value="stoic">🟢 Stoic Mentor</option>
         </select>
 
-        <button
-  onClick={handleGenerateSummary}
-  disabled={!canGenerateSummary}
-  style={{
-    opacity: canGenerateSummary ? 1 : 0.5,
-    cursor: canGenerateSummary ? 'pointer' : 'not-allowed'
-  }}
->
-  🔍 Generate Summary
-</button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+  <button
+    onClick={handleGenerateSummary}
+    disabled={!canGenerateSummary}
+    title={!canGenerateSummary ? 'You need at least 5 journal entries to generate a summary.' : ''}
+    style={{
+      opacity: canGenerateSummary ? 1 : 0.5,
+      cursor: canGenerateSummary ? 'pointer' : 'not-allowed',
+      padding: '0.5rem 1rem',
+      fontSize: '1rem',
+      borderRadius: '4px',
+      backgroundColor: '#333',
+      color: '#fff',
+      border: 'none'
+    }}
+  >
+    🔍 Generate Summary
+  </button>
+
+  {!canGenerateSummary && (
+    <span style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#999' }}>
+      At least 5 entries are required to generate a reflection summary.
+    </span>
+  )}
+</div>
+
 
       </div>
 
