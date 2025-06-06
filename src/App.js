@@ -6,6 +6,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
+  const [forcedTone, setForcedTone] = useState('mirror');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -52,7 +53,8 @@ const App = () => {
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry }),
+      body: JSON.stringify({ entry, forcedTone }),
+
 
     });
 
@@ -87,6 +89,13 @@ const App = () => {
       <p>✅ Logged in as {session.user.email}</p>
 
       <br /><br />
+<label style={{ display: 'block', marginBottom: '0.5rem' }}>Voice (optional override):</label>
+<select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
+  <option value="mirror">🪞 Mirror (auto)</option>
+  <option value="frank">🔴 Frank Friend</option>
+  <option value="stoic">🟢 Stoic Mentor</option>
+</select>
+<br /><br />
 
       <textarea
         rows="6"
