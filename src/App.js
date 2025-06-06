@@ -69,6 +69,7 @@ const App = () => {
         user_id: user.id,
         entry_text: entry,
         response_text: responseText,
+        tone_mode: data.tone_mode,
       })
       .select();
 
