@@ -222,7 +222,7 @@ const App = () => {
       </div>
 
       {showSummary && summaryText && (
-        <div style={{ marginTop: '2rem', backgroundColor: '#f1f1f1', padding: '1.5rem', borderRadius: '8px', fontFamily: 'Georgia, serif', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+  <div className="fade-in" style={{ marginTop: '2rem', backgroundColor: '#f1f1f1', padding: '1.5rem', borderRadius: '8px', fontFamily: 'Georgia, serif', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
           <h3>🧠 Clinical Reflection Summary</h3>
 
           {parsedTags.length > 0 && (
