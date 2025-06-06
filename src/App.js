@@ -57,17 +57,17 @@ const App = () => {
 
     try {
       const response = await fetch('https://cognitive-mirror-backend.onrender.com/clinical-summary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          history: history.map((e) => ({
-            tone: e.tone || 'unknown',
-            entry: e.entry_text || e.text,
-          })),
-        }),
-      });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    history: history.map((e) => ({
+      tone: e.tone || 'unknown',
+      entry: e.entry_text || e.text,
+    })),
+  }),
+});
 
       const data = await response.json();
       console.log('SUMMARY FROM BACKEND:', data.summary);
