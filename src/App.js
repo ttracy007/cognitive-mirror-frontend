@@ -293,31 +293,32 @@ const App = () => {
 
   return (
     <div key={index} className={item.id === latestEntryId ? 'fade-in' : ''} style={{ marginBottom: '2rem' }}>
-                <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
-                  <p><strong>🧍 You:</strong></p>
-                  <p>{item.entry_text}</p>
-                  <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
-                    📅 {formattedTime}
-                </p>
-                </div>
-                <div style={{
-                  backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
-                  padding: '1rem',
-                  borderRadius: '6px',
-                  borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
-                  marginTop: '1rem'
-                }}>
-                  <p><strong>
-                    {item.tone_mode?.trim() === 'Frank Friend'
-                      ? '🔴 Frank Friend'
-                      : '🟢 Stoic Mentor'}
-                  </strong></p>
-                  <p>{item.response_text}</p>
-                </div>
-                <hr style={{ marginTop: '2rem' }} />
-              </div>
-           );
-        })}
+      <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+        <p><strong>🧍 You:</strong></p>
+        <p>{item.entry_text}</p>
+        <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+          📅 {formattedTime}
+        </p>
+      </div>
+
+      <div style={{
+        backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
+        padding: '1rem',
+        borderRadius: '6px',
+        borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
+        marginTop: '1rem'
+      }}>
+        <p><strong>
+          {item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}
+        </strong></p>
+        <p>{item.response_text}</p>
+      </div>
+
+      <hr style={{ marginTop: '2rem' }} />
+    </div>
+  );
+})}
+
             <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
           )}
         </div>
