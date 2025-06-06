@@ -10,23 +10,22 @@ const LoginPage = ({ onAuthSuccess }) => {
   const handleSignUpOrLogin = async () => {
     setErrorMsg('');
 
-    if (!username || !password) {
-      setErrorMsg('Username and password are required.');
+    if (!username || !password || !email) {
+      setErrorMsg('All fields are required.');
       return;
     }
 
-    // Email is optional
-    email: email.trim(),
     const authData = {
-      email: email?.trim() || fallbackEmail,
+      email: email.trim(),
       password,
-};
+    };
+
     try {
-      // Try login first
-      let { error, data } = await supabase.auth.signInWithPassword(authData);
+      // Try logging in first
+      let { error } = await supabase.auth.signInWithPassword(authData);
 
       if (error) {
-        // Try sign-up if login fails
+        // If login fails, try signing up
         const { error: signupError } = await supabase.auth.signUp(authData);
         if (signupError) {
           setErrorMsg(signupError.message);
@@ -40,16 +39,17 @@ const LoginPage = ({ onAuthSuccess }) => {
         return;
       }
 
-      onAuthSuccess(sessionData.session);
+      onAuthSuccess(sessionData.session, username); // ✅ pass username to App.js
     } catch (err) {
-      setErrorMsg('Unexpected error. Please try again.');
       console.error(err);
+      setErrorMsg('Unexpected error. Please try again.');
     }
   };
 
   return (
     <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Cognitive Mirror</h1>
+
       <p style={{ fontSize: '1.1rem', lineHeight: 1.5 }}>
         <strong>It’s not a chatbot. It’s a mirror with memory.</strong><br />
         Cognitive Mirror listens across days—not minutes. It sees what loops you’re stuck in, and it nudges you forward.
@@ -64,19 +64,9 @@ const LoginPage = ({ onAuthSuccess }) => {
         <label>Username (required)</label><br />
         <input
           type="text"
+          required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-        />
-        <small style={{ color: '#888' }}>
-          We’ll only use this to help you recover your password. Never shared or used for marketing.
-        </small>
-
-        <label>Password (required)</label><br />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
 
@@ -86,6 +76,18 @@ const LoginPage = ({ onAuthSuccess }) => {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '0.25rem' }}
+        />
+        <small style={{ color: '#888' }}>
+          We’ll only use this to help you recover your password. Never shared or used for marketing.
+        </small>
+
+        <label>Password (required)</label><br />
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
 
@@ -97,7 +99,9 @@ const LoginPage = ({ onAuthSuccess }) => {
             padding: '0.75rem 1.5rem',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            width: '100%',
+            marginTop: '1rem'
           }}
         >
           Start Journaling →
