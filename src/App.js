@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import AuthForm from './AuthForm';
 import { supabase } from './supabaseClient';
+import jsPDF from 'jspdf';
 
 const App = () => {
   const [session, setSession] = useState(null);
