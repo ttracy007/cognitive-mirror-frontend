@@ -299,7 +299,8 @@ const App = () => {
         </div>
       )}
 
-      {historyLoaded && !canGenerateSummary && !showSummary && (
+      {/*
+      historyLoaded && !canGenerateSummary && !showSummary && (
         <div style={{ backgroundColor: '#fef9ef', padding: '1.5rem', borderLeft: '5px solid #ffa500', borderRadius: '6px', lineHeight: '1.5', marginBottom: '2rem' }}>
           <h3 style={{ marginTop: 0 }}>🔍 <strong>“Not Quite Yet”</strong></h3>
           <p>
