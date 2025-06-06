@@ -146,8 +146,13 @@ const App = () => {
     } else if (saved && saved[0]) {
       setLatestEntryId(saved[0].id);
     }
+   
 
     setEntry('');
+    setShowSummary(false);
+    setSummaryText('');
+    setParsedTags([]);
+    setSeverityLevel('');
     setTimeout(fetchHistory, 300);
   };
 
@@ -167,13 +172,17 @@ const App = () => {
           <option value="stoic">🟢 Stoic Mentor</option>
         </select>
 
-        {canGenerateSummary ? (
-          <>
-            <button onClick={handleGenerateSummary}>🔍 Generate Summary</button>
-            <button onClick={() => alert('🧪 Previewing a sample summary...')}>🧪 Preview Summary</button>
-            {loadingSummary && <p>⏳ Generating summary...</p>}
-          </>
-        ) : null}
+        <button
+  onClick={handleGenerateSummary}
+  disabled={!canGenerateSummary}
+  style={{
+    opacity: canGenerateSummary ? 1 : 0.5,
+    cursor: canGenerateSummary ? 'pointer' : 'not-allowed'
+  }}
+>
+  🔍 Generate Summary
+</button>
+
       </div>
 
       {showSummary && summaryText && (
