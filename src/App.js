@@ -121,7 +121,7 @@ const App = () => {
             <p>{String(item.entry_text || '(No entry text)')}</p>
           </div>
 
-       <div style={{
+     <div style={{
   backgroundColor: item.tone_mode === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
   padding: '1rem',
   borderRadius: '6px',
@@ -138,7 +138,6 @@ const App = () => {
   </p>
   <p>{String(item.response_text || '(No reflection yet)')}</p>
 </div>
-
 
           <hr style={{ marginTop: '2rem' }} />
         </div>
