@@ -9,6 +9,9 @@ const App = () => {
   const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("frank");
   const [latestEntryId, setLatestEntryId] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [hasUsedOverride, setHasUsedOverride] = useState(false);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -115,6 +118,48 @@ const handleSubmit = async () => {
       <br /><br />
 
       <button onClick={handleSubmit}>Reflect</button>
+      {!showSummary && history.length < 5 && (
+  <div
+    style={{
+      backgroundColor: '#fef9ef',
+      padding: '1.5rem',
+      borderLeft: '5px solid #ffa500',
+      borderRadius: '6px',
+      lineHeight: '1.5',
+      marginBottom: '2rem',
+    }}
+  >
+    <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>🔍 <strong>“Not Quite Yet”</strong></h3>
+    <p style={{ marginBottom: '0.75rem' }}>
+      <strong>Cognitive Mirror</strong> works best when it sees you over time—not just in a single moment.<br />
+      We need <strong>at least five days</strong> of journaling to form a meaningful reflection summary.<br />
+      That gives the mirror a chance to detect emotional patterns, shifts, and turning points—not just passing moods.
+    </p>
+    <p style={{ marginBottom: '1rem' }}>
+      The more you write, the clearer the picture gets.<br />
+      Keep going. You’re not just venting—you’re building self-understanding.
+    </p>
+    {!hasUsedOverride && (
+      <button
+        onClick={() => {
+          setShowSummary(true);
+          setHasUsedOverride(true);
+        }}
+        style={{
+          marginTop: '1rem',
+          backgroundColor: '#ffa500',
+          color: '#fff',
+          border: 'none',
+          padding: '0.5rem 1rem',
+          borderRadius: '4px',
+          cursor: 'pointer',
+        }}
+      >
+        ✨ Generate Preview Summary →
+      </button>
+    )}
+  </div>
+)}
 
       <div style={{ marginTop: '2rem' }}>
         <h3>🧠 Your Reflection Thread</h3>
