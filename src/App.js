@@ -146,9 +146,10 @@ const handleSubmit = async () => {
     </button>
   </div>
 )}
+</div> {/* close the scrolling wrapper if not already */}
+</div> {/* close the reflection block if not already */}
 
-
-      <br /><br />
+<br /><br />
 
       <textarea
         rows="6"
