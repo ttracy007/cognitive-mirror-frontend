@@ -173,8 +173,6 @@ const App = () => {
           <option value="stoic">🟢 Stoic Mentor</option>
         </select>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-  <button
 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
   <button
     onClick={() => {
