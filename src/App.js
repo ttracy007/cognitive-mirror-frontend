@@ -47,13 +47,13 @@ const App = () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
 
-    console.log('Submitting:', entry, tone);
+    console.log('Submitting:', entry);
 
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entry }),
-,
+
     });
 
     const data = await res.json();
@@ -66,7 +66,6 @@ const App = () => {
       .insert({
         user_id: user.id,
         entry_text: entry,
-        tone_mode: tone,
         response_text: responseText,
       })
       .select();
