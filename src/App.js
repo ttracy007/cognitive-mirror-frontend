@@ -54,17 +54,31 @@ const App = () => {
   const handleGenerateSummary = async () => {
   setLoadingSummary(true);
 
-  const handleExportPDF = () => {
+ const handleExportPDF = () => {
   if (!summaryText) return;
 
   const doc = new jsPDF();
-  const margin = 10;
-  const maxLineWidth = 180;
+  const margin = 15;
+  const maxWidth = 180;
+  const lineHeight = 10;
 
-  const lines = doc.splitTextToSize(summaryText, maxLineWidth);
-  doc.text(lines, margin, margin + 10);
+  const title = 'Cognitive Mirror – Clinical Reflection Summary';
+  const date = new Date().toLocaleDateString();
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text(title, margin, 20);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated on: ${date}`, margin, 28);
+
+  // Body content
+  const lines = doc.splitTextToSize(summaryText, maxWidth);
+  doc.text(lines, margin, 40, { maxWidth, lineHeightFactor: 1.4 });
+
   doc.save('clinical_summary.pdf');
 };
+
 
   const response = await fetch('https://your-backend-url.com/clinical-summary', {
     method: 'POST',
