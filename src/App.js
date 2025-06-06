@@ -89,14 +89,6 @@ const App = () => {
 
 return (
   <>
-    <style>
-      {`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}
-    </style>
 
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <p>✅ Logged in as {session.user.email}</p>
