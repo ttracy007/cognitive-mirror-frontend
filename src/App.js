@@ -11,6 +11,9 @@ const App = () => {
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const [hasUsedOverride, setHasUsedOverride] = useState(false);
+  const [summaryText, setSummaryText] = useState('');
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -46,6 +49,32 @@ const App = () => {
   useEffect(() => {
     if (session) fetchHistory();
   }, [session]);
+  
+  const handleGenerateSummary = async () => {
+  setLoadingSummary(true);
+
+  const response = await fetch('https://your-backend-url.com/clinical-summary', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      history: history.map((e) => ({
+        tone: e.tone || 'unknown',
+        entry: e.entry_text || e.text,
+      })),
+    })
+  });
+
+  const data = await response.json();
+
+  if (data.summary) {
+    setSummaryText(data.summary);
+    setShowSummary(true); // already in your state
+  }
+
+  setLoadingSummary(false);
+};
 
   const handleSubmit = async () => {
     const user = session?.user;
@@ -98,15 +127,17 @@ const App = () => {
         </select>
 
         {canGenerateSummary ? (
-          <>
-            <button onClick={() => alert('🧠 Summary feature coming soon.')}>
-              🔍 Generate Summary
-            </button>
-            <button onClick={() => alert('🧪 Previewing a sample summary...')}>
-              🧪 Preview Summary
-            </button>
-          </>
-        ) : null}
+  <>
+    <button onClick={handleGenerateSummary}>
+      🔍 Generate Summary
+    </button>
+    <button onClick={() => alert('🧪 Previewing a sample summary...')}>
+      🧪 Preview Summary
+    </button>
+    {loadingSummary && <p>⏳ Generating summary...</p>}
+  </>
+) : null}
+
       </div>
 
       {/* Conditional “Not Quite Yet” block */}
