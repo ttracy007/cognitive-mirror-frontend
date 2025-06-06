@@ -138,6 +138,23 @@ const App = () => {
   </>
 ) : null}
 
+{showSummary && summaryText && (
+  <div
+    style={{
+      marginTop: '2rem',
+      backgroundColor: '#f1f1f1',
+      padding: '1.5rem',
+      borderRadius: '8px',
+      fontFamily: 'Georgia, serif',
+      whiteSpace: 'pre-wrap',
+      lineHeight: '1.6',
+    }}
+  >
+    <h3>🧠 Clinical Reflection Summary</h3>
+    <pre style={{ margin: 0 }}>{summaryText}</pre>
+  </div>
+)}
+
       </div>
 
       {/* Conditional “Not Quite Yet” block */}
