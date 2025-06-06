@@ -5,7 +5,6 @@ import { supabase } from './supabaseClient';
 const App = () => {
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
-  const [tone, setTone] = useState('warm-therapist');
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
@@ -53,7 +52,8 @@ const App = () => {
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry, tone }),
+      body: JSON.stringify({ entry }),
+,
     });
 
     const data = await res.json();
@@ -86,13 +86,6 @@ const App = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <p>✅ Logged in as {session.user.email}</p>
-
-      <label>Choose Your Voice:</label>
-      <select value={tone} onChange={(e) => setTone(e.target.value)}>
-        <option value="warm-therapist">Warm Therapist</option>
-        <option value="stoic-mentor">Stoic Mentor</option>
-        <option value="frank-friend">Frank-but-Kind Friend</option>
-      </select>
 
       <br /><br />
 
