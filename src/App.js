@@ -107,38 +107,30 @@ const App = () => {
 
       <button onClick={handleSubmit}>Reflect</button>
 
-      <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
-        <div style={{ flex: 1 }}>
-          <h3>📝 Reflections</h3>
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {Array.isArray(history) && history.length > 0 ? (
-              history.map((item, index) => (
-                <div key={index} style={{ marginBottom: '1rem' }}>
-                  <p>{String(item.entry_text || '(No entry text)')}</p>
-                  <hr />
-                </div>
-              ))
-            ) : (
-              <p style={{ color: '#777' }}><em>No entries yet.</em></p>
-            )}
+     <div style={{ marginTop: '2rem' }}>
+  <h3>🧠 Your Reflection Thread</h3>
+  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+    {Array.isArray(history) && history.length > 0 ? (
+      history.map((item, index) => (
+        <div key={index} style={{ marginBottom: '2rem' }}>
+          <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+            <p><strong>🧍 You:</strong></p>
+            <p>{String(item.entry_text || '(No entry text)')}</p>
           </div>
-        </div>
 
-        <div style={{ flex: 1 }}>
-          <h3>🪞 Cognitive Mirror</h3>
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {Array.isArray(history) && history.length > 0 ? (
-              history.map((item, index) => (
-                <div key={index} style={{ marginBottom: '1rem' }}>
-                  <p>{String(item.response_text || '(No reflection yet)')}</p>
-                  <hr />
-                </div>
-              ))
-            ) : (
-              <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-            )}
+          <div style={{ backgroundColor: '#fdf7f0', padding: '1rem', borderRadius: '6px', borderLeft: '4px solid #ffa500', marginTop: '1rem' }}>
+            <p><strong>🪞 Cognitive Mirror {item.tone_mode === 'Frank Friend' ? '🔴' : '🟢'}:</strong></p>
+            <p>{String(item.response_text || '(No reflection yet)')}</p>
           </div>
+
+          <hr style={{ marginTop: '2rem' }} />
         </div>
+      ))
+    ) : (
+      <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+    )}
+  </div>
+</div>
       </div>
     </div>
   );
