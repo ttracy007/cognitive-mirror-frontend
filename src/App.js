@@ -121,20 +121,20 @@ const App = () => {
             <p>{String(item.entry_text || '(No entry text)')}</p>
           </div>
 
-     <div style={{
-  backgroundColor: item.tone_mode === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
+    <div style={{
+  backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
   padding: '1rem',
   borderRadius: '6px',
-  borderLeft: `4px solid ${item.tone_mode === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
+  borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
   marginTop: '1rem'
 }}>
   <p style={{
     fontWeight: 'bold',
     fontSize: '0.9rem',
-    color: item.tone_mode === 'Frank Friend' ? '#b30000' : '#05642c',
+    color: item.tone_mode?.trim() === 'Frank Friend' ? '#b30000' : '#05642c',
     marginBottom: '0.5rem'
   }}>
-    {item.tone_mode === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}
+    {item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}
   </p>
   <p>{String(item.response_text || '(No reflection yet)')}</p>
 </div>
