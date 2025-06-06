@@ -154,7 +154,12 @@ const App = () => {
   if (!session) return <AuthForm />;
 
   // UI and JSX remains the same
-  return <div>/* ... existing JSX ... */</div>;
+  return (
+  <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+    <p>✅ Logged in as {session.user.email}</p>
+    ...
+  </div>
+);
 };
 
 export default App;
