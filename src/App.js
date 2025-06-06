@@ -56,18 +56,47 @@ const App = () => {
   
   const handleGenerateSummary = async () => {
   setLoadingSummary(true);
-  setShowSummary(true);
-    const tagsMatch = data.summary.match(/Tags:\s*(.+)/i);
-const severityMatch = data.summary.match(/Severity Level:\s*(.+)/i);
 
-if (tagsMatch) {
-  const rawTags = tagsMatch[1].split(',').map(tag => tag.trim());
-  setParsedTags(rawTags);
-}
+  try {
+    const response = await fetch('https://your-backend-url.com/clinical-summary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        history: history.map((e) => ({
+          tone: e.tone || 'unknown',
+          entry: e.entry_text || e.text,
+        })),
+      }),
+    });
 
-if (severityMatch) {
-  setSeverityLevel(severityMatch[1].trim());
-}
+    const data = await response.json();
+    console.log('SUMMARY FROM BACKEND:', data.summary);
+
+    if (data.summary) {
+      setSummaryText(data.summary);
+      setShowSummary(true);
+
+      const tagsMatch = data.summary.match(/Tags:\s*(.+)/i);
+      const severityMatch = data.summary.match(/Severity Level:\s*(.+)/i);
+
+      if (tagsMatch) {
+        const rawTags = tagsMatch[1].split(',').map(tag => tag.trim());
+        setParsedTags(rawTags);
+      }
+
+      if (severityMatch) {
+        setSeverityLevel(severityMatch[1].trim());
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error in handleGenerateSummary:', error);
+  }
+
+  setLoadingSummary(false);
+};
+
 
 
  const handleExportPDF = () => {
