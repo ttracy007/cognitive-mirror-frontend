@@ -127,7 +127,7 @@ return (
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {Array.isArray(history) && history.length > 0 ? (
             history.map((item, index) => (
-              <div key={index} style={{ marginBottom: '2rem', animation: 'fadeIn 0.5s ease' }}>
+              <div key={index} className="fade-in" style={{ marginBottom: '2rem' }}>
                 <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
                   <p><strong>🧍 You:</strong></p>
                   <p>{String(item.entry_text || '(No entry text)')}</p>
