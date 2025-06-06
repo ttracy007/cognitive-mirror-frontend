@@ -14,6 +14,9 @@ const App = () => {
   const [hasUsedOverride, setHasUsedOverride] = useState(false);
   const [summaryText, setSummaryText] = useState('');
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [parsedTags, setParsedTags] = useState([]);
+  const [severityLevel, setSeverityLevel] = useState('');
+
 
 
   useEffect(() => {
@@ -53,6 +56,19 @@ const App = () => {
   
   const handleGenerateSummary = async () => {
   setLoadingSummary(true);
+  setShowSummary(true);
+    const tagsMatch = data.summary.match(/Tags:\s*(.+)/i);
+const severityMatch = data.summary.match(/Severity Level:\s*(.+)/i);
+
+if (tagsMatch) {
+  const rawTags = tagsMatch[1].split(',').map(tag => tag.trim());
+  setParsedTags(rawTags);
+}
+
+if (severityMatch) {
+  setSeverityLevel(severityMatch[1].trim());
+}
+
 
  const handleExportPDF = () => {
   if (!summaryText) return;
@@ -178,24 +194,63 @@ const App = () => {
     }}
   >
     <h3>🧠 Clinical Reflection Summary</h3>
-    <pre style={{ margin: 0 }}>{summaryText}</pre>
-    <button
-  onClick={handleExportPDF}
-  style={{
-    marginTop: '1rem',
-    backgroundColor: '#333',
-    color: '#fff',
-    border: 'none',
-    padding: '0.5rem 1rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  }}
->
-  📄 Download PDF
-</button>
 
+    {parsedTags.length > 0 && (
+      <div style={{ marginBottom: '1rem' }}>
+        <strong>Tags:</strong>{' '}
+        {parsedTags.map((tag, index) => (
+          <span
+            key={index}
+            style={{
+              display: 'inline-block',
+              backgroundColor: '#ddd',
+              borderRadius: '12px',
+              padding: '0.25rem 0.75rem',
+              marginRight: '0.5rem',
+              marginTop: '0.25rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {severityLevel && (
+      <div style={{ marginBottom: '1rem' }}>
+        <strong>Severity:</strong>{' '}
+        <span
+          style={{
+            color: severityLevel === 'severe' ? 'red' :
+                   severityLevel === 'moderate' ? 'orange' : 'green',
+            fontWeight: 'bold',
+          }}
+        >
+          {severityLevel.toUpperCase()}
+        </span>
+      </div>
+    )}
+
+    <pre style={{ margin: 0 }}>{summaryText}</pre>
+
+    <button
+      onClick={handleExportPDF}
+      style={{
+        marginTop: '1rem',
+        backgroundColor: '#333',
+        color: '#fff',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '4px',
+        cursor: 'pointer',
+      }}
+    >
+      📄 Download PDF
+    </button>
   </div>
 )}
+
 
       </div>
 
