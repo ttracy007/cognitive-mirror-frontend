@@ -110,40 +110,41 @@ const App = () => {
 
       <button onClick={handleSubmit}>Reflect</button>
 
-     <div style={{ marginTop: '2rem' }}>
+    <div style={{ marginTop: '2rem' }}>
   <h3>🧠 Your Reflection Thread</h3>
   <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
     {Array.isArray(history) && history.length > 0 ? (
-      history.map((item, index) => (
+      history.map((item, index) => {
         console.log('→ Tone string:', JSON.stringify(item.tone_mode));
         return (
-        <div key={index} style={{ marginBottom: '2rem' }}>
-          <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
-            <p><strong>🧍 You:</strong></p>
-            <p>{String(item.entry_text || '(No entry text)')}</p>
+          <div key={index} style={{ marginBottom: '2rem' }}>
+            <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+              <p><strong>🧍 You:</strong></p>
+              <p>{String(item.entry_text || '(No entry text)')}</p>
+            </div>
+
+            <div style={{
+              backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
+              padding: '1rem',
+              borderRadius: '6px',
+              borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
+              marginTop: '1rem'
+            }}>
+              <p style={{
+                fontWeight: 'bold',
+                fontSize: '0.9rem',
+                color: item.tone_mode?.trim() === 'Frank Friend' ? '#b30000' : '#05642c',
+                marginBottom: '0.5rem'
+              }}>
+                {item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}
+              </p>
+              <p>{String(item.response_text || '(No reflection yet)')}</p>
+            </div>
+
+            <hr style={{ marginTop: '2rem' }} />
           </div>
-
-    <div style={{
-  backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
-  padding: '1rem',
-  borderRadius: '6px',
-  borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
-  marginTop: '1rem'
-}}>
-  <p style={{
-    fontWeight: 'bold',
-    fontSize: '0.9rem',
-    color: item.tone_mode?.trim() === 'Frank Friend' ? '#b30000' : '#05642c',
-    marginBottom: '0.5rem'
-  }}>
-    {item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}
-  </p>
-  <p>{String(item.response_text || '(No reflection yet)')}</p>
-</div>
-
-          <hr style={{ marginTop: '2rem' }} />
-        </div>
-      ))
+        );
+      })
     ) : (
       <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
     )}
