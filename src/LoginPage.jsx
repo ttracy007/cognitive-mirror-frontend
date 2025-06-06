@@ -6,6 +6,7 @@ const LoginPage = ({ onAuthSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUpOrLogin = async () => {
     setErrorMsg('');
@@ -21,16 +22,19 @@ const LoginPage = ({ onAuthSuccess }) => {
     };
 
     try {
-      // Try logging in first
-      let { error } = await supabase.auth.signInWithPassword(authData);
+      // Try signing up first
+      let { error: signupError } = await supabase.auth.signUp(authData);
 
-      if (error) {
-        // If login fails, try signing up
-        const { error: signupError } = await supabase.auth.signUp(authData);
-        if (signupError) {
-          setErrorMsg(signupError.message);
-          return;
-        }
+      if (signupError && !signupError.message.includes('already registered')) {
+        setErrorMsg(signupError.message);
+        return;
+      }
+
+      // If already registered, try login
+      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
+      if (loginError) {
+        setErrorMsg(loginError.message);
+        return;
       }
 
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -39,7 +43,7 @@ const LoginPage = ({ onAuthSuccess }) => {
         return;
       }
 
-      onAuthSuccess(sessionData.session, username); // ✅ pass username to App.js
+      onAuthSuccess(sessionData.session, username);
     } catch (err) {
       console.error(err);
       setErrorMsg('Unexpected error. Please try again.');
@@ -83,13 +87,29 @@ const LoginPage = ({ onAuthSuccess }) => {
         </small>
 
         <label>Password (required)</label><br />
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '0.5rem', paddingRight: '2.5rem', marginBottom: '1rem' }}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: '0.75rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              color: '#555',
+              fontSize: '1rem'
+            }}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </span>
+        </div>
 
         <button
           onClick={handleSignUpOrLogin}
@@ -114,3 +134,4 @@ const LoginPage = ({ onAuthSuccess }) => {
 };
 
 export default LoginPage;
+
