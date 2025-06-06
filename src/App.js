@@ -30,7 +30,7 @@ const App = () => {
 
     const { data, error } = await supabase
       .from('journals')
-      .select('entry_text, response_text, tone_mode, timestamp')
+      .select('id, entry_text, response_text, tone_mode, timestamp')
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
 
@@ -124,7 +124,11 @@ const handleSubmit = async () => {
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {Array.isArray(history) && history.length > 0 ? (
             history.map((item, index) => (
-              <div key={index} className="fade-in" style={{ marginBottom: '2rem' }}>
+             <div
+              key={index}
+              className={item.id === latestEntryId ? 'fade-in' : ''}
+              style={{ marginBottom: '2rem' }}
+              >
                 <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
                   <p><strong>🧍 You:</strong></p>
                   <p>{String(item.entry_text || '(No entry text)')}</p>
