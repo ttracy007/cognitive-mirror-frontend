@@ -100,11 +100,26 @@ const handleSubmit = async () => {
 
       <br /><br />
 
-      <label style={{ display: 'block', marginBottom: '0.5rem' }}>Voice (required):</label>
-      <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
-        <option value="frank">🔴 Frank Friend</option>
-        <option value="stoic">🟢 Stoic Mentor</option>
-      </select>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+  <label style={{ marginRight: '0.5rem' }}>Voice (required):</label>
+  <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
+    <option value="frank">🔴 Frank Friend</option>
+    <option value="stoic">🟢 Stoic Mentor</option>
+  </select>
+
+  <button
+    style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
+    onClick={() => alert('🧠 Summary feature coming soon.')}>
+    🔍 Generate Summary
+  </button>
+
+  <button
+    style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
+    onClick={() => alert('🧪 Previewing a sample summary...')}>
+    🧪 Preview Summary
+  </button>
+</div>
+
 
       <br /><br />
 
