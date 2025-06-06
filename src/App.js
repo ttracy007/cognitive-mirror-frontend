@@ -7,8 +7,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
-  const [forcedTone, setForcedTone] = useState("frank"); // or "stoic" as default
-
+  const [forcedTone, setForcedTone] = useState("frank");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -56,8 +55,6 @@ const App = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entry, forcedTone }),
-
-
     });
 
     const data = await res.json();
@@ -87,9 +84,7 @@ const App = () => {
 
   if (!session) return <AuthForm />;
 
-return (
-  <>
-
+  return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <p>✅ Logged in as {session.user.email}</p>
 
@@ -149,8 +144,7 @@ return (
         </div>
       </div>
     </div>
-  </>
-);
+  );
 };
 
 export default App;
