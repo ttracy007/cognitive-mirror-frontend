@@ -280,11 +280,25 @@ const App = () => {
         <h3>🧠 Your Reflection Thread</h3>
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {history.length > 0 ? (
-            history.map((item, index) => (
-              <div key={index} className={item.id === latestEntryId ? 'fade-in' : ''} style={{ marginBottom: '2rem' }}>
+            {history.map((item, index) => {
+  const formattedTime = new Date(item.timestamp).toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  return (
+    <div key={index} className={item.id === latestEntryId ? 'fade-in' : ''} style={{ marginBottom: '2rem' }}>
                 <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
                   <p><strong>🧍 You:</strong></p>
                   <p>{item.entry_text}</p>
+                  <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+                    📅 {formattedTime}
+                </p>
                 </div>
                 <div style={{
                   backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
