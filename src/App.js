@@ -317,7 +317,8 @@ const App = () => {
             </button>
           )}
         </div>
-      )}
+      )
+    */}
 
       <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's on your mind?" />
       <br /><br />
