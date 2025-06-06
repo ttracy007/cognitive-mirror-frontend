@@ -86,7 +86,7 @@ const App = () => {
 
   if (!session) return <AuthForm />;
 
-  return (
+return (
   <>
     <style>
       {`
@@ -139,7 +139,11 @@ const App = () => {
                   borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
                   marginTop: '1rem'
                 }}>
-                  <p><strong>{item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}:</strong></p>
+                  <p><strong>
+                    {item.tone_mode?.trim() === 'Frank Friend'
+                      ? '🔴 Frank Friend'
+                      : '🟢 Stoic Mentor'}
+                  </strong></p>
                   <p>{String(item.response_text || '(No reflection yet)')}</p>
                 </div>
 
@@ -154,6 +158,5 @@ const App = () => {
     </div>
   </>
 );
-
 
 export default App;
