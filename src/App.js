@@ -136,14 +136,16 @@ const App = () => {
     const responseText = data.response || 'No response received.';
 
     const { data: saved, error } = await supabase
-      .from('journals')
-      .insert({
-        user_id: user.id,
-        entry_text: entry,
-        response_text: responseText,
-        tone_mode: data.tone_mode,
-      })
-      .select();
+  .from('journals')
+  .insert({
+    user_id: user.id,
+    username: username,  // ✅ this stores the visible identity
+    entry_text: entry,
+    response_text: responseText,
+    tone_mode: data.tone_mode,
+  })
+  .select();
+
 
     if (error) {
       console.error('Save error:', error.message);
