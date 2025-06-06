@@ -145,7 +145,7 @@ const handleSubmit = async () => {
       🧪 Preview Summary
     </button>
   </div>
-)}
+        
 </div> {/* close the scrolling wrapper if not already */}
 </div> {/* close the reflection block if not already */}
 
