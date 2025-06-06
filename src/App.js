@@ -158,6 +158,9 @@ const App = () => {
   };
 
   const canGenerateSummary = Array.isArray(history) && history.length >= 10;
+  const reflectionCount = history.length;
+  const requiredReflections = 10;
+  const progressPercent = Math.min((reflectionCount / requiredReflections) * 100, 100);
 
   if (!session) return <AuthForm />;
 
@@ -172,6 +175,25 @@ const App = () => {
           <option value="frank">🔴 Frank Friend</option>
           <option value="stoic">🟢 Stoic Mentor</option>
         </select>
+
+  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+  ✍️ You’ve logged <strong>{reflectionCount}</strong> of <strong>{requiredReflections}</strong> reflections needed for your first clinical summary.
+</div>
+<div style={{
+  width: '100%',
+  backgroundColor: '#e0e0e0',
+  height: '8px',
+  borderRadius: '4px',
+  overflow: 'hidden',
+  marginBottom: '1rem'
+}}>
+  <div style={{
+    width: `${progressPercent}%`,
+    height: '100%',
+    backgroundColor: progressPercent >= 100 ? '#4caf50' : '#ffa500',
+    transition: 'width 0.4s ease'
+  }}></div>
+</div>
 
 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
   <button
