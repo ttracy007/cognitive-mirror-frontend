@@ -94,6 +94,8 @@ const handleSubmit = async () => {
 
   if (!session) return <AuthForm />;
 
+  const canGenerateSummary = history.length >= 5;
+  
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <p>✅ Logged in as {session.user.email}</p>
@@ -107,11 +109,18 @@ const handleSubmit = async () => {
     <option value="stoic">🟢 Stoic Mentor</option>
   </select>
 
-  <button
-    style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
-    onClick={() => alert('🧠 Summary feature coming soon.')}>
-    🔍 Generate Summary
-  </button>
+ <button
+  style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
+  onClick={() => {
+    if (!canGenerateSummary) {
+      alert(`🧠 Not quite yet.\n\nCognitive Mirror works best when it sees you over time—not just in a single moment.\n\nWe need at least five days of journaling to form a meaningful reflection summary. That gives the mirror a chance to detect emotional patterns, shifts, and turning points—not just passing moods.\n\nThe more you write, the clearer the picture gets. Keep going. You’re not just venting—you’re building self-understanding.`);
+    } else {
+      alert('🧠 Summary feature coming soon.');
+    }
+  }}
+>
+  🔍 Generate Summary
+</button>
 
   <button
     style={{ padding: '0.4rem 0.75rem', fontSize: '0.9rem' }}
