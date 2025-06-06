@@ -89,9 +89,8 @@ const App = () => {
       <p>✅ Logged in as {session.user.email}</p>
 
       <br /><br />
-<label style={{ display: 'block', marginBottom: '0.5rem' }}>Voice (optional override):</label>
+<label style={{ display: 'block', marginBottom: '0.5rem' }}>Voice (required):</label>
 <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
-  <option value="mirror">🪞 Mirror (auto)</option>
   <option value="frank">🔴 Frank Friend</option>
   <option value="stoic">🟢 Stoic Mentor</option>
 </select>
