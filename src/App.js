@@ -54,6 +54,18 @@ const App = () => {
   const handleGenerateSummary = async () => {
   setLoadingSummary(true);
 
+  const handleExportPDF = () => {
+  if (!summaryText) return;
+
+  const doc = new jsPDF();
+  const margin = 10;
+  const maxLineWidth = 180;
+
+  const lines = doc.splitTextToSize(summaryText, maxLineWidth);
+  doc.text(lines, margin, margin + 10);
+  doc.save('clinical_summary.pdf');
+};
+
   const response = await fetch('https://your-backend-url.com/clinical-summary', {
     method: 'POST',
     headers: {
@@ -153,6 +165,21 @@ const App = () => {
   >
     <h3>🧠 Clinical Reflection Summary</h3>
     <pre style={{ margin: 0 }}>{summaryText}</pre>
+    <button
+  onClick={handleExportPDF}
+  style={{
+    marginTop: '1rem',
+    backgroundColor: '#333',
+    color: '#fff',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  }}
+>
+  📄 Download PDF
+</button>
+
   </div>
 )}
 
