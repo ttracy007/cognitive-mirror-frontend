@@ -16,11 +16,11 @@ const LoginPage = ({ onAuthSuccess }) => {
     }
 
     // Email is optional
+    const fallbackEmail = `${username}@demo.cognitivemirror.app`;
     const authData = {
-      email: email || `${username}@demo.cognitive`,
+      email: email?.trim() || fallbackEmail,
       password,
-    };
-
+};
     try {
       // Try login first
       let { error, data } = await supabase.auth.signInWithPassword(authData);
