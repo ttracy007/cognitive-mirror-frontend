@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
-import AuthForm from './AuthForm';
 import { supabase } from './supabaseClient';
 import jsPDF from 'jspdf';
+import './App.css';
+//import AuthForm from './AuthForm';
+import LoginPage from './LoginPage';
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -162,7 +163,7 @@ const App = () => {
   const requiredReflections = 10;
   const progressPercent = Math.min((reflectionCount / requiredReflections) * 100, 100);
 
-  if (!session) return <AuthForm />;
+  if (!session) return <LoginPage onAuthSuccess={(session) => setSession(session)} />;
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
