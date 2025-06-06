@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './App.css';
 import AuthForm from './AuthForm';
 import { supabase } from './supabaseClient';
 
