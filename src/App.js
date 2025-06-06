@@ -16,6 +16,7 @@ const App = () => {
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [parsedTags, setParsedTags] = useState([]);
   const [severityLevel, setSeverityLevel] = useState('');
+  const [showBlockedMessage, setShowBlockedMessage] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -156,7 +157,7 @@ const App = () => {
     setTimeout(fetchHistory, 300);
   };
 
-  const canGenerateSummary = Array.isArray(history) && history.length >= 5;
+  const canGenerateSummary = Array.isArray(history) && history.length >= 10;
 
   if (!session) return <AuthForm />;
 
@@ -174,9 +175,16 @@ const App = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
   <button
-    onClick={handleGenerateSummary}
-    disabled={!canGenerateSummary}
-    title={!canGenerateSummary ? 'You need at least 5 journal entries to generate a summary.' : ''}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+  <button
+    onClick={() => {
+      if (canGenerateSummary) {
+        handleGenerateSummary();
+      } else {
+        setShowBlockedMessage(true);
+        setTimeout(() => setShowBlockedMessage(false), 4000); // auto-dismiss
+      }
+    }}
     style={{
       opacity: canGenerateSummary ? 1 : 0.5,
       cursor: canGenerateSummary ? 'pointer' : 'not-allowed',
@@ -191,12 +199,26 @@ const App = () => {
     🔍 Generate Summary
   </button>
 
-  {!canGenerateSummary && (
-    <span style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#999' }}>
-      At least 5 entries are required to generate a reflection summary.
-    </span>
+  {showBlockedMessage && (
+    <div
+      style={{
+        backgroundColor: '#fffbe6',
+        border: '1px solid #ffe58f',
+        padding: '1rem',
+        borderRadius: '6px',
+        marginTop: '0.75rem',
+        fontSize: '0.9rem',
+        lineHeight: 1.5
+      }}
+    >
+      <strong>🕰 Not Quite Yet</strong><br />
+      Cognitive Mirror works best when it sees you over time—not just in a single moment.<br />
+      We need <strong>at least ten reflections</strong> to form a meaningful clinical summary.<br />
+      The more you write, the clearer the picture gets.
+    </div>
   )}
 </div>
+
 
 
       </div>
