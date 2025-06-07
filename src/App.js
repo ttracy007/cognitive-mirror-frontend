@@ -396,8 +396,23 @@ const App = () => {
 />
 <button
   onClick={() => {
-    if (recognition) {
-      listening ? recognition.stop() : recognition.start();
+    if (!recognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+  
+    try {
+      if (listening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    } catch (err) {
+      console.error('🎤 Error toggling recognition:', err);
+      if (err.name === 'InvalidStateError') {
+        recognition.abort(); // force reset
+        setTimeout(() => recognition.start(), 300); // try again after short pause
+      }
     }
   }}
   style={{
