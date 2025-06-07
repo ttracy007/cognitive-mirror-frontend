@@ -16,6 +16,8 @@ const App = () => {
     prompts[Math.floor(Math.random() * prompts.length)]
   );
 
+  let transcriptBuffer = '';
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -29,18 +31,24 @@ const App = () => {
     recog.lang = 'en-US';
 
     recog.onresult = (event) => {
-      let fullTranscript = '';
+      let interimTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        fullTranscript += event.results[i][0].transcript;
+        interimTranscript += event.results[i][0].transcript;
       }
 
-      // Trim spaces and clean up double punctuation
-      const cleaned = fullTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
+      const cleaned = interimTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
 
-      setEntry((prev) => (prev.trim() + ' ' + cleaned).trim());
+      if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
+        transcriptBuffer += (cleaned + ' ');
+        setEntry(transcriptBuffer.trim());
+      }
     };
 
-    recog.onend = () => setIsListening(false);
+    recog.onend = () => {
+      setIsListening(false);
+      transcriptBuffer = '';
+    };
+
     setRecognition(recog);
   }, []);
 
