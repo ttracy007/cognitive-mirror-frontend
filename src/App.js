@@ -331,7 +331,7 @@ const App = () => {
       )
     */}
 
-      <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's on your mind?" />
+      <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's your struggle?" />
       <br /><br />
       <button onClick={handleSubmit}>Reflect</button>
 
