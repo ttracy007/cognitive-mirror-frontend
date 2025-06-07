@@ -21,9 +21,11 @@ const App = () => {
   const [showBlockedMessage, setShowBlockedMessage] = useState(false);
   const [username, setUsername] = useState('');
   const prompts = ["What’s weighing you down?", "What needs to come out?"];
-  const [placeholderPrompt] = useState(() =>
+  const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
   prompts[Math.floor(Math.random() * prompts.length)]
 );
+  const [lastReflectionTime, setLastReflectionTime] = useState(null);
+
 
 
   useEffect(() => {
@@ -78,6 +80,22 @@ const App = () => {
     })),
   }),
 });
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (!lastReflectionTime) return;
+
+    const now = Date.now();
+    const timeSince = now - lastReflectionTime;
+
+    // Show prompt again if 3+ minutes of inactivity
+    if (timeSince > 3 * 60 * 1000) {
+      setPlaceholderPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
+      setLastReflectionTime(null); // Reset so it doesn't loop
+    }
+  }, 10000); // Check every 10 seconds
+
+  return () => clearInterval(interval);
+}, [lastReflectionTime]);
 
       const data = await response.json();
       console.log('SUMMARY FROM BACKEND:', data.summary);
@@ -167,6 +185,7 @@ const App = () => {
     setSeverityLevel('');
     setTimeout(fetchHistory, 300);
   };
+    setLastReflectionTime(Date.now());
 
   const canGenerateSummary = Array.isArray(history) && history.length >= 10;
   const reflectionCount = history.length;
