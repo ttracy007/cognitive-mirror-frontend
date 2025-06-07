@@ -331,7 +331,7 @@ const App = () => {
       )
     */}
 
-      <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's your struggle?" />
+      <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's weighing you down?" />
       <br /><br />
       <button onClick={handleSubmit}>Reflect</button>
 <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
