@@ -56,9 +56,14 @@ const LoginPage = ({ onAuthSuccess }) => {
     <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Cognitive Mirror</h1>
 
-      <p style={{ fontSize: '1.1rem', lineHeight: 1.5 }}>
-        <strong>It’s not a chatbot. It’s a mirror with memory.</strong><br />
-        Cognitive Mirror listens across days—not minutes. It sees what loops you’re stuck in, and it nudges you forward.
+      <p style={{ fontSize: '1.1rem', lineHeight: 1.6 }}>
+        <strong>It’s not a chatbot. It’s a mirror with memory—and no patience for bullshit.</strong><br />
+          Cognitive Mirror listens across days—not minutes. It sees the loops you’re stuck in and nudges you toward truth.
+      </p>
+
+      <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
+        The more honest you are, the more clearly it reflects what matters.<br />
+      <strong>Truth in. Truth out.</strong>
       </p>
 
       <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
