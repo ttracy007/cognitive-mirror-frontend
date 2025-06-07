@@ -184,8 +184,10 @@ const App = () => {
     setParsedTags([]);
     setSeverityLevel('');
     setTimeout(fetchHistory, 300);
-  };
     setLastReflectionTime(Date.now());
+  };
+  
+    
 
   const canGenerateSummary = Array.isArray(history) && history.length >= 10;
   const reflectionCount = history.length;
