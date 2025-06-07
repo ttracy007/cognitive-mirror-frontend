@@ -8,48 +8,49 @@ const LoginPage = ({ onAuthSuccess }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignUpOrLogin = async () => {
-    setErrorMsg('');
+const handleSignUpOrLogin = async () => {
+  setErrorMsg('');
 
-    if (!username || !password || !email) {
-      setErrorMsg('All fields are required.');
-      return;
-    }
+  if (!username || !password || !email) {
+    setErrorMsg('All fields are required.');
+    return;
+  }
 
-    const authData = {
-      email: email.trim(),
-      password,
-    };
+  const authData = {
+    email: email.trim(),
+    password,
+  };
 
-    try {
-      // Try signing up first
-      let { error: signupError } = await supabase.auth.signUp(authData);
+  try {
+    // Try login first
+    let { error: loginError } = await supabase.auth.signInWithPassword(authData);
 
+    if (loginError) {
+      // If login fails, try signup
+      const { error: signupError } = await supabase.auth.signUp(authData);
       if (signupError && !signupError.message.includes('already registered')) {
         setErrorMsg(signupError.message);
         return;
       }
 
-      // If already registered, try login
-      await new Promise((resolve) => setTimeout(resolve, 1200)); // 1.2 seconds
-      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
-      if (loginError) {
-        setErrorMsg(loginError.message);
-        return;
-      }
-
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        setErrorMsg('Authentication failed.');
-        return;
-      }
-
-      onAuthSuccess(sessionData.session, username);
-    } catch (err) {
-      console.error(err);
-      setErrorMsg('Unexpected error. Please try again.');
+      // 🔄 Wait briefly for Supabase to activate session
+      await new Promise((resolve) => setTimeout(resolve, 1500));
     }
-  };
+
+    // Fetch current session
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !sessionData.session) {
+      setErrorMsg('Authentication failed.');
+      return;
+    }
+
+    onAuthSuccess(sessionData.session, username);
+  } catch (err) {
+    console.error(err);
+    setErrorMsg('Unexpected error. Please try again.');
+  }
+};
+
 
   return (
     <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
