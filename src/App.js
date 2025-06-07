@@ -25,6 +25,29 @@ const App = () => {
   prompts[Math.floor(Math.random() * prompts.length)]
 );
   const [lastReflectionTime, setLastReflectionTime] = useState(null);
+  const [listening, setListening] = useState(false);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+  useEffect(() => {
+    if (!recognition) return;
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => setListening(true);
+        recognition.onend = () => setListening(false);
+        recognition.onerror = (event) => {
+            console.error('🎤 Speech error:', event.error);
+            setListening(false);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setEntry((prev) => prev + ' ' + transcript);
+        };
+        }, []);
 
 
 
@@ -370,6 +393,28 @@ const App = () => {
   }
   style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
 />
+<button
+  onClick={() => {
+    if (recognition) {
+      listening ? recognition.stop() : recognition.start();
+    }
+  }}
+  style={{
+    marginTop: '0.5rem',
+    marginLeft: '0.5rem',
+    backgroundColor: listening ? '#ff4d4f' : '#555',
+    color: '#fff',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '0.9rem'
+  }}
+>
+  {listening ? '🛑 Stop Listening' : '🎤 Speak Your Reflection'}
+</button>
+
+
     <button
       onClick={handleSubmit}
       style={{
