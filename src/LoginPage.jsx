@@ -31,6 +31,7 @@ const LoginPage = ({ onAuthSuccess }) => {
       }
 
       // If already registered, try login
+      await new Promise((resolve) => setTimeout(resolve, 1200)); // 1.2 seconds
       let { error: loginError } = await supabase.auth.signInWithPassword(authData);
       if (loginError) {
         setErrorMsg(loginError.message);
