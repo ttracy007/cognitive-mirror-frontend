@@ -20,6 +20,11 @@ const App = () => {
   const [severityLevel, setSeverityLevel] = useState('');
   const [showBlockedMessage, setShowBlockedMessage] = useState(false);
   const [username, setUsername] = useState('');
+  const prompts = ["What’s weighing you down?", "What needs to come out?"];
+  const [placeholderPrompt] = useState(() =>
+  prompts[Math.floor(Math.random() * prompts.length)]
+);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -337,14 +342,16 @@ const App = () => {
 <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
   {/* Left: Journal Input */}
   <div style={{ flex: 1 }}>
-    <textarea
-      rows="6"
-      cols="60"
-      value={entry}
-      onChange={(e) => setEntry(e.target.value)}
-      placeholder="What's your struggle?"
-      style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-    />
+   <textarea
+  rows="6"
+  cols="60"
+  value={entry}
+  onChange={(e) => setEntry(e.target.value)}
+  placeholder={
+    history.length === 0 ? placeholderPrompt : ''  // Only show on first reflection
+  }
+  style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+/>
     <button
       onClick={handleSubmit}
       style={{
