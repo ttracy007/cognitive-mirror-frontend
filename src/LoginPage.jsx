@@ -2,55 +2,55 @@ import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
 
 const LoginPage = ({ onAuthSuccess }) => {
-  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-const handleSignUpOrLogin = async () => {
-  setErrorMsg('');
+  const handleSignUpOrLogin = async () => {
+    setErrorMsg('');
 
-  if (!username || !password || !email) {
-    setErrorMsg('All fields are required.');
-    return;
-  }
-
-  const authData = {
-    email: email.trim(),
-    password,
-  };
-
-  try {
-    // Try login first
-    let { error: loginError } = await supabase.auth.signInWithPassword(authData);
-
-    if (loginError) {
-      // If login fails, try signup
-      const { error: signupError } = await supabase.auth.signUp(authData);
-      if (signupError && !signupError.message.includes('already registered')) {
-        setErrorMsg(signupError.message);
-        return;
-      }
-
-      // 🔄 Wait briefly for Supabase to activate session
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    }
-
-    // Fetch current session
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !sessionData.session) {
-      setErrorMsg('Authentication failed.');
+    if (!username || !password) {
+      setErrorMsg('Username and password are required.');
       return;
     }
 
-    onAuthSuccess(sessionData.session, username);
-  } catch (err) {
-    console.error(err);
-    setErrorMsg('Unexpected error. Please try again.');
-  }
-};
+    // Generate a fake email to meet Supabase email login requirements
+    const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@cognitivemirror.app`;
 
+    const authData = {
+      email: fakeEmail,
+      password,
+    };
+
+    try {
+      // Try to log in
+      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
+
+      if (loginError) {
+        // If not found, try to sign up instead
+        const { error: signupError } = await supabase.auth.signUp(authData);
+        if (signupError && !signupError.message.includes('already registered')) {
+          setErrorMsg(signupError.message);
+          return;
+        }
+
+        // Wait briefly for session to activate
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        setErrorMsg('Authentication failed.');
+        return;
+      }
+
+      onAuthSuccess(sessionData.session, username);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Unexpected error. Please try again.');
+    }
+  };
 
   return (
     <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -63,7 +63,7 @@ const handleSignUpOrLogin = async () => {
 
       <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
         Everything you write is private, encrypted, and only visible to you.<br />
-        Be fully honest—your reflections don’t leave this mirror.
+        If you forget your password, just create a new username to start fresh.
       </p>
 
       <div style={{ marginTop: '2rem' }}>
@@ -75,18 +75,6 @@ const handleSignUpOrLogin = async () => {
           onChange={(e) => setUsername(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
-
-        <label>Email (required for password recovery)</label><br />
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '0.25rem' }}
-        />
-        <small style={{ color: '#888' }}>
-          We’ll only use this to help you recover your password. Never shared or used for marketing.
-        </small>
 
         <label>Password (required)</label><br />
         <div style={{ position: 'relative' }}>
@@ -136,4 +124,3 @@ const handleSignUpOrLogin = async () => {
 };
 
 export default LoginPage;
-
