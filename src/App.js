@@ -59,22 +59,7 @@ const App = () => {
     }
     setHistoryLoaded(true);
   };
-useEffect(() => {
-  const interval = setInterval(() => {
-    if (!lastReflectionTime) return;
 
-    const now = Date.now();
-    const timeSince = now - lastReflectionTime;
-
-    // Show prompt again if 3+ minutes of inactivity
-    if (timeSince > 3 * 60 * 1000) {
-      setPlaceholderPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
-      setLastReflectionTime(null); // Reset so it doesn't loop
-    }
-  }, 10000); // Check every 10 seconds
-
-  return () => clearInterval(interval);
-}, [lastReflectionTime]);
   useEffect(() => {
     if (session) fetchHistory();
   }, [session]);
@@ -121,6 +106,23 @@ useEffect(() => {
 
     setLoadingSummary(false);
   };
+
+  useEffect(() => {
+  const interval = setInterval(() => {
+    if (!lastReflectionTime) return;
+
+    const now = Date.now();
+    const timeSince = now - lastReflectionTime;
+
+    // Show prompt again if 3+ minutes of inactivity
+    if (timeSince > 3 * 60 * 1000) {
+      setPlaceholderPrompt(prompts[Math.floor(Math.random() * prompts.length)]);
+      setLastReflectionTime(null); // Reset so it doesn't loop
+    }
+  }, 10000); // Check every 10 seconds
+
+  return () => clearInterval(interval);
+}, [lastReflectionTime]);
 
   const handleExportPDF = () => {
     if (!summaryText) return;
