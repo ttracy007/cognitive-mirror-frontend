@@ -28,7 +28,8 @@ const App = () => {
   const [listening, setListening] = useState(false);
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-
+  console.log('SpeechRecognition available:', !!recognition);
+  
   useEffect(() => {
     if (!recognition) return;
 
