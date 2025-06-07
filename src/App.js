@@ -334,6 +334,50 @@ const App = () => {
       <textarea rows="6" cols="60" value={entry} onChange={(e) => setEntry(e.target.value)} placeholder="What's your struggle?" />
       <br /><br />
       <button onClick={handleSubmit}>Reflect</button>
+<div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+  {/* Left: Journal Input */}
+  <div style={{ flex: 1 }}>
+    <textarea
+      rows="6"
+      cols="60"
+      value={entry}
+      onChange={(e) => setEntry(e.target.value)}
+      placeholder="What's your struggle?"
+      style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+    />
+    <button
+      onClick={handleSubmit}
+      style={{
+        marginTop: '0.5rem',
+        backgroundColor: '#333',
+        color: '#fff',
+        border: 'none',
+        padding: '0.5rem 1.25rem',
+        borderRadius: '4px',
+        cursor: 'pointer'
+      }}
+    >
+      Reflect
+    </button>
+  </div>
+
+  {/* Right: Instructional Message */}
+  <div style={{
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    padding: '1rem',
+    borderLeft: '4px solid #ffa500',
+    borderRadius: '6px',
+    fontSize: '0.95rem',
+    lineHeight: 1.5,
+    color: '#333'
+  }}>
+    <strong>Pick a real problem. Share it fully.</strong><br />
+    The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
+    Respond honestly to whatever it reflects back. Let it challenge you.<br />
+    <strong>The more you give, the more it gives you back.</strong>
+  </div>
+</div>
 
       <div style={{ marginTop: '2rem' }}>
         <h3>🧠 Your Reflection Thread</h3>
