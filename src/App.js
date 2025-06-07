@@ -19,6 +19,7 @@ const App = () => {
   const [parsedTags, setParsedTags] = useState([]);
   const [severityLevel, setSeverityLevel] = useState('');
   const [showBlockedMessage, setShowBlockedMessage] = useState(false);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -167,7 +168,17 @@ const App = () => {
   const requiredReflections = 10;
   const progressPercent = Math.min((reflectionCount / requiredReflections) * 100, 100);
 
-  if (!session) return <LoginPage onAuthSuccess={(session) => setSession(session)} />;
+ if (!session) {
+  return (
+    <LoginPage
+      onAuthSuccess={(session, username) => {
+        setSession(session);        // Set the login session
+        setUsername(username);      // Capture the passed username
+      }}
+    />
+  );
+}
+
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
