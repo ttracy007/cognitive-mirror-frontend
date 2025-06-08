@@ -26,3 +26,5 @@
     Try both. See what resonates. The more honest you are, the more the mirror reflects back what really matters.
   </p>
 </div>
+
+export default LoginPage;
