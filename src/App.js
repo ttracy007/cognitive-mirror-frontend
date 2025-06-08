@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import jsPDF from 'jspdf';
 import './App.css';
+import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 
 const App = () => {
+  const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -19,7 +21,7 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const prompts = ["What’s weighing you down?", "What needs to come out?"];
+  const prompts = ["What’s weighing you down?"];
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)]
   );
@@ -134,16 +136,31 @@ const App = () => {
     setTimeout(fetchHistory, 300);
   };
 
-  if (!session) {
-    return (
-      <LoginPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
-  }
+  if (!session && !showLogin) {
+  return <LandingPage onStart={() => setShowLogin(true)} />;
+}
+
+if (!session) {
+  return (
+    <LoginPage
+      onAuthSuccess={(session, username) => {
+        setSession(session);
+        setUsername(username);
+      }}
+    />
+  );
+}
+
+🚀 Result
+
+    Users land on the welcome page
+
+    Click “Start Journaling” to go to the login form (username + password)
+
+    Once authenticated, they enter the main journal interface
+
+Want me to package that into a full file export or help style the transition between landing → login?
+
 
   return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
