@@ -1,35 +1,43 @@
-import React, { useState } from 'react'
-import { supabase } from './supabaseClient'
 
-function AuthForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
+import React, { useState } from 'react';
+import { supabase } from './supabaseClient';
 
-  async function handleSignUp() {
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) setMessage(error.message)
-    else setMessage('Check your email to confirm sign-up!')
-  }
+const AuthForm = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  async function handleLogIn() {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setMessage(error.message)
-    else setMessage('Logged in!')
-  }
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: username + '@mirror.app',
+      password,
+    });
+    if (error) alert(error.message);
+  };
+
+  const handleSignup = async () => {
+    const { error } = await supabase.auth.signUp({
+      email: username + '@mirror.app',
+      password,
+    });
+    if (error) alert(error.message);
+  };
 
   return (
-    <div>
-      <h2>Supabase Auth</h2>
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-      <br />
-      <button onClick={handleSignUp}>Sign Up</button>
-      <button onClick={handleLogIn}>Log In</button>
-      <p>{message}</p>
+    <div style={{ maxWidth: '400px', margin: '100px auto', textAlign: 'left' }}>
+      <h1>Cognitive Mirror</h1>
+      <p>🧠 A journaling experiment. It listens across days—not minutes—and helps you see patterns that weigh you down.</p>
+      <div>
+        <label>Username</label>
+        <input value={username} onChange={(e) => setUsername(e.target.value)} />
+      </div>
+      <div>
+        <label>Password</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      </div>
+      <button onClick={handleLogin}>Start Journaling</button>
+      <button onClick={handleSignup} style={{ marginLeft: '10px' }}>Sign Up</button>
     </div>
-  )
-}
+  );
+};
 
-export default AuthForm
-
+export default AuthForm;
