@@ -17,7 +17,6 @@ const App = () => {
   const [severityLevel, setSeverityLevel] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [username, setUsername] = useState('');
-
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const prompts = ["What’s weighing you down?", "What needs to come out?"];
@@ -148,23 +147,42 @@ const App = () => {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Cognitive Mirror</h1>
+      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
 
-      <textarea
-        rows="6"
-        cols="60"
-        value={entry}
-        onChange={(e) => setEntry(e.target.value)}
-        placeholder={placeholderPrompt}
-        style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-      />
+      <div style={{ display: 'flex', gap: '2rem' }}>
+        <div style={{ flex: 1 }}>
+          <textarea
+            rows="6"
+            cols="60"
+            value={entry}
+            onChange={(e) => setEntry(e.target.value)}
+            placeholder={placeholderPrompt}
+            style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+          />
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+            <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
+            <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+            {isListening && <span>🎧 Listening…</span>}
+            {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+          </div>
+        </div>
 
-      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
-        <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-        <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-        {isListening && <span>🎧 Listening…</span>}
-        {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+        <div style={{
+          flex: 1,
+          backgroundColor: '#f9f9f9',
+          padding: '1rem',
+          borderLeft: '4px solid #ffa500',
+          borderRadius: '6px',
+          fontSize: '0.95rem',
+          lineHeight: 1.5,
+          color: '#333'
+        }}>
+          <strong>Pick a real problem. Share it fully.</strong><br />
+          The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
+          Respond honestly to whatever it reflects back. Let it challenge you.<br />
+          <strong>The more you give, the more it gives you back.</strong>
+        </div>
       </div>
 
       <div style={{ marginTop: '2rem' }}>
