@@ -11,6 +11,7 @@ const App = () => {
   const [forcedTone, setForcedTone] = useState('frank');
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const prompts = ["What’s weighing you down?", "What needs to come out?"];
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)]
@@ -68,6 +69,19 @@ const App = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    if (!entry.trim()) return;
+
+    setIsProcessing(true);
+
+    // Simulate async processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      alert("Reflection submitted! (simulated)");
+      setEntry('');
+    }, 2000);
+  };
+
   if (!session) {
     return (
       <LoginPage
@@ -91,14 +105,18 @@ const App = () => {
         style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
       />
 
-      <div style={{ marginTop: '1rem' }}>
+      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <button onClick={startListening} disabled={isListening}>
           🎙️ Start Talking
         </button>
-        <button onClick={stopListening} disabled={!isListening} style={{ marginLeft: '0.5rem' }}>
+        <button onClick={stopListening} disabled={!isListening}>
           🛑 Stop
         </button>
-        {isListening && <span style={{ marginLeft: '1rem' }}>🎧 Listening…</span>}
+        <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>
+          🧠 Reflect
+        </button>
+        {isListening && <span>🎧 Listening…</span>}
+        {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
       </div>
     </div>
   );
