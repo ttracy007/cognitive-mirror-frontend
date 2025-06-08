@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import './App.css';
-import AuthForm from './AuthForm';
 import { supabase } from './supabaseClient';
-import Journal from './Journal';
+import jsPDF from 'jspdf';
+import './App.css';
+import LoginPage from './LoginPage';
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -11,67 +11,207 @@ const App = () => {
   const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("frank");
   const [latestEntryId, setLatestEntryId] = useState(null);
-  const [showSummary, setShowSummary] = useState(false);
-  const [hasUsedOverride, setHasUsedOverride] = useState(false);
+  const [summaryText, setSummaryText] = useState('');
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [parsedTags, setParsedTags] = useState([]);
+  const [severityLevel, setSeverityLevel] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [username, setUsername] = useState('');
+  const [recognition, setRecognition] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const prompts = ["What’s weighing you down?", "What needs to come out?"];
+  const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
+    prompts[Math.floor(Math.random() * prompts.length)]
+  );
+  let transcriptBuffer = '';
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recog = new SpeechRecognition();
+      recog.continuous = true;
+      recog.interimResults = true;
+      recog.lang = 'en-US';
+
+      recog.onresult = (event) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        const cleaned = finalTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
+        if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
+          transcriptBuffer += (cleaned + ' ');
+          setEntry(transcriptBuffer.trim());
+        }
+      };
+
+      recog.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recog);
+    }
+  }, []);
+
+  const startListening = () => {
+    if (recognition && !isListening) {
+      recognition.start();
+      setIsListening(true);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognition && isListening) {
+      recognition.stop();
+      setIsListening(false);
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
   }, []);
 
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, tone_mode, timestamp')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+    if (!error) setHistory(data || []);
+  };
+
   useEffect(() => {
-    if (!session) return;
-
-    const fetchEntries = async () => {
-      const { data, error } = await supabase
-        .from('entries')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false });
-
-      if (!error && data) {
-        setHistory(data);
-        if (data.length > 0) {
-          setLatestEntryId(data[0].id);
-          const firstDate = new Date(data[data.length - 1].created_at);
-          const now = new Date();
-          const diffDays = Math.floor((now - firstDate) / (1000 * 60 * 60 * 24));
-          if (diffDays >= 5) setShowSummary(true);
-        }
-      }
-    };
-
-    fetchEntries();
+    if (session) fetchHistory();
   }, [session]);
 
+  const handleSubmit = async () => {
+    const user = session?.user;
+    if (!user || !entry.trim()) return;
+
+    setIsProcessing(true);
+
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry, forcedTone }),
+    });
+
+    const data = await res.json();
+    const responseText = data.response || 'No response received.';
+
+    const { data: saved, error } = await supabase
+      .from('journals')
+      .insert({
+        user_id: user.id,
+        username: username,
+        entry_text: entry,
+        response_text: responseText,
+        tone_mode: data.tone_mode,
+      })
+      .select();
+
+    if (!error && saved && saved[0]) {
+      setLatestEntryId(saved[0].id);
+    }
+
+    setEntry('');
+    setSummaryText('');
+    setParsedTags([]);
+    setSeverityLevel('');
+    setIsProcessing(false);
+    setTimeout(fetchHistory, 300);
+  };
+
+  if (!session) {
+    return (
+      <LoginPage
+        onAuthSuccess={(session, username) => {
+          setSession(session);
+          setUsername(username);
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="App">
-      {session ? (
-        <Journal
-          session={session}
-          entry={entry}
-          setEntry={setEntry}
-          history={history}
-          setHistory={setHistory}
-          forcedTone={forcedTone}
-          setForcedTone={setForcedTone}
-          latestEntryId={latestEntryId}
-          showSummary={showSummary}
-          hasUsedOverride={hasUsedOverride}
-          setHasUsedOverride={setHasUsedOverride}
-        />
-      ) : (
-        <AuthForm />
-      )}
+    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+
+      <div style={{ display: 'flex', gap: '2rem' }}>
+        <div style={{ flex: 1 }}>
+          <textarea
+            rows="6"
+            cols="60"
+            value={entry}
+            onChange={(e) => setEntry(e.target.value)}
+            placeholder={placeholderPrompt}
+            style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+          />
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+            <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
+            <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+            {isListening && <span>🎧 Listening…</span>}
+            {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+          </div>
+        </div>
+
+        <div style={{
+          flex: 1,
+          backgroundColor: '#f9f9f9',
+          padding: '1rem',
+          borderLeft: '4px solid #ffa500',
+          borderRadius: '6px',
+          fontSize: '0.95rem',
+          lineHeight: 1.5,
+          color: '#333'
+        }}>
+          <strong>Pick a real problem. Share it fully.</strong><br />
+          The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
+          Respond honestly to whatever it reflects back. Let it challenge you.<br />
+          <strong>The more you give, the more it gives you back.</strong>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '2rem' }}>
+        <h3>🧠 Your Reflection Thread</h3>
+        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+          {history.length > 0 ? (
+            history.map((item, index) => (
+              <div key={index} style={{ marginBottom: '2rem' }}>
+                <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+                  <p><strong>🧍 You:</strong></p>
+                  <p>{item.entry_text}</p>
+                </div>
+                <div style={{
+                  backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
+                  padding: '1rem',
+                  borderRadius: '6px',
+                  borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
+                  marginTop: '1rem'
+                }}>
+                  <p><strong>{item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}</strong></p>
+                  <p>{item.response_text}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
