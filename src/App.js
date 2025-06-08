@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import jsPDF from 'jspdf';
@@ -13,69 +12,18 @@ const App = () => {
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [summaryText, setSummaryText] = useState('');
   const [loadingSummary, setLoadingSummary] = useState(false);
-  const [parsedTags, setParsedTags] = useState([]);
-  const [severityLevel, setSeverityLevel] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [username, setUsername] = useState('');
+  const [listening, setListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
-  const [isListening, setIsListening] = useState(false);
-  const prompts = ["What’s weighing you down?", "What needs to come out?"];
-  const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
-    prompts[Math.floor(Math.random() * prompts.length)]
-  );
-  let transcriptBuffer = '';
-
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recog = new SpeechRecognition();
-      recog.continuous = true;
-      recog.interimResults = true;
-      recog.lang = 'en-US';
-
-      recog.onresult = (event) => {
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
-        }
-        const cleaned = finalTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
-        if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
-          transcriptBuffer += (cleaned + ' ');
-          setEntry(transcriptBuffer.trim());
-        }
-      };
-
-      recog.onend = () => {
-        setIsListening(false);
-      };
-
-      setRecognition(recog);
-    }
-  }, []);
-
-  const startListening = () => {
-    if (recognition && !isListening) {
-      recognition.start();
-      setIsListening(true);
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition && isListening) {
-      recognition.stop();
-      setIsListening(false);
-    }
-  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
+
     return () => {
       listener?.subscription.unsubscribe();
     };
@@ -84,11 +32,13 @@ const App = () => {
   const fetchHistory = async () => {
     const user = session?.user;
     if (!user) return;
+
     const { data, error } = await supabase
       .from('journals')
-      .select('id, entry_text, response_text, tone_mode, timestamp')
+      .select('*')
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
+
     if (!error) setHistory(data || []);
   };
 
@@ -96,11 +46,9 @@ const App = () => {
     if (session) fetchHistory();
   }, [session]);
 
-  const handleSubmit = async () => {
+  const handleReflect = async () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
-
-    setIsProcessing(true);
 
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
@@ -111,72 +59,89 @@ const App = () => {
     const data = await res.json();
     const responseText = data.response || 'No response received.';
 
-    const { data: saved, error } = await supabase
-      .from('journals')
-      .insert({
-        user_id: user.id,
-        username: username,
-        entry_text: entry,
-        response_text: responseText,
-        tone_mode: data.tone_mode,
-      })
-      .select();
-
-    if (!error && saved && saved[0]) {
-      setLatestEntryId(saved[0].id);
-    }
+    await supabase.from('journals').insert({
+      user_id: user.id,
+      entry_text: entry,
+      response_text: responseText,
+      tone_mode: data.tone_mode,
+    });
 
     setEntry('');
-    setSummaryText('');
-    setParsedTags([]);
-    setSeverityLevel('');
-    setIsProcessing(false);
-    setTimeout(fetchHistory, 300);
+    fetchHistory();
+  };
+
+  const handleStartListening = () => {
+    if (!window.webkitSpeechRecognition) {
+      alert("Your browser does not support SpeechRecognition.");
+      return;
+    }
+
+    const recog = new window.webkitSpeechRecognition();
+    recog.continuous = true;
+    recog.interimResults = true;
+    recog.lang = 'en-US';
+
+    recog.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          setEntry((prev) => prev + ' ' + event.results[i][0].transcript.trim());
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+    };
+
+    recog.onend = () => setListening(false);
+
+    recog.start();
+    setRecognition(recog);
+    setListening(true);
+  };
+
+  const handleStopListening = () => {
+    if (recognition) recognition.stop();
+    setListening(false);
   };
 
   if (!session) {
-    return (
-      <LoginPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
+    return <LoginPage onAuthSuccess={(session) => setSession(session)} />;
   }
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+    <div style={{ padding: '2rem' }}>
+      <h1>Cognitive Mirror</h1>
 
-      
-      <div style={{ marginBottom: '1rem' }}>
-        <label>Voice (required): </label>
-        <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
-          <option value="frank">🔴 Frank Friend</option>
-          <option value="stoic">🟢 Stoic Mentor</option>
-        </select>
+      <label>Voice (required): </label>
+      <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
+        <option value="frank">🔴 Frank Friend</option>
+        <option value="stoic">🟢 Stoic Mentor</option>
+      </select>
+
+      <textarea
+        rows="5"
+        style={{ width: '100%', marginTop: '1rem' }}
+        value={entry}
+        onChange={(e) => setEntry(e.target.value)}
+        placeholder="What's weighing you down?"
+      />
+
+      <div style={{ marginTop: '0.5rem' }}>
+        <button onClick={handleStartListening} disabled={listening}>🎙 Start Talking</button>
+        <button onClick={handleStopListening} disabled={!listening}>🔴 Stop</button>
+        <button onClick={handleReflect}>🧠 Reflect</button>
       </div>
 
-
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        <div style={{ flex: 1 }}>
-          <textarea
-            rows="6"
-            cols="60"
-            value={entry}
-            onChange={(e) => setEntry(e.target.value)}
-            placeholder={placeholderPrompt}
-            style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-          />
-          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-            <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
-            <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-            {isListening && <span>🎧 Listening…</span>}
-            {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
-          </div>
-        </div>
+      <div style={{ marginTop: '2rem' }}>
+        <h3>🧠 Your Reflection Thread</h3>
+        {loadingSummary && <p>⏳ Processing...</p>}
+        {history.length === 0 ? <p><em>No reflections yet.</em></p> :
+          history.map((item, idx) => (
+            <div key={idx} style={{ marginBottom: '1rem', background: '#f9f9f9', padding: '1rem', borderRadius: '8px' }}>
+              <p><strong>🧍 You:</strong> {item.entry_text}</p>
+              <p><strong>{item.tone_mode}:</strong> {item.response_text}</p>
+            </div>
+          ))}
       </div>
     </div>
   );
