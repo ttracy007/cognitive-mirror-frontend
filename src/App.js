@@ -31,12 +31,15 @@ const App = () => {
     recog.lang = 'en-US';
 
     recog.onresult = (event) => {
-      let interimTranscript = '';
+      let finalTranscript = '';
+
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        interimTranscript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
       }
 
-      const cleaned = interimTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
+      const cleaned = finalTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
 
       if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
         transcriptBuffer += (cleaned + ' ');
@@ -46,7 +49,6 @@ const App = () => {
 
     recog.onend = () => {
       setIsListening(false);
-      transcriptBuffer = '';
     };
 
     setRecognition(recog);
