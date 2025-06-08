@@ -151,17 +151,6 @@ if (!session) {
   );
 }
 
-🚀 Result
-
-    Users land on the welcome page
-
-    Click “Start Journaling” to go to the login form (username + password)
-
-    Once authenticated, they enter the main journal interface
-
-Want me to package that into a full file export or help style the transition between landing → login?
-
-
   return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
