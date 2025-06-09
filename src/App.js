@@ -114,15 +114,16 @@ const App = () => {
     const responseText = data.response || 'No response received.';
 
     const { data: saved, error } = await supabase
-      .from('journals')
-      .insert({
-        user_id: user.id,
-        username: username,
-        entry_text: entry,
-        response_text: responseText,
-        tone_mode: data.tone_mode,
-      })
-      .select();
+  .from('journals')
+  .insert({
+    user_id: user.id,
+    username: username, // this ensures journal entry logs visible username
+    entry_text: entry,
+    response_text: responseText,
+    tone_mode: data.tone_mode,
+  })
+  .select();
+
 
     if (!error && saved && saved[0]) {
       setLatestEntryId(saved[0].id);
@@ -145,11 +146,12 @@ if (!session) {
     <LoginPage
       onAuthSuccess={(session, username) => {
         setSession(session);
-        setUsername(username);
+        setUsername(username); // manually store for journal use
       }}
     />
   );
 }
+
 
   return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
