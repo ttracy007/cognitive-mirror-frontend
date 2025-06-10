@@ -134,8 +134,8 @@ console.log('✅ Submitting journal for user:', userId);
 
 
 
-    if (!error && saved && saved[0]) {
-      setLatestEntryId(saved[0].id);
+    if (!error && savedEntry && savedEntry[0]) {
+      setLatestEntryId(savedEntry[0].id);
     }
 
     setEntry('');
