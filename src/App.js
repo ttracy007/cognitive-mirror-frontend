@@ -103,7 +103,9 @@ const App = () => {
     if (!user || !entry.trim()) return;
 
     setIsProcessing(true);
-
+    
+console.log("Sending tone:", forcedTone); // Should match dropdown
+    
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
