@@ -113,19 +113,25 @@ const App = () => {
     const data = await res.json();
     const responseText = data.response || 'No response received.';
 
-     const {
-  data: savedEntry,
-  error,
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+console.log('✅ Submitting journal for user:', userId);
+
+    const {
+    data: savedEntry,
+    error,
 } = await supabase
   .from('journals')
   .insert({
-    user_id: supabase.auth.getUser().data.user?.id,  // ✅ this is the key part
+    user_id: userId,
     entry_text: entry,
     response_text: responseWithoutTags,
     tone_mode: forcedTone,
     theme_tags: rawTags
   })
   .select();
+
 
 
 
