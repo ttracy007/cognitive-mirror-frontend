@@ -128,7 +128,6 @@ console.log('✅ Submitting journal for user:', userId);
     entry_text: entry,
     response_text: responseText,
     tone_mode: forcedTone,
-    theme_tags: rawTags
   })
   .select();
 
