@@ -126,7 +126,7 @@ console.log('✅ Submitting journal for user:', userId);
   .insert({
     user_id: userId,
     entry_text: entry,
-    response_text: responseWithoutTags,
+    response_text: responseText,
     tone_mode: forcedTone,
     theme_tags: rawTags
   })
