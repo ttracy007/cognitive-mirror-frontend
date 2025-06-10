@@ -86,13 +86,21 @@ const App = () => {
   const fetchHistory = async () => {
     const user = session?.user;
     if (!user) return;
-    const { data, error } = await supabase
-      .from('journals')
-      .select('id, entry_text, response_text, tone_mode, timestamp')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false });
-    if (!error) setHistory(data || []);
-  };
+   
+    const {
+  data: savedEntry,
+  error,
+} = await supabase
+  .from('journals')
+  .insert({
+    user_id: supabase.auth.getUser().data.user?.id,  // ✅ this is the key part
+    entry_text: entry,
+    response_text: responseWithoutTags,
+    tone_mode: forcedTone,
+    theme_tags: rawTags
+  })
+  .select();
+
 
   useEffect(() => {
     if (session) fetchHistory();
