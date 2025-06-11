@@ -7,6 +7,7 @@ import LoginPage from './LoginPage';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
+  const [username, setUsername] = useState('');
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -56,6 +57,14 @@ const App = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      console.log('✅ Restored username:', storedUsername);
+      setUsername(storedUsername);
+    }
+  }, []);
+
   const startListening = () => {
     if (recognition && !isListening) {
       recognition.start();
@@ -80,6 +89,14 @@ const App = () => {
     return () => {
       listener?.subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      console.log('✅ Restored username:', storedUsername);
+      setUsername(storedUsername);
+    }
   }, []);
 
   const fetchHistory = async () => {
@@ -111,6 +128,7 @@ console.log("🧠 Submitting journal for user:", username);
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
+        username,
     entry,
     forcedTone,
     username, // ✅ must be the state variable, not the string "username"
@@ -163,6 +181,8 @@ if (!session) {
   return (
     <LoginPage
       onAuthSuccess={(session, username) => {
+          setUsername(username);
+          localStorage.setItem('username', username);
         setSession(session);
         setUsername(username);
       }}
