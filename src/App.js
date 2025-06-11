@@ -253,13 +253,13 @@ if (!session) {
                 <p>{item.entry_text}</p>
               </div>
               <div style={{
-                backgroundColor: item.tone_mode?.trim() === 'Frank Friend' ? '#fff1f1' : '#f0fdf4',
+                backgroundColor: item.tone_mode?.trim().toLowerCase() === 'frank friend' ? '#fff1f1' : '#f0fdf4',
                 padding: '1rem',
                 borderRadius: '6px',
-                borderLeft: `4px solid ${item.tone_mode?.trim() === 'Frank Friend' ? '#cc0000' : '#2e7d32'}`,
+                borderLeft: `4px solid ${item.tone_mode?.trim().toLowerCase() === 'frank friend' ? '#cc0000' : '#2e7d32'}`,
                 marginTop: '1rem'
               }}>
-                <p><strong>{item.tone_mode?.trim() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}</strong></p>
+                <p><strong>{item.tone_mode?.trim().toLowerCase() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}</strong></p>
                 <p>{item.response_text}</p>
               </div>
             </div>
