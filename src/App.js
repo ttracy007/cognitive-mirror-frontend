@@ -26,13 +26,6 @@ const App = () => {
   );
   let transcriptBuffer = '';
 
- useEffect(() => {
-  const storedUsername = localStorage.getItem('username');
-  if (storedUsername) {
-    setUsername(storedUsername);
-  }
-}, []);
-
   
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -82,6 +75,15 @@ const App = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
+
+    useEffect(() => {
+  const savedUsername = localStorage.getItem("username");
+  if (savedUsername) {
+    console.log("✅ Username restored from localStorage:", savedUsername);
+    setUsername(savedUsername);
+  }
+}, []);
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
