@@ -26,6 +26,14 @@ const App = () => {
   );
   let transcriptBuffer = '';
 
+ useEffect(() => {
+  const storedUsername = localStorage.getItem('username');
+  if (storedUsername) {
+    setUsername(storedUsername);
+  }
+}, []);
+
+  
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -165,6 +173,7 @@ if (!session) {
       onAuthSuccess={(session, username) => {
         setSession(session);
         setUsername(username);
+        localStorage.setItem('username', username);
       }}
     />
   );
