@@ -27,6 +27,14 @@ const App = () => {
   let transcriptBuffer = '';
 
   useEffect(() => {
+      const savedUsername = localStorage.getItem("username");
+      console.log(" Restoring saved username:", savedUsername);
+      if (savedUsername) {
+        setUsername(savedUsername);
+  }
+  }, []);
+  
+  useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recog = new SpeechRecognition();
@@ -102,6 +110,12 @@ const App = () => {
     if (!user || !entry.trim()) return;
 
     setIsProcessing(true);
+
+    if (!username || username.trim() === "") {
+      console.warn("Username is missing-aborting submission.");
+      alert("Username is missing-please refresh or log in again.");
+      return;
+    }
     
       console.log("Sending tone:", forcedTone); // Should match dropdown
 
