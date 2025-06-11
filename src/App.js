@@ -108,7 +108,7 @@ console.log("Sending tone:", forcedTone); // Should match dropdown
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry, forcedTone }),
+      body: JSON.stringify({ entry, forcedTone, username }),
     });
 
     const data = await res.json();
