@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import jsPDF from 'jspdf';
@@ -103,34 +102,49 @@ const App = () => {
     if (!user || !entry.trim()) return;
 
     setIsProcessing(true);
+    
+console.log("Sending tone:", forcedTone); // Should match dropdown
 
+console.log("🧠 Submitting journal for user:", username);
+    
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry, forcedTone }),
-    });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    entry,
+    forcedTone,
+    username, // ✅ must be the state variable, not the string "username"
+  }),
+});
+
 
     const data = await res.json();
     const responseText = data.response || 'No response received.';
 
-     const {
-  data: savedEntry,
-  error,
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+console.log('✅ Submitting journal for user:', userId);
+
+    const {
+    data: savedEntry,
+    error,
 } = await supabase
   .from('journals')
   .insert({
-    user_id: supabase.auth.getUser().data.user?.id,  // ✅ this is the key part
+    user_id: userId,
+    username: username,
     entry_text: entry,
-    response_text: responseWithoutTags,
+    response_text: responseText,
     tone_mode: forcedTone,
-    theme_tags: rawTags
   })
   .select();
 
 
 
-    if (!error && saved && saved[0]) {
-      setLatestEntryId(saved[0].id);
+
+    if (!error && savedEntry && savedEntry[0]) {
+      setLatestEntryId(savedEntry[0].id);
     }
 
     setEntry('');
@@ -150,7 +164,7 @@ if (!session) {
     <LoginPage
       onAuthSuccess={(session, username) => {
         setSession(session);
-        setUsername(username); // manually store for journal use
+        setUsername(username);
       }}
     />
   );
