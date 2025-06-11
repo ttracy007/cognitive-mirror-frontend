@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import AuthForm from './AuthForm';
@@ -25,16 +24,12 @@ const App = () => {
     });
   }, []);
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      console.log("✅ Username restored from localStorage:", storedUsername);
-      setUsername(storedUsername);
-    }
-  }, []);
-
   const fetchHistory = async () => {
-    const { data: user } = await supabase.auth.getUser();
+    const {
+      data: user,
+      error: userError
+    } = await supabase.auth.getUser();
+
     const { data, error } = await supabase
       .from('journals')
       .select('*')
@@ -48,7 +43,6 @@ const App = () => {
 
   const handleSubmit = async () => {
     setIsProcessing(true);
-    console.log("🧠 Submitting journal for user:", username);
 
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
@@ -59,20 +53,18 @@ const App = () => {
     const data = await res.json();
     const responseText = data.response || 'No response received.';
 
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
-
     const {
       data: savedEntry,
       error,
     } = await supabase
       .from('journals')
       .insert({
-        user_id: userId,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
         username: username,
         entry_text: entry,
         response_text: responseText,
-        tone_mode: forcedTone,
+        tone_mode: data.tone_mode,
+        theme_tags: data.theme_tags || [],
       })
       .select();
 
@@ -88,6 +80,32 @@ const App = () => {
     setTimeout(fetchHistory, 300);
   };
 
+  const handleSummary = async () => {
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/clinical-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history }),
+    });
+    const data = await res.json();
+    setSummaryText(data.summary);
+  };
+
+  const parseTags = (text) => {
+    const match = text.match(/Tags:\s*\[([^\]]+)\]/i);
+    return match ? match[1].split(',').map(t => t.trim().toLowerCase()) : [];
+  };
+
+  const renderHistory = () => {
+    return history.map((entry, index) => (
+      <div key={index} className="entry">
+        <div><strong>{entry.tone_mode}:</strong> {entry.entry_text}</div>
+        <div><em>Response:</em> {entry.response_text}</div>
+        <div><em>Tags:</em> {entry.theme_tags?.join(', ')}</div>
+        <hr />
+      </div>
+    ));
+  };
+
   if (!session && !showLogin) {
     return <LandingPage onStart={() => setShowLogin(true)} />;
   }
@@ -98,7 +116,6 @@ const App = () => {
         onAuthSuccess={(session, username) => {
           setSession(session);
           setUsername(username);
-          localStorage.setItem("username", username);
         }}
       />
     );
@@ -112,24 +129,29 @@ const App = () => {
         onChange={(e) => setEntry(e.target.value)}
         placeholder="What's on your mind?"
       />
+
       <div className="controls">
         <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
           <option value="frank">Frank Friend</option>
           <option value="stoic">Stoic Mentor</option>
         </select>
+
         <button onClick={handleSubmit} disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Submit'}
         </button>
+        <button onClick={handleSummary}>Get Summary</button>
       </div>
+
+      {summaryText && (
+        <div className="summary">
+          <h2>Summary</h2>
+          <pre>{summaryText}</pre>
+        </div>
+      )}
+
       <div className="history">
         <h2>Journal History</h2>
-        {history.map((entry, index) => (
-          <div key={index} className="entry">
-            <strong>{entry.tone_mode}:</strong> {entry.entry_text}<br />
-            <em>Response:</em> {entry.response_text}<br />
-            <hr />
-          </div>
-        ))}
+        {renderHistory()}
       </div>
     </div>
   );
