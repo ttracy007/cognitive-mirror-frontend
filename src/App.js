@@ -105,18 +105,12 @@ const App = () => {
     
 console.log("Sending tone:", forcedTone); // Should match dropdown
 
-console.log("🧠 Submitting journal for user:", username);
     
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    entry,
-    forcedTone,
-    username, // ✅ must be the state variable, not the string "username"
-  }),
-});
-
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry, forcedTone, username }),
+    });
 
     const data = await res.json();
     const responseText = data.response || 'No response received.';
