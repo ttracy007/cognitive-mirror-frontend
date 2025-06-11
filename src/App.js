@@ -104,7 +104,7 @@ const App = () => {
     setIsProcessing(true);
     
 console.log("Sending tone:", forcedTone); // Should match dropdown
-console.log("📦 Sending payload to backend:", {
+
     
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
