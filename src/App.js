@@ -104,6 +104,7 @@ const App = () => {
     setIsProcessing(true);
     
 console.log("Sending tone:", forcedTone); // Should match dropdown
+console.log("📦 Sending payload to backend:", {
     
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
@@ -126,6 +127,7 @@ console.log('✅ Submitting journal for user:', userId);
   .from('journals')
   .insert({
     user_id: userId,
+    username: username,
     entry_text: entry,
     response_text: responseText,
     tone_mode: forcedTone,
@@ -156,7 +158,7 @@ if (!session) {
     <LoginPage
       onAuthSuccess={(session, username) => {
         setSession(session);
-        setUsername(username); // manually store for journal use
+        setUsername(username);
       }}
     />
   );
