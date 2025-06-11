@@ -178,6 +178,10 @@ if (!session) {
   );
 }
 
+  const displayTone = (mode) => {
+          const t = mode?.trim().toLowerCase();
+          return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
+        };
 
   return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -246,12 +250,6 @@ if (!session) {
       <h3>🧠 Your Reflection Thread</h3>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
         
-
-      const displayTone = (mode) => {
-          const t = mode?.trim().toLowerCase();
-          return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
-        };
-
         {history.length > 0 ? (
           history.map((item, index) => (
             <div key={index} style={{ marginBottom: '2rem' }}>
