@@ -245,6 +245,13 @@ if (!session) {
     <div style={{ marginTop: '2rem' }}>
       <h3>🧠 Your Reflection Thread</h3>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+        
+
+      const displayTone = (mode) => {
+          const t = mode?.trim().toLowerCase();
+          return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
+        };
+
         {history.length > 0 ? (
           history.map((item, index) => (
             <div key={index} style={{ marginBottom: '2rem' }}>
@@ -253,13 +260,13 @@ if (!session) {
                 <p>{item.entry_text}</p>
               </div>
               <div style={{
-                backgroundColor: item.tone_mode?.trim().toLowerCase() === 'frank friend' ? '#fff1f1' : '#f0fdf4',
+                backgroundColor: item.tone_mode?.trim().toLowerCase() === 'frank' ? '#fff1f1' : '#f0fdf4',
                 padding: '1rem',
                 borderRadius: '6px',
-                borderLeft: `4px solid ${item.tone_mode?.trim().toLowerCase() === 'frank friend' ? '#cc0000' : '#2e7d32'}`,
+                borderLeft: `4px solid ${item.tone_mode?.trim().toLowerCase() === 'frank' ? '#cc0000' : '#2e7d32'}`,
                 marginTop: '1rem'
               }}>
-                <p><strong>{item.tone_mode?.trim().toLowerCase() === 'Frank Friend' ? '🔴 Frank Friend' : '🟢 Stoic Mentor'}</strong></p>
+                <p><strong>{displayTone(item.tone_mode)}</strong></p>
                 <p>{item.response_text}</p>
               </div>
             </div>
