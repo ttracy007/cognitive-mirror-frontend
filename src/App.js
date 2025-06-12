@@ -202,6 +202,8 @@ if (!session) {
       >
         <option value="frank">Frank Friend</option>
         <option value="stoic">Stoic Mentor</option>
+        <option value="therapist">Therapist Mode</option>
+        <option value="movies">Movie Metaphors Man</option>
       </select>
     </div>
 
