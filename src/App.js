@@ -178,6 +178,44 @@ if (!session) {
           return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
         };
 
+const getToneStyle = (mode) => {
+  const tone = mode?.trim().toLowerCase();
+  switch (tone) {
+    case 'frank':
+    case 'frank friend':
+      return {
+        backgroundColor: '#fff1f1',
+        borderColor: '#cc0000',
+        label: '🔴 Frank Friend',
+      };
+    case 'stoic':
+    case 'stoic mentor':
+      return {
+        backgroundColor: '#f0fdf4',
+        borderColor: '#2e7d32',
+        label: '🟢 Stoic Mentor',
+      };
+    case 'therapist':
+      return {
+        backgroundColor: '#fef6ff',
+        borderColor: '#b755e5',
+        label: '🟣 Therapist Mode',
+      };
+    case 'movies':
+      return {
+        backgroundColor: '#fdfaf6',
+        borderColor: '#ff8c00',
+        label: '🎬 Movie Metaphors Man',
+      };
+    default:
+      return {
+        backgroundColor: '#eeeeee',
+        borderColor: '#999999',
+        label: '❓ Unknown',
+      };
+  }
+};
+
   return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,19 +287,20 @@ if (!session) {
         
         {history.length > 0 ? (
           history.map((item, index) => (
+            const style = getToneStyle(item.tone_mode);
             <div key={index} style={{ marginBottom: '2rem' }}>
               <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
                 <p><strong>🧍 You:</strong></p>
                 <p>{item.entry_text}</p>
               </div>
               <div style={{
-                backgroundColor: item.tone_mode?.trim().toLowerCase() === 'frank' ? '#fff1f1' : '#f0fdf4',
+                backgroundColor: style.backgroundColor,
                 padding: '1rem',
                 borderRadius: '6px',
-                borderLeft: `4px solid ${item.tone_mode?.trim().toLowerCase() === 'frank' ? '#cc0000' : '#2e7d32'}`,
+                borderLeft: `4px solid ${style.borderColor}`,
                 marginTop: '1rem'
               }}>
-                <p><strong>{displayTone(item.tone_mode)}</strong></p>
+                <p><strong>{style.label}</strong></p>
                 <p>{item.response_text}</p>
               </div>
             </div>
