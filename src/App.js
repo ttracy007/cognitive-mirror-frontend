@@ -305,12 +305,12 @@ const getToneStyle = (mode) => {
       >
         <p><strong>{style.label}</strong></p>
         <p>{item.response_text}</p>
-      </div>
     </div>
   );
 })
-          <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-        )}
+):(         
+     <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+ )
       </div>
     </div>
   </div>
