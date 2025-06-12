@@ -285,7 +285,7 @@ const getToneStyle = (mode) => {
       <h3>🧠 Your Reflection Thread</h3>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
         
-        {history.length > 0 ? (
+   {history.length > 0 ? (
   history.map((item, index) => {
     const style = getToneStyle(item.tone_mode);
     return (
@@ -312,8 +312,9 @@ const getToneStyle = (mode) => {
 ) : (
   <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
 )}
- </div>
- </div>
+</div>
+</div>
 );
 };
+
 export default App;
