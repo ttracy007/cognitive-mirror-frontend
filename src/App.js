@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
-import jsPDF from 'jspdf';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
@@ -28,7 +27,6 @@ const App = () => {
 
   useEffect(() => {
       const savedUsername = localStorage.getItem("username");
-      console.log(" Restoring saved username:", savedUsername);
       if (savedUsername) {
         setUsername(savedUsername);
   }
@@ -116,10 +114,7 @@ const App = () => {
       alert("Username is missing-please refresh or log in again.");
       return;
     }
-    
-      console.log("Sending tone:", forcedTone); // Should match dropdown
 
-      console.log("🧠 Submitting journal for user:", username);   
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
