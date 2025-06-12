@@ -312,7 +312,6 @@ const getToneStyle = (mode) => {
 ) : (
   <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
 )}
-</div>
 );
 };
 export default App;
