@@ -286,34 +286,33 @@ const getToneStyle = (mode) => {
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
         
         {history.length > 0 ? (
-         history.map((item, index) => {
-  const style = getToneStyle(item.tone_mode);
-  return (
-    <div key={index} style={{ marginBottom: '2rem' }}>
-      <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
-        <p><strong>🧠 You:</strong></p>
-        <p>{item.entry_text}</p>
+  history.map((item, index) => {
+    const style = getToneStyle(item.tone_mode);
+    return (
+      <div key={index} style={{ marginBottom: '2rem' }}>
+        <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+          <p><strong>🧠 You:</strong></p>
+          <p>{item.entry_text}</p>
+        </div>
+        <div
+          style={{
+            backgroundColor: style.backgroundColor,
+            padding: '1rem',
+            borderRadius: '6px',
+            borderLeft: `4px solid ${style.borderColor}`,
+            marginTop: '1rem'
+          }}
+        >
+          <p><strong>{style.label}</strong></p>
+          <p>{item.response_text}</p>
+        </div>
       </div>
-      <div
-        style={{
-          backgroundColor: style.backgroundColor,
-          padding: '1rem',
-          borderRadius: '6px',
-          borderLeft: `4px solid ${style.borderColor}`,
-          marginTop: '1rem'
-        }}
-      >
-        <p><strong>{style.label}</strong></p>
-        <p>{item.response_text}</p>
-    </div>
-  );
-})
-):(         
-     <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
- )
-      </div>
-    </div>
-  </div>
+    );
+  })
+) : (
+  <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+)}
+</div>
 );
 };
 export default App;
