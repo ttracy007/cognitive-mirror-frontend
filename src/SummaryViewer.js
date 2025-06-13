@@ -24,21 +24,23 @@ const SummaryViewer = ({ history, onClose}) => {
     console.log("🧠 Starting summary generation for:", types);
 
     const results = await Promise.all(
-      types.map(async (type) => {
+      types.map((type) => {
         console.log(`➡️ Fetching summary for: ${type}`);
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+        return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ history, summary_type: type })
-        });
-
-        if (!response.ok) {
-          throw new Error(`❌ ${type} summary failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log(`✅ ${type} summary received:`, data);
-        return data;
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`❌ ${type} summary failed with status ${res.status}`);
+            }
+            return res.json();
+          })
+          .then((data) => {
+            console.log(`✅ ${type} summary received:`, data);
+            return data;
+          });
       })
     );
 
