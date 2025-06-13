@@ -12,7 +12,7 @@ const App = () => {
   const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("frank");
   const [latestEntryId, setLatestEntryId] = useState(null);
-  const [summaryText, setSummaryText] = useState('');
+  const [showSummary, setShowSummary] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [parsedTags, setParsedTags] = useState([]);
   const [severityLevel, setSeverityLevel] = useState('');
@@ -286,9 +286,47 @@ const getToneStyle = (mode) => {
       <h3>🧠 Your Reflection Thread</h3>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
 
-    <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-      <SummaryViewer history={history} onClose={() => setShowSummary(false)}/>
-    </div>
+    {history.length >= 5 ? (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <button
+      onClick={() => setShowSummary(true)}
+      style={{
+        padding: '1rem 2rem',
+        fontSize: '1rem',
+        backgroundColor: '#333',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      }}
+    >
+      Generate Handoff Summaries
+    </button>
+  </div>
+) : (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <button
+      disabled
+      style={{
+        padding: '1rem 2rem',
+        fontSize: '1rem',
+        backgroundColor: '#ccc',
+        color: '#666',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'not-allowed'
+      }}
+    >
+      Add at least 5 reflections to enable summaries
+    </button>
+  </div>
+)}
+
+{showSummary && (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+  </div>
+)}
         
    {history.length > 0 ? (
   history.map((item, index) => {
