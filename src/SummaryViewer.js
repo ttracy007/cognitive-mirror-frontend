@@ -15,40 +15,32 @@ const SummaryViewer = ({ history, onClose}) => {
     navigator.clipboard.writeText(text);
   };
 
-  const generateAllSummaries = async () => {
+ const generateAllSummaries = async () => {
   setIsLoading(true);
   setIsModalOpen(true);
 
   try {
     const types = ['insight', 'clinical', 'narrative'];
-    console.log("🧠 Starting summary generation for:", types);
+    const fetchSummary = (type) => {
+      return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history, summary_type: type })
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch ${type} summary: ${res.status}`);
+        }
+        return res.json();
+      });
+    };
 
-    const results = await Promise.all(
-      types.map((type) => {
-        console.log(`➡️ Fetching summary for: ${type}`);
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ history, summary_type: type })
-        })
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`❌ ${type} summary failed with status ${res.status}`);
-            }
-            return res.json();
-          })
-          .then((data) => {
-            console.log(`✅ ${type} summary received:`, data);
-            return data;
-          });
-      })
+    const [insight, clinical, narrative] = await Promise.all(
+      types.map((type) => fetchSummary(type))
     );
 
-    const [insight, clinical, narrative] = results;
     setSummaries({ insight, clinical, narrative });
-
   } catch (error) {
-    console.error('🔥 Summary generation error:', error);
+    console.error('Error generating summaries:', error);
   } finally {
     setIsLoading(false);
   }
