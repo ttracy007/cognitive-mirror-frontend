@@ -160,7 +160,6 @@ console.log('✅ Submitting journal for user:', userId);
     }
 
     setEntry('');
-    setSummaryText('');
     setParsedTags([]);
     setSeverityLevel('');
     setIsProcessing(false);
