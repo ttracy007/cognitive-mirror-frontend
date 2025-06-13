@@ -33,10 +33,12 @@ const SummaryViewer = ({ history }) => {
 
       const [insight, clinical, narrative] = results;
       setSummaries({ insight, clinical, narrative });
+
     } catch (error) {
-      console.error('Error generating summaries:', error);
+      console.error('❌ Error generating summaries:', error);
+      setIsModalOpen(false); // ✅ Close the modal on failure
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // ✅ Always stop spinner
     }
   };
 
