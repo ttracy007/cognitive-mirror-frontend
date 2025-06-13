@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SummaryBlock from './SummaryBlock';
  
-const SummaryViewer = ({ history }) => {
+const SummaryViewer = ({ history, onClose}) => {
   const [summaries, setSummaries] = useState({
     insight: null,
     clinical: null,
@@ -9,7 +9,7 @@ const SummaryViewer = ({ history }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const SummaryViewer = ({ history, onClose}) => {
+  
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
