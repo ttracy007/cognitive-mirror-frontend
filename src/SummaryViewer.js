@@ -9,7 +9,7 @@ const SummaryViewer = ({ history }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const SummaryViewer = ({ history, onClose}) =>{
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -94,7 +94,7 @@ const SummaryViewer = ({ history }) => {
       )}
 
       <button
-        onClick={() => setIsModalOpen(false)}
+        onClick={onClose}
         style={{
           marginTop: '2rem',
           padding: '0.75rem 1.5rem',
