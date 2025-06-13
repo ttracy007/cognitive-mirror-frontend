@@ -35,7 +35,7 @@ const SummaryViewer = ({ history, onClose}) => {
       setSummaries({ insight, clinical, narrative });
 
     } catch (error) {
-      console.error('❌ Error generating summaries:', error);
+      console.error('❌ Summary generation failed:', error.message || error);
       setIsModalOpen(false); // ✅ Close the modal on failure
     } finally {
       setIsLoading(false); // ✅ Always stop spinner
