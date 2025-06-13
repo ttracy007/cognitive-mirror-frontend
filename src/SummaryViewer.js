@@ -1,55 +1,62 @@
 import React, { useState } from 'react';
 import SummaryBlock from './SummaryBlock';
- 
-const SummaryViewer = ({ history, onClose}) => {
+
+const SummaryViewer = ({ history, onClose }) => {
   const [summaries, setSummaries] = useState({
     insight: null,
     clinical: null,
-    narrative: null
+    narrative: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
   };
 
- const generateAllSummaries = async () => {
-  setIsLoading(true);
-  setIsModalOpen(true);
+  const generateAllSummaries = async () => {
+    setIsLoading(true);
+    setIsModalOpen(true);
 
-  try {
-    const types = ['insight', 'clinical', 'narrative'];
-    const fetchSummary = (type) => {
-      return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history, summary_type: type })
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(`Failed to fetch ${type} summary: ${res.status}`);
-        }
-        return res.json();
-      });
-    };
+    try {
+      const types = ['insight', 'clinical', 'narrative'];
+      const fetchSummary = (type) => {
+        return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ history, summary_type: type }),
+        }).then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch ${type} summary: ${res.status}`);
+          }
+          return res.json();
+        });
+      };
 
-    const [insight, clinical, narrative] = await Promise.all(
-      types.map((type) => fetchSummary(type))
-    );
+      const [insight, clinical, narrative] = await Promise.all(
+        types.map((type) => fetchSummary(type))
+      );
 
-    setSummaries({ insight, clinical, narrative });
-  } catch (error) {
-    console.error('Error generating summaries:', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      setSummaries({ insight, clinical, narrative });
+    } catch (error) {
+      console.error('Error generating summaries:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Auto-trigger summaries on mount
+  React.useEffect(() => {
+    generateAllSummaries();
+  }, []);
+
+  return (
     <div
       style={{
         maxHeight: '90vh',
         overflowY: 'auto',
-        fontFamily: 'sans-serif'
+        fontFamily: 'sans-serif',
       }}
     >
       <h2>🧾 Handoff Summaries</h2>
@@ -66,8 +73,8 @@ const SummaryViewer = ({ history, onClose}) => {
           </p>
           <SummaryBlock
             label="Insight Summary"
-            content={summaries.insight}
-            onCopy={() => copyToClipboard(summaries.insight)}
+            content={summaries.insight?.summary || 'Summary not available.'}
+            onCopy={() => copyToClipboard(summaries.insight?.summary)}
           />
 
           {/* Clinical Summary */}
@@ -78,8 +85,8 @@ const SummaryViewer = ({ history, onClose}) => {
           </p>
           <SummaryBlock
             label="Clinical Summary"
-            content={summaries.clinical}
-            onCopy={() => copyToClipboard(summaries.clinical)}
+            content={summaries.clinical?.summary || 'Summary not available.'}
+            onCopy={() => copyToClipboard(summaries.clinical?.summary)}
           />
 
           {/* Narrative Voice Summary */}
@@ -89,8 +96,8 @@ const SummaryViewer = ({ history, onClose}) => {
           </p>
           <SummaryBlock
             label="Narrative Voice Summary"
-            content={summaries.narrative}
-            onCopy={() => copyToClipboard(summaries.narrative)}
+            content={summaries.narrative?.summary || 'Summary not available.'}
+            onCopy={() => copyToClipboard(summaries.narrative?.summary)}
           />
         </>
       )}
@@ -103,7 +110,7 @@ const SummaryViewer = ({ history, onClose}) => {
           fontSize: '1rem',
           backgroundColor: '#eee',
           border: '1px solid #ccc',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Close
