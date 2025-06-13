@@ -78,6 +78,14 @@ const App = () => {
   };
 
   useEffect(() => {
+  const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
+  if (!hasTriggeredSummary && history.length >= 5) {
+    setShowSummary(true);
+    localStorage.setItem('hasTriggeredSummary', 'true');
+  }
+}, [history]);
+  
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
