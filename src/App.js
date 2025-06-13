@@ -285,6 +285,10 @@ const getToneStyle = (mode) => {
     <div style={{ marginTop: '2rem' }}>
       <h3>🧠 Your Reflection Thread</h3>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+
+    <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+      <SummaryViewer history={history} />
+    </div>
         
    {history.length > 0 ? (
   history.map((item, index) => {
