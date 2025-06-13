@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SummaryBlock from './SummaryBlock';
-
+ 
 const SummaryViewer = ({ history }) => {
   const [summaries, setSummaries] = useState({
     insight: null,
