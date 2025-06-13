@@ -287,7 +287,7 @@ const getToneStyle = (mode) => {
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
 
     <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-      <SummaryViewer history={history} />
+      <SummaryViewer history={history} onClose={() => setShowSummary(false)}/>
     </div>
         
    {history.length > 0 ? (
