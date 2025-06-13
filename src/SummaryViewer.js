@@ -16,33 +16,41 @@ const SummaryViewer = ({ history, onClose}) => {
   };
 
   const generateAllSummaries = async () => {
-    setIsLoading(true);
-    setIsModalOpen(true);
+  setIsLoading(true);
+  setIsModalOpen(true);
 
-    try {
-      const types = ['insight', 'clinical', 'narrative'];
-      const results = await Promise.all(
-        types.map(type =>
-          fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ history, summary_type: type })
-          }).then(res => res.json())
-        )
-      );
+  try {
+    const types = ['insight', 'clinical', 'narrative'];
+    console.log("🧠 Starting summary generation for:", types);
 
-      const [insight, clinical, narrative] = results;
-      setSummaries({ insight, clinical, narrative });
+    const results = await Promise.all(
+      types.map(async (type) => {
+        console.log(`➡️ Fetching summary for: ${type}`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ history, summary_type: type })
+        });
 
-    } catch (error) {
-      console.error('❌ Summary generation failed:', error.message || error);
-      setIsModalOpen(false); // ✅ Close the modal on failure
-    } finally {
-      setIsLoading(false); // ✅ Always stop spinner
-    }
-  };
+        if (!response.ok) {
+          throw new Error(`❌ ${type} summary failed with status ${response.status}`);
+        }
 
-  return (
+        const data = await response.json();
+        console.log(`✅ ${type} summary received:`, data);
+        return data;
+      })
+    );
+
+    const [insight, clinical, narrative] = results;
+    setSummaries({ insight, clinical, narrative });
+
+  } catch (error) {
+    console.error('🔥 Summary generation error:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
     <div
       style={{
         maxHeight: '90vh',
