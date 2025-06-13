@@ -23,7 +23,7 @@ const SummaryViewer = ({ history, onClose}) => {
       const types = ['insight', 'clinical', 'narrative'];
       const results = await Promise.all(
         types.map(type =>
-          fetch(process.env.REACT_APP_BACKEND_URL + '/generate-summary', {
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ history, summary_type: type })
