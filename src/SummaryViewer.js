@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SummaryBlock from './SummaryBlock';
 
 const SummaryViewer = ({ history }) => {
   const [summaries, setSummaries] = useState({
@@ -6,8 +7,13 @@ const SummaryViewer = ({ history }) => {
     clinical: null,
     narrative: null
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
 
   const generateAllSummaries = async () => {
     setIsLoading(true);
@@ -25,131 +31,81 @@ const SummaryViewer = ({ history }) => {
         )
       );
 
-      setSummaries({
-        insight: results[0].summary,
-        clinical: results[1].summary,
-        narrative: results[2].summary
-      });
-    } catch (err) {
-      console.error("Summary generation failed:", err);
+      const [insight, clinical, narrative] = results;
+      setSummaries({ insight, clinical, narrative });
+    } catch (error) {
+      console.error('Error generating summaries:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    alert('Summary copied to clipboard');
-  };
-
   return (
-    <div>
+    <div
+      style={{
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        fontFamily: 'sans-serif'
+      }}
+    >
+      <h2>🧾 Handoff Summaries</h2>
+
+      {isLoading ? (
+        <p>🔄 Generating summaries...</p>
+      ) : (
+        <>
+          {/* Insight Summary */}
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>🧠 Insight Summary</h3>
+          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
+            <strong>Empathic. Reflective. Grounded.</strong><br />
+            A therapist-to-therapist narrative that distills emotional patterns, protective strategies, and therapeutic needs.
+          </p>
+          <SummaryBlock
+            label="Insight Summary"
+            content={summaries.insight}
+            onCopy={() => copyToClipboard(summaries.insight)}
+          />
+
+          {/* Clinical Summary */}
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>🧠 Clinical Summary</h3>
+          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
+            <strong>Structured. DSM-Informed. Objective.</strong><br />
+            A concise intake-style overview highlighting symptom patterns, cognitive tendencies, and behavioral dynamics.
+          </p>
+          <SummaryBlock
+            label="Clinical Summary"
+            content={summaries.clinical}
+            onCopy={() => copyToClipboard(summaries.clinical)}
+          />
+
+          {/* Narrative Voice Summary */}
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>✍️ Narrative Voice Summary</h3>
+          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
+            A first-person reflection written in the client’s voice. Captures their emotional experience, recurring struggles, and hopes for therapy—offering therapists a direct connection to the client’s inner world.
+          </p>
+          <SummaryBlock
+            label="Narrative Voice Summary"
+            content={summaries.narrative}
+            onCopy={() => copyToClipboard(summaries.narrative)}
+          />
+        </>
+      )}
+
       <button
-        onClick={generateAllSummaries}
+        onClick={() => setIsModalOpen(false)}
         style={{
           marginTop: '2rem',
           padding: '0.75rem 1.5rem',
-          backgroundColor: '#444',
-          color: '#fff',
           fontSize: '1rem',
-          borderRadius: '6px',
-          border: 'none',
+          backgroundColor: '#eee',
+          border: '1px solid #ccc',
           cursor: 'pointer'
         }}
       >
-        Generate Handoff Summaries
+        Close
       </button>
-
-      {isModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '2rem',
-            borderRadius: '8px',
-            maxWidth: '800px',
-            width: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            fontFamily: 'sans-serif'
-          }}>
-            <h2>🪞 Handoff Summaries</h2>
-
-            {isLoading ? (
-              <p>Generating summaries...</p>
-            ) : (
-              <>
-                <SummaryBlock
-                  label="🧠 Insight Summary"
-                  content={summaries.insight}
-                  onCopy={() => copyToClipboard(summaries.insight)}
-                />
-                <SummaryBlock
-                  label="📋 Clinical Summary"
-                  content={summaries.clinical}
-                  onCopy={() => copyToClipboard(summaries.clinical)}
-                />
-                <SummaryBlock
-                  label="📝 Narrative Voice Summary"
-                  content={summaries.narrative}
-                  onCopy={() => copyToClipboard(summaries.narrative)}
-                />
-              </>
-            )}
-
-            <button
-              onClick={() => setIsModalOpen(false)}
-              style={{
-                marginTop: '1rem',
-                backgroundColor: '#888',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '0.5rem 1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-
-const SummaryBlock = ({ label, content, onCopy }) => (
-  <div style={{ marginTop: '2rem' }}>
-    <h3>{label}</h3>
-    <pre style={{
-      whiteSpace: 'pre-wrap',
-      backgroundColor: '#f9f9f9',
-      padding: '1rem',
-      borderRadius: '6px',
-      border: '1px solid #ddd'
-    }}>{content}</pre>
-    <button
-      onClick={onCopy}
-      style={{
-        marginTop: '0.5rem',
-        backgroundColor: '#333',
-        color: '#fff',
-        border: 'none',
-        padding: '0.4rem 0.8rem',
-        borderRadius: '4px',
-        cursor: 'pointer'
-      }}
-    >
-      Copy
-    </button>
-  </div>
-);
 
 export default SummaryViewer;
