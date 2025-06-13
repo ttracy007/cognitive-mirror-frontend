@@ -9,7 +9,7 @@ const SummaryViewer = ({ history }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const SummaryViewer = ({ history, onClose}) =>{
+  const SummaryViewer = ({ history, onClose}) => 
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
