@@ -97,54 +97,6 @@ const App = () => {
     };
   }, []);
 
-   // 🔽 Function 1: Submit Journal
-  const handleSubmitJournal = async () => {
-    if (!entry.trim()) {
-      console.warn("⚠️ Entry is empty—submission skipped.");
-      return;
-    }
-
-    try {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        console.error("❌ Supabase session error:", sessionError?.message);
-        return;
-      }
-
-      const token = sessionData.session.access_token;
-      const userId = sessionData.session.user?.id;
-
-      const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          entry,
-          tone_mode: forcedTone,
-          username,
-          user_id: userId
-        }),
-      });
-
-      if (!res.ok) {
-        const errorResponse = await res.json();
-        console.error("❌ Journal POST failed:", errorResponse.error || res.statusText);
-        return;
-      }
-
-      const result = await res.json();
-      setSummaryText(result.response_text);
-      setParsedTags(result.emotion_tags || []);
-      setSeverityLevel(result.severity || '');
-      fetchHistory(); // Optional refresh if needed
-    } catch (err) {
-      console.error("❌ Unhandled journal submit error:", err.message);
-    }
-  };
-
-  // 🔽 Function 2: Fetch Past Journals
   const fetchHistory = async () => {
     const user = session?.user;
     if (!user) return;
@@ -156,84 +108,267 @@ const App = () => {
     if (!error) setHistory(data || []);
   };
 
-  // 🔽 UI setup (useEffect, etc)
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchHistory();
-    }
+    if (session) fetchHistory();
   }, [session]);
 
-  // 🔽 UI rendering begins
+  const handleSubmit = async () => {
+    const user = session?.user;
+    if (!user || !entry.trim()) return;
+
+    setIsProcessing(true);
+
+    if (!username || username.trim() === "") {
+      console.warn("Username is missing-aborting submission.");
+      alert("Username is missing-please refresh or log in again.");
+      return;
+    }
+
+
+    
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry_text: entry, tone_mode: forcedTone, username, user_id: session.user.id  }),
+    });
+
+    const data = await res.json();
+    const responseText = data.response || 'No response received.';
+
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+console.log('✅ Submitting journal for user:', userId);
+
+    const {
+    data: savedEntry,
+    error,
+} = await supabase
+  .from('journals')
+  .insert({
+    user_id: userId,
+    username: username,
+    entry_text: entry,
+    response_text: responseText,
+    tone_mode: forcedTone,
+  })
+  .select();
+
+
+
+
+    if (!error && savedEntry && savedEntry[0]) {
+      setLatestEntryId(savedEntry[0].id);
+    }
+
+    setEntry('');
+    setParsedTags([]);
+    setSeverityLevel('');
+    setIsProcessing(false);
+    setTimeout(fetchHistory, 300);
+  };
+
+  if (!session && !showLogin) {
+  return <LandingPage onStart={() => setShowLogin(true)} />;
+}
+
+if (!session) {
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Cognitive Mirror</h1>
-      <textarea
-        value={entry}
-        onChange={(e) => setEntry(e.target.value)}
-        placeholder="What’s on your mind?"
-        style={{ width: '100%', height: '100px' }}
-      />
-      <div style={{ marginTop: '1rem' }}>
-        <label>
-          Choose a voice:
-          <select
-            value={forcedTone}
-            onChange={(e) => setForcedTone(e.target.value)}
-            style={{ marginLeft: '0.5rem' }}
-          >
-            <option value="frank">Frank Friend</option>
-            <option value="stoic">Stoic Mentor</option>
-            <option value="therapist">Therapist</option>
-            <option value="movies">Movie Metaphors</option>
-          </select>
-        </label>
-        <button onClick={handleSubmitJournal} style={{ marginLeft: '1rem' }}>
-          Submit
-        </button>
-      </div>
-
-      <div style={{ marginTop: '2rem' }}>
-        {history.length > 0 ? (
-          history.map((item, index) => (
-            <div key={index} style={{ marginBottom: '2rem' }}>
-              <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
-                <p><strong>🧠 You:</strong></p>
-                <p>{item.entry_text}</p>
-              </div>
-              <div
-                style={{
-                  backgroundColor: '#e6f7ff',
-                  padding: '1rem',
-                  borderRadius: '6px',
-                  borderLeft: '4px solid #1890ff',
-                  marginTop: '1rem'
-                }}
-              >
-                <p><strong>{item.tone_mode}</strong></p>
-                <p>{item.response_text}</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-        )}
-      </div>
-
-      {showSummary && (
-        <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
-      )}
-    </div>
+    <LoginPage
+      onAuthSuccess={(session, username) => {
+        setSession(session);
+        setUsername(username);
+      }}
+    />
   );
+}
+
+  const displayTone = (mode) => {
+          const t = mode?.trim().toLowerCase();
+          return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
+        };
+
+const getToneStyle = (mode) => {
+  const tone = mode?.trim().toLowerCase();
+  switch (tone) {
+    case 'frank':
+    case 'frank friend':
+      return {
+        backgroundColor: '#fff1f1',
+        borderColor: '#cc0000',
+        label: '🔴 Frank Friend',
+      };
+    case 'stoic':
+    case 'stoic mentor':
+      return {
+        backgroundColor: '#f0fdf4',
+        borderColor: '#2e7d32',
+        label: '🟢 Stoic Mentor',
+      };
+    case 'therapist':
+      return {
+        backgroundColor: '#fef6ff',
+        borderColor: '#b755e5',
+        label: '🟣 Therapist Mode',
+      };
+    case 'movies':
+      return {
+        backgroundColor: '#fdfaf6',
+        borderColor: '#ff8c00',
+        label: '🎬 Movie Metaphors Man',
+      };
+    default:
+      return {
+        backgroundColor: '#eeeeee',
+        borderColor: '#999999',
+        label: '❓ Unknown',
+      };
+  }
 };
 
+  return (
+  <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          setSession(null);
+        }}
+        style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
+      >
+        Log Out
+      </button>
+    </div>
+
+    <div style={{ marginBottom: '1rem' }}>
+      <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+      <select
+        value={forcedTone}
+        onChange={(e) => setForcedTone(e.target.value)}
+        style={{ padding: '0.4rem' }}
+      >
+        <option value="frank">Frank Friend</option>
+        <option value="stoic">Stoic Mentor</option>
+        <option value="therapist">Therapist Mode</option>
+        <option value="movies">Movie Metaphors Man</option>
+      </select>
+    </div>
+
+    <div style={{ display: 'flex', gap: '2rem' }}>
+      <div style={{ flex: 1 }}>
+        <textarea
+          rows="6"
+          cols="60"
+          value={entry}
+          onChange={(e) => setEntry(e.target.value)}
+          placeholder={placeholderPrompt}
+          style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+        />
+        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+          <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
+          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+          <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+          {isListening && <span>🎧 Listening…</span>}
+          {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+        </div>
+      </div>
+
+      <div style={{
+        flex: 1,
+        backgroundColor: '#f9f9f9',
+        padding: '1rem',
+        borderLeft: '4px solid #ffa500',
+        borderRadius: '6px',
+        fontSize: '0.95rem',
+        lineHeight: 1.5,
+        color: '#333'
+      }}>
+        <strong>Pick a real problem. Share it fully.</strong><br />
+        The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
+        Respond honestly to whatever it reflects back. Let it challenge you.<br />
+        <strong>The more you give, the more it gives you back.</strong>
+      </div>
+    </div>
+
+    <div style={{ marginTop: '2rem' }}>
+      <h3>🧠 Your Reflection Thread</h3>
+      <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+
+    {history.length >= 5 ? (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <button
+      onClick={() => setShowSummary(true)}
+      style={{
+        padding: '1rem 2rem',
+        fontSize: '1rem',
+        backgroundColor: '#333',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      }}
+    >
+      Generate Handoff Summaries
+    </button>
+  </div>
+) : (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <button
+      disabled
+      style={{
+        padding: '1rem 2rem',
+        fontSize: '1rem',
+        backgroundColor: '#ccc',
+        color: '#666',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'not-allowed'
+      }}
+    >
+      Add at least 5 reflections to enable summaries
+    </button>
+  </div>
+)}
+
+{showSummary && (
+  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+    <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+  </div>
+)}
+        
+   {history.length > 0 ? (
+  history.map((item, index) => {
+    const style = getToneStyle(item.tone_mode);
+    return (
+      <div key={index} style={{ marginBottom: '2rem' }}>
+        <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+          <p><strong>🧠 You:</strong></p>
+          <p>{item.entry_text}</p>
+        </div>
+        <div
+          style={{
+            backgroundColor: style.backgroundColor,
+            padding: '1rem',
+            borderRadius: '6px',
+            borderLeft: `4px solid ${style.borderColor}`,
+            marginTop: '1rem'
+          }}
+        >
+          <p><strong>{style.label}</strong></p>
+          <p>{item.response_text}</p>
+        </div>
+      </div>
+    );
+  })
+) : (
+  <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+        )}
+      </div>
+    </div>
+  </div>
+);
+};
 export default App;
+
+
