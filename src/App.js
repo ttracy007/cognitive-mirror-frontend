@@ -97,7 +97,6 @@ const App = () => {
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
-            console.log("sending journal entry:");
         body: JSON.stringify({
           entry_text: entry_text,
           tone_mode: forcedTone,
@@ -105,6 +104,7 @@ const App = () => {
           user_id: userId
         }),
       });
+                  console.log("sending journal entry:");
 
       if (!res.ok) {
         const errorResponse = await res.json();
