@@ -102,7 +102,8 @@ const App = () => {
         user_id: userID
       };
 
-       console.log("sending journal entry payload:", jouralPayload);
+       console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
+       console.log("🚀 Submitting to backend:", journalPayload);
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
