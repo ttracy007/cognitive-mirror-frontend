@@ -82,6 +82,10 @@ const App = () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
 
+    if (isProcessing) {
+  console.warn("🚨 Duplicate submission attempt blocked.");
+  return;
+}   
     setIsProcessing(true);
 
     if (!username || username.trim() === "") {
