@@ -98,7 +98,7 @@ const App = () => {
         method: 'POST',
         
         body: JSON.stringify({
-          entry_text: entry,
+          entry_text: entry_text,
           tone_mode: forcedTone,
           username,
           user_id: userId
