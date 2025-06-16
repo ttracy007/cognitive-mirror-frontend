@@ -126,24 +126,6 @@ const App = () => {
       setParsedTags(result.emotion_tags || []);
       setSeverityLevel(result.severity || '');
 
-      const {
-        data: savedEntry,
-        error,
-      } = await supabase
-        .from('journals')
-        .insert({
-          user_id: userId,
-          username: username,
-          entry_text: entry,
-          response_text: responseText,
-          tone_mode: forcedTone,
-        })
-        .select();
-
-      if (!error && savedEntry && savedEntry[0]) {
-        setLatestEntryId(savedEntry[0].id);
-      }
-
       setEntry('');
       setIsProcessing(false);
       setTimeout(fetchHistory, 300);
