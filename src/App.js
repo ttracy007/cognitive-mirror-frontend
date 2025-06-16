@@ -103,7 +103,8 @@ const App = () => {
         entry_text: entry_text,
         tone_mode:  forcedTone,
         username,
-        user_id: userID
+        user_id: userID,
+        debug_marker: Math.random().toString(36).substring(2, 8)
       };
 
        console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
