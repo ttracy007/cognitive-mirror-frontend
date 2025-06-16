@@ -93,14 +93,12 @@ const App = () => {
     try {
       const token = session.access_token;
       const userId = session.user.id;
-
-console.log("Outgoing token:", token);
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
         
         body: JSON.stringify({
-          entry: entry_text,
+          entry_text: entry,
           tone_mode: forcedTone,
           username,
           user_id: userId
