@@ -98,12 +98,9 @@ console.log("Outgoing token:", token);
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        
         body: JSON.stringify({
-          entry,
+          entry: entry_text,
           tone_mode: forcedTone,
           username,
           user_id: userId
