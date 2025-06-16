@@ -93,7 +93,14 @@ const App = () => {
     try {
       const token = session.access_token;
       const userId = session.user.id;
+      const journalPayload = {
+        entry_text: entry_text,
+        tone_mode:  forcedTone,
+        username,
+        user_id: userID
+      };
 
+       console.log("sending journal entry payload:", jouralPayload);
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
@@ -104,7 +111,7 @@ const App = () => {
           user_id: userId
         }),
       });
-                  console.log("sending journal entry:");
+                 
 
       if (!res.ok) {
         const errorResponse = await res.json();
