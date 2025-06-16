@@ -189,11 +189,25 @@ const App = () => {
       />
     );
   }
+const displayTone = (mode) => {
+  const t = mode?.trim().toLowerCase();
+  switch (t) {
+    case 'frank':
+    case 'frank friend':
+      return '🔴 Frank Friend';
+    case 'stoic':
+    case 'stoic mentor':
+      return '🟢 Stoic Mentor';
+    case 'therapist':
+      return '🟣 Therapist Mode';
+    case 'movies':
+    case 'movie metaphors':
+      return '🎬 Movie Metaphors Man';
+    default:
+      return '❓ Unknown';
+  }
+};
 
-  const displayTone = (mode) => {
-    const t = mode?.trim().toLowerCase();
-    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
-  };
 
   const getToneStyle = (mode) => {
     const tone = mode?.trim().toLowerCase();
