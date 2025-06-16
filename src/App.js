@@ -90,6 +90,8 @@ const App = () => {
       return;
     }
 
+    const forcedTone = tone_mode;
+    
     try {
       const token = session.access_token;
       const userId = session.user.id;
