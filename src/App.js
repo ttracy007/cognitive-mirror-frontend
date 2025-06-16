@@ -94,7 +94,7 @@ const App = () => {
       const token = session.access_token;
       const userId = session.user.id;
 
-       console.log("sending journal entry:", {
+       console.log("sending journal entry:");
       
       const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
         method: 'POST',
