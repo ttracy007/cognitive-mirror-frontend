@@ -141,16 +141,24 @@ const App = () => {
   };
 
   // 🔽 Function 2: Fetch Past Journals
-  const fetchHistory = async () => {
-    const user = session?.user;
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('journals')
-      .select('id, entry_text, response_text, tone_mode, timestamp')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false });
-    if (!error) setHistory(data || []);
-  };
+const fetchHistory = async () => {
+  const user = session?.user;
+  if (!user) return;
+
+  const { data, error } = await supabase
+    .from('journals')
+    .select('id, entry_text, response_text, tone_mode, timestamp')
+    .eq('user_id', user.id)
+    .order('timestamp', { ascending: false });
+
+  if (!error) {
+    const filtered = (data || []).filter(entry =>
+      entry.response_text && entry.response_text !== 'No response received.'
+    );
+    setHistory(filtered);
+  }
+};
+
 
   // 🔽 UI setup (useEffect, auth, summary check)
   useEffect(() => {
