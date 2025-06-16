@@ -103,7 +103,7 @@ const App = () => {
         entry_text: entry_text,
         tone_mode:  forcedTone,
         username,
-        user_id: userId 
+        user_id: userID
       };
 
        console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
