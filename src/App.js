@@ -103,7 +103,7 @@ const App = () => {
         entry_text: entry_text,
         tone_mode:  forcedTone,
         username,
-        user_id: userID
+        user_id: userId,
         debug_marker: Math.random().toString(36).substring(2, 8) 
       };
 
