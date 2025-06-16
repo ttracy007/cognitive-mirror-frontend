@@ -98,6 +98,7 @@ const App = () => {
         method: 'POST',
         
         body: JSON.stringify({
+        console.log("sending journal entry:", {
           entry_text: entry_text,
           tone_mode: forcedTone,
           username,
