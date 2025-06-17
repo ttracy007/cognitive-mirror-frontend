@@ -83,64 +83,77 @@ const App = () => {
   };
 
   // 🔽 Function 3: Submit Journal
- const handleSubmit = async () => {
-    const user = session?.user;
-    if (!user || !entry.trim()) return;
+ const handleSubmitJournal = async () => {
+  if (!entry.trim()) {
+    console.warn("⚠️ Empty entry—skipping submission.");
+    return;
+  }
 
-    if (isProcessing) {
-  console.warn("🚨 Duplicate submission attempt blocked.");
-  return;
-}   
-    setIsProcessing(true);
+  if (isProcessing) {
+    console.warn("⚠️ Submission already in progress—skipping.");
+    return;
+  }
 
-    if (!username || username.trim() === "") {
-      console.warn("Username is missing—aborting submission.");
-      alert("Username is missing—please refresh or log in again.");
+  const now = Date.now();
+  const timeSinceLastSubmit = now - lastSubmitTimeRef.current;
+
+  if (timeSinceLastSubmit < 1000) {
+    console.warn(`⚠️ Rapid re-submit detected (${timeSinceLastSubmit}ms) — ignoring.`);
+    return;
+  }
+
+  lastSubmitTimeRef.current = now;
+  setIsProcessing(true);
+
+     const forcedTone = tone_mode;
+   
+  try {
+    const token = session.access_token;
+    const userId = session.user.id;
+
+    const journalPayload = {
+      entry_text: entry,
+      tone_mode: forcedTone,
+      username,
+      user_id: userId,
+      debug_marker: Math.random().toString(36).substring(2, 8),
+    };
+
+    console.log("📝 handleSubmitJournal() triggered.");
+    console.log("🔍 Entry content:", entry);
+    console.log("⏱️ Time since last submit:", timeSinceLastSubmit + "ms");
+    console.log("🚀 Sending payload:", journalPayload);
+
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(journalPayload),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      console.error("❌ Server responded with error:", json.error);
+      setIsProcessing(false);
       return;
     }
 
-    const forcedTone = tone_mode;
+    setEntry('');
+    setParsedTags([]);
+    setSeverityLevel('');
+    setShowSummary(false);
+    setTimeout(fetchHistory, 500);
+  } catch (err) {
+    console.error("❌ Submission failed:", err);
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+
+  
     
-    try {
-      const token = session.access_token;
-      const userId = session.user.id;
-      const journalPayload = {
-        entry_text: entry_text,
-        tone_mode:  forcedTone,
-        username,
-        user_id: userID,
-        debug_marker: Math.random().toString(36).substring(2, 8)
-      };
-
-       console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
-       console.log("🚀 Submitting to backend:", journalPayload);
-      
-      const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-        method: 'POST',
-        body: JSON.stringify(journalPayload),
-      });
-                 
-
-      if (!res.ok) {
-        const errorResponse = await res.json();
-        console.error("❌ Journal POST failed:", errorResponse.error || res.statusText);
-        return;
-      }
-
-      const result = await res.json();
-      const responseText = result.response_text || 'No response received.';
-      setParsedTags(result.emotion_tags || []);
-      setSeverityLevel(result.severity || '');
-
-      setEntry('');
-      setIsProcessing(false);
-      setTimeout(fetchHistory, 300);
-    } catch (err) {
-      console.error("❌ Unhandled journal submit error:", err.message);
-      setIsProcessing(false);
-    }
-  };
-
+ 
   // 🔽 Function 4: Fetch Past Journals
 const fetchHistory = async () => {
   const user = session?.user;
