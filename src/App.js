@@ -82,21 +82,59 @@ const App = () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
 
+    if (isProcessing) {
+  console.warn("🚨 Duplicate submission attempt blocked.");
+  return;
+}   
     setIsProcessing(true);
 
     if (!username || username.trim() === "") {
-      console.warn("Username is missing-aborting submission.");
-      alert("Username is missing-please refresh or log in again.");
+      console.warn("Username is missing—aborting submission.");
+      alert("Username is missing—please refresh or log in again.");
       return;
     }
-   
-   const forcedTone = tone_mode;
+
+    const forcedTone = tone_mode;
     
-   const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry_text, forcedTone, username }),
-    });
+    try {
+      const token = session.access_token;
+      const userId = session.user.id;
+      const journalPayload = {
+        entry_text: entry_text,
+        tone_mode:  forcedTone,
+        username,
+        user_id: userID,
+        debug_marker: Math.random().toString(36).substring(2, 8)
+      };
+
+       console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
+       console.log("🚀 Submitting to backend:", journalPayload);
+      
+      const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+        method: 'POST',
+        body: JSON.stringify(journalPayload),
+      });
+                 
+
+      if (!res.ok) {
+        const errorResponse = await res.json();
+        console.error("❌ Journal POST failed:", errorResponse.error || res.statusText);
+        return;
+      }
+
+      const result = await res.json();
+      const responseText = result.response_text || 'No response received.';
+      setParsedTags(result.emotion_tags || []);
+      setSeverityLevel(result.severity || '');
+
+      setEntry('');
+      setIsProcessing(false);
+      setTimeout(fetchHistory, 300);
+    } catch (err) {
+      console.error("❌ Unhandled journal submit error:", err.message);
+      setIsProcessing(false);
+    }
+  };
 
   // 🔽 Function 2: Fetch Past Journals
 const fetchHistory = async () => {
