@@ -78,63 +78,34 @@ const App = () => {
   };
 
   // 🔽 Function 1: Submit Journal
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
 
-    if (isProcessing) {
-  console.warn("🚨 Duplicate submission attempt blocked.");
-  return;
-}   
     setIsProcessing(true);
 
     if (!username || username.trim() === "") {
-      console.warn("Username is missing—aborting submission.");
-      alert("Username is missing—please refresh or log in again.");
+      console.warn("Username is missing-aborting submission.");
+      alert("Username is missing-please refresh or log in again.");
       return;
     }
-
-    const forcedTone = tone_mode;
+   
+   const forcedTone = tone_mode;
     
-    try {
-      const token = session.access_token;
-      const userId = session.user.id;
-      const journalPayload = {
-        entry_text: entry_text,
-        tone_mode:  forcedTone,
-        username,
-        user_id: userID,
-        debug_marker: Math.random().toString(36).substring(2, 8)
-      };
+   const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry_text, forcedTone, username }),
+    });
 
-       console.log("🔥 handleSubmitJournal() triggered with entry_text:", entry_text);
-       console.log("🚀 Submitting to backend:", journalPayload);
-      
-      const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-        method: 'POST',
-        body: JSON.stringify(journalPayload),
-      });
-                 
+    const data = await res.json();
+    const responseText = data.response || 'No response received.';
 
-      if (!res.ok) {
-        const errorResponse = await res.json();
-        console.error("❌ Journal POST failed:", errorResponse.error || res.statusText);
-        return;
-      }
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
 
-      const result = await res.json();
-      const responseText = result.response_text || 'No response received.';
-      setParsedTags(result.emotion_tags || []);
-      setSeverityLevel(result.severity || '');
+console.log('✅ Submitting journal for user:', userId);
 
-      setEntry('');
-      setIsProcessing(false);
-      setTimeout(fetchHistory, 300);
-    } catch (err) {
-      console.error("❌ Unhandled journal submit error:", err.message);
-      setIsProcessing(false);
-    }
-  };
 
   // 🔽 Function 2: Fetch Past Journals
 const fetchHistory = async () => {
