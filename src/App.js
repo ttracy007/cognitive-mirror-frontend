@@ -98,15 +98,6 @@ const App = () => {
       body: JSON.stringify({ entry_text, forcedTone, username }),
     });
 
-    const data = await res.json();
-    const responseText = data.response || 'No response received.';
-
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
-
-console.log('✅ Submitting journal for user:', userId);
-
-
   // 🔽 Function 2: Fetch Past Journals
 const fetchHistory = async () => {
   const user = session?.user;
