@@ -1,3 +1,4 @@
+// 🔽 Imports
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer';  
 import { supabase } from './supabaseClient';
@@ -6,6 +7,7 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 
 const App = () => {
+  // 🔽 State Initialization  
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
@@ -25,7 +27,9 @@ const App = () => {
     prompts[Math.floor(Math.random() * prompts.length)]
   );
   let transcriptBuffer = '';
-
+  const lastSubmitTimeRef = useRef(0);
+  
+  // 🔽 Function 1: Load Saved Username
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
     if (savedUsername) {
@@ -33,6 +37,7 @@ const App = () => {
     }
   }, []);
 
+  // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -77,7 +82,7 @@ const App = () => {
     }
   };
 
-  // 🔽 Function 1: Submit Journal
+  // 🔽 Function 3: Submit Journal
  const handleSubmit = async () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
@@ -136,7 +141,7 @@ const App = () => {
     }
   };
 
-  // 🔽 Function 2: Fetch Past Journals
+  // 🔽 Function 4: Fetch Past Journals
 const fetchHistory = async () => {
   const user = session?.user;
   if (!user) return;
@@ -156,7 +161,7 @@ const fetchHistory = async () => {
 };
 
 
-  // 🔽 UI setup (useEffect, auth, summary check)
+  // 🔽 UI setup (useEffect, auth, summary check/triggers)
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -251,6 +256,7 @@ const displayTone = (mode) => {
     }
   };
 
+  // 🔽 UI Buttons and Layout 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
