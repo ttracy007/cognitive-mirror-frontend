@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer';  
 import { supabase } from './supabaseClient';
 import './App.css';
