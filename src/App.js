@@ -120,17 +120,6 @@ const App = () => {
 
     console.log('✅ Submitting journal for user:', userId);
 
-    const { data: savedEntry, error } = await supabase
-      .from('journals')
-      .insert({
-        user_id: userId,
-        username: username,
-        entry_text: entry_text,
-        response_text: responseText,
-        tone_mode: forcedTone,
-      })
-      .select();
-
     if (!error && savedEntry && savedEntry[0]) {
       setLatestEntryId(savedEntry[0].id);
     }
