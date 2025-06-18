@@ -120,10 +120,13 @@ const App = () => {
   }, [session]);
 
   // 🔽 Function 6: Submit New Journal Entry
-  const handleSubmit = async () => {
+  const handleSubmitJournal = async () => {
+        console.warn("🧪 handleSubmitJournal called!");
     const user = session?.user;
     if (!user || !entry.trim()) return;
-
+    
+    
+    
     setIsProcessing(true);
 
     if (!username || username.trim() === "") {
