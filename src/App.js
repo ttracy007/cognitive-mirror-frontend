@@ -117,8 +117,7 @@ const App = () => {
     const filtered = (data || []).filter(
       entry =>
         entry.response_text &&
-        entry.response_text.trim().toLowerCase() !== 'no response received.' &&
-        entry.debug_marker
+        entry.response_text.trim().toLowerCase() !== 'no response received.' 
     );
     setHistory(filtered);
   }
