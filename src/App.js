@@ -131,7 +131,7 @@ const App = () => {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
 
-    console.log('✅ Submitting journal for user:', username);
+    // console.log('✅ Submitting journal for user:', username);
     console.log("💡 Fresh deploy trigger");
 
     setEntry('');
