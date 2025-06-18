@@ -11,7 +11,7 @@ const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
-  // const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("frank");
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
