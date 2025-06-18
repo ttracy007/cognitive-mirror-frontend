@@ -146,10 +146,6 @@ const App = () => {
 
     console.log('✅ Submitting journal for user:', userId);
 
-    if (!error && savedEntry && savedEntry[0]) {
-      setLatestEntryId(savedEntry[0].id);
-    }
-
     setEntry('');
     setParsedTags([]);
     setSeverityLevel('');
