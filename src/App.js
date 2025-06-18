@@ -137,7 +137,7 @@ const App = () => {
     setParsedTags([]);
     setSeverityLevel('');
     setIsProcessing(false);
-    setTimeout(fetchHistory, 300);
+    // setTimeout(fetchHistory, 300);
   };
 
    // 🔽 Function 6: Fetch Past Journals
