@@ -150,14 +150,17 @@ const App = () => {
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
       
-    if (!error) {
-    const filtered = (data || []).filter(
-      entry =>
-        entry.response_text &&
-        entry.response_text.trim().toLowerCase() !== 'no response received.' 
-    );
-    setHistory(filtered);
+    if (error) {
+    console.error("❌ Error fetching history:", error.message);
+    return;
   }
+
+  const filtered = (data || []).filter(entry =>
+    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
+    entry.debug_marker?.trim() !== ''
+  );
+  console.log("📜 Filtered journal history:", filtered);  // <== Required for confirmation
+  setHistory(filtered);
 };
 
   useEffect(() => {
