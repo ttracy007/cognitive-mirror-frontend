@@ -103,22 +103,6 @@ const App = () => {
     };
   }, []);
 
-  // 🔽 Function 5: Fetch Past Journals
-  const fetchHistory = async () => {
-    const user = session?.user;
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('journals')
-      .select('id, entry_text, response_text, tone_mode, timestamp')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false });
-    if (!error) setHistory(data || []);
-  };
-
-  useEffect(() => {
-    if (session) fetchHistory();
-  }, [session]);
-
   // 🔽 Function 6: Submit Journal
  const handleSubmit = async () => {
     const user = session?.user;
