@@ -81,8 +81,45 @@ const App = () => {
       setIsListening(false);
     }
   };
+  // 🔽 Function 3: Show Summary Trigger
+  useEffect(() => {
+    const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
+    if (!hasTriggeredSummary && history.length >= 5) {
+      setShowSummary(true);
+      localStorage.setItem('hasTriggeredSummary', 'true');
+    }
+  }, [history]);
 
-  // 🔽 Function 3: Submit Journal
+  // 🔽 Function 4: Auth Setup
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  // 🔽 Function 5: Fetch Past Journals
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, tone_mode, timestamp')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+    if (!error) setHistory(data || []);
+  };
+
+  useEffect(() => {
+    if (session) fetchHistory();
+  }, [session]);
+
+  // 🔽 Function 6: Submit Journal
  const handleSubmit = async () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
@@ -133,51 +170,6 @@ const App = () => {
     setTimeout(fetchHistory, 300);
   };
   
-  // 🔽 Function 4: Fetch Past Journals
-const fetchHistory = async () => {
-  const user = session?.user;
-  if (!user) return;
-
-  const { data, error } = await supabase
-    .from('journals')
-    .select('id, entry_text, response_text, tone_mode, timestamp')
-    .eq('user_id', user.id)
-    .order('timestamp', { ascending: false });
-
-  if (!error) {
-    const filtered = (data || []).filter(entry =>
-      entry.response_text && entry.response_text !== 'No response received.'
-    );
-    setHistory(filtered);
-  }
-};
-
-
-  // 🔽 UI setup (useEffect, auth, summary check/triggers)
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (session) fetchHistory();
-  }, [session]);
-
-  useEffect(() => {
-    const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
-    if (!hasTriggeredSummary && history.length >= 5) {
-      setShowSummary(true);
-      localStorage.setItem('hasTriggeredSummary', 'true');
-    }
-  }, [history]);
-
   // 🔽 UI rendering
   if (!session && !showLogin) return <LandingPage onStart={() => setShowLogin(true)} />;
   if (!session) {
