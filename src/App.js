@@ -104,8 +104,8 @@ const App = () => {
   }, []);
 
   // 🔽 Function 5: Submit New Journal Entry
-  const handleSubmitJournal = async () => {
-        console.warn("🧪 handleSubmitJournal called!");
+  const handleSubmit = async () => {
+        console.warn("🧪 handleSubmit called!");
     const user = session?.user;
     if (!user || !entry.trim()) return;
     
