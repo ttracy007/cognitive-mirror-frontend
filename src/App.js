@@ -90,18 +90,6 @@ const App = () => {
     }
   }, [history]);
 
-  // 🔽 Function 4: Auth Setup
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
 
   // 🔽 Function 6: Submit Journal
  const handleSubmit = async () => {
