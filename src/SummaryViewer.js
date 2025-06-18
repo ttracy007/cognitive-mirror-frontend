@@ -47,9 +47,9 @@ const SummaryViewer = ({ history, onClose }) => {
   };
 
   // Auto-trigger summaries on mount
-  React.useEffect(() => {
-    generateAllSummaries();
-  }, []);
+  // React.useEffect(() => {
+  //   generateAllSummaries();
+  // }, []);
 
   return (
     <div
