@@ -1,13 +1,13 @@
-// 🔽 Imports
-import React, { useEffect, useState } from 'react'; 
-import SummaryViewer from './SummaryViewer';  
+// 🔼 Imports and Setup
+import React, { useEffect, useState } from 'react';
+import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 
+// 🔽 Component State Initialization
 const App = () => {
-  // 🔽 State Initialization  
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
@@ -27,14 +27,13 @@ const App = () => {
     prompts[Math.floor(Math.random() * prompts.length)]
   );
   let transcriptBuffer = '';
-  const lastSubmitTimeRef = useRef(0);
-  
+
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    if (savedUsername) {
-      setUsername(savedUsername);
-    }
+      const savedUsername = localStorage.getItem("username");
+      if (savedUsername) {
+        setUsername(savedUsername);
+      }
   }, []);
 
   // 🔽 Function 2: Set Up Voice Recognition
@@ -81,6 +80,7 @@ const App = () => {
       setIsListening(false);
     }
   };
+
   // 🔽 Function 3: Show Summary Trigger
   useEffect(() => {
     const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
@@ -90,9 +90,37 @@ const App = () => {
     }
   }, [history]);
 
+  // 🔽 Function 4: Auth Setup
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
 
-  // 🔽 Function 6: Submit Journal
- const handleSubmit = async () => {
+  // 🔽 Function 5: Fetch Past Journals
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, tone_mode, timestamp')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+    if (!error) setHistory(data || []);
+  };
+
+  useEffect(() => {
+    if (session) fetchHistory();
+  }, [session]);
+
+  // 🔽 Function 6: Submit New Journal Entry
+  const handleSubmit = async () => {
     const user = session?.user;
     if (!user || !entry.trim()) return;
 
@@ -104,14 +132,12 @@ const App = () => {
       return;
     }
 
-   const forcedTone = tone_mode; 
-   
-   const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry_text, forcedTone, username }),
+      body: JSON.stringify({ entry, forcedTone, username }),
     });
-  
+
     const data = await res.json();
     const responseText = data.response || 'No response received.';
 
@@ -119,6 +145,17 @@ const App = () => {
     const userId = userData.user?.id;
 
     console.log('✅ Submitting journal for user:', userId);
+
+    const { data: savedEntry, error } = await supabase
+      .from('journals')
+      .insert({
+        user_id: userId,
+        username: username,
+        entry_text: entry,
+        response_text: responseText,
+        tone_mode: forcedTone,
+      })
+      .select();
 
     if (!error && savedEntry && savedEntry[0]) {
       setLatestEntryId(savedEntry[0].id);
@@ -130,9 +167,12 @@ const App = () => {
     setIsProcessing(false);
     setTimeout(fetchHistory, 300);
   };
-  
-  // 🔽 UI rendering
-  if (!session && !showLogin) return <LandingPage onStart={() => setShowLogin(true)} />;
+
+  // 🔽 UI State Routing
+  if (!session && !showLogin) {
+    return <LandingPage onStart={() => setShowLogin(true)} />;
+  }
+
   if (!session) {
     return (
       <LoginPage
@@ -143,25 +183,12 @@ const App = () => {
       />
     );
   }
-const displayTone = (mode) => {
-  const t = mode?.trim().toLowerCase();
-  switch (t) {
-    case 'frank':
-    case 'frank friend':
-      return '🔴 Frank Friend';
-    case 'stoic':
-    case 'stoic mentor':
-      return '🟢 Stoic Mentor';
-    case 'therapist':
-      return '🟣 Therapist Mode';
-    case 'movies':
-    case 'movie metaphors':
-      return '🎬 Movie Metaphors Man';
-    default:
-      return '❓ Unknown';
-  }
-};
 
+  // 🔽 Tone Display Utility
+  const displayTone = (mode) => {
+    const t = mode?.trim().toLowerCase();
+    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
+  };
 
   const getToneStyle = (mode) => {
     const tone = mode?.trim().toLowerCase();
@@ -201,11 +228,12 @@ const displayTone = (mode) => {
     }
   };
 
-  // 🔽 UI Buttons and Layout 
+  // 🔽 UI Rendering
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      {/* Header and Logout */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Cognitive Mirror</h1>
+        <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
         <button
           onClick={async () => {
             await supabase.auth.signOut();
@@ -217,9 +245,14 @@ const displayTone = (mode) => {
         </button>
       </div>
 
+      {/* Tone Picker */}
       <div style={{ marginBottom: '1rem' }}>
         <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-        <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)} style={{ padding: '0.4rem' }}>
+        <select
+          value={forcedTone}
+          onChange={(e) => setForcedTone(e.target.value)}
+          style={{ padding: '0.4rem' }}
+        >
           <option value="frank">Frank Friend</option>
           <option value="stoic">Stoic Mentor</option>
           <option value="therapist">Therapist Mode</option>
@@ -227,7 +260,9 @@ const displayTone = (mode) => {
         </select>
       </div>
 
+      {/* Journal Input & Instructions */}
       <div style={{ display: 'flex', gap: '2rem' }}>
+        {/* Input */}
         <div style={{ flex: 1 }}>
           <textarea
             rows="6"
@@ -240,12 +275,13 @@ const displayTone = (mode) => {
           <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
             <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
             <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-            <button onClick={handleSubmitJournal} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
             {isListening && <span>🎧 Listening…</span>}
             {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
           </div>
         </div>
 
+        {/* Prompt Instructions */}
         <div style={{
           flex: 1,
           backgroundColor: '#f9f9f9',
@@ -263,9 +299,11 @@ const displayTone = (mode) => {
         </div>
       </div>
 
+      {/* Reflection Thread & Summary */}
       <div style={{ marginTop: '2rem' }}>
         <h3>🧠 Your Reflection Thread</h3>
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+
           {history.length >= 5 ? (
             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
               <button
