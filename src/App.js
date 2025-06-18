@@ -142,6 +142,7 @@ const App = () => {
 
    // 🔽 Function 6: Fetch Past Journals
   const fetchHistory = async () => {
+    console.log("🔁 fetchHistory ran at", new Date().toISOString());
     const user = session?.user;
     if (!user) return;
     const { data, error } = await supabase
