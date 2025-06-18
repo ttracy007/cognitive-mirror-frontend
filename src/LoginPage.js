@@ -44,11 +44,11 @@ const LoginPage = ({ onAuthSuccess }) => {
       }
 
       // Fetch session after successful login
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        setErrorMsg('Authentication failed.');
-        return;
-      }
+      // const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      // if (sessionError || !sessionData.session) {
+      //   setErrorMsg('Authentication failed.');
+      //   return;
+      // }
 
       // Pass username manually to App
       onAuthSuccess(sessionData.session, username);
