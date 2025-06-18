@@ -119,6 +119,8 @@ const App = () => {
       return;
     }
 
+    const debug_marker = Math.random().toString(36).substring(2, 8);
+    
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
