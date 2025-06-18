@@ -240,7 +240,7 @@ const displayTone = (mode) => {
           <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
             <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
             <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+            <button onClick={handleSubmitJournal} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
             {isListening && <span>🎧 Listening…</span>}
             {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
           </div>
