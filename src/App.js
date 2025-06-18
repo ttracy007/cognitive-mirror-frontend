@@ -103,31 +103,7 @@ const App = () => {
     };
   }, []);
 
-  // 🔽 Function 5: Fetch Past Journals
-  const fetchHistory = async () => {
-    const user = session?.user;
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('journals')
-      .select('id, entry_text, response_text, tone_mode, timestamp')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false });
-      
-    if (!error) {
-    const filtered = (data || []).filter(
-      entry =>
-        entry.response_text &&
-        entry.response_text.trim().toLowerCase() !== 'no response received.' 
-    );
-    setHistory(filtered);
-  }
-};
-
-  useEffect(() => {
-    if (session) fetchHistory();
-  }, [session]);
-
-  // 🔽 Function 6: Submit New Journal Entry
+  // 🔽 Function 5: Submit New Journal Entry
   const handleSubmitJournal = async () => {
         console.warn("🧪 handleSubmitJournal called!");
     const user = session?.user;
@@ -163,6 +139,30 @@ const App = () => {
     setIsProcessing(false);
     setTimeout(fetchHistory, 300);
   };
+
+   // 🔽 Function 6: Fetch Past Journals
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, tone_mode, timestamp')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+      
+    if (!error) {
+    const filtered = (data || []).filter(
+      entry =>
+        entry.response_text &&
+        entry.response_text.trim().toLowerCase() !== 'no response received.' 
+    );
+    setHistory(filtered);
+  }
+};
+
+  useEffect(() => {
+    if (session) fetchHistory();
+  }, [session]);
 
   // 🔽 UI State Routing
   if (!session && !showLogin) {
