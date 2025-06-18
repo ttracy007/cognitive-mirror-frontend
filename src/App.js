@@ -83,77 +83,56 @@ const App = () => {
   };
 
   // 🔽 Function 3: Submit Journal
- const handleSubmitJournal = async () => {
-  if (!entry.trim()) {
-    console.warn("⚠️ Empty entry—skipping submission.");
-    return;
-  }
+ const handleSubmit = async () => {
+    const user = session?.user;
+    if (!user || !entry.trim()) return;
 
-  if (isProcessing) {
-    console.warn("⚠️ Submission already in progress—skipping.");
-    return;
-  }
+    setIsProcessing(true);
 
-  const now = Date.now();
-  const timeSinceLastSubmit = now - lastSubmitTimeRef.current;
+    if (!username || username.trim() === "") {
+      console.warn("Username is missing-aborting submission.");
+      alert("Username is missing-please refresh or log in again.");
+      return;
+    }
 
-  if (timeSinceLastSubmit < 1000) {
-    console.warn(`⚠️ Rapid re-submit detected (${timeSinceLastSubmit}ms) — ignoring.`);
-    return;
-  }
-
-  lastSubmitTimeRef.current = now;
-  setIsProcessing(true);
-
-     const forcedTone = tone_mode;
+   const forcedTone = tone_mode; 
    
-  try {
-    const token = session.access_token;
-    const userId = session.user.id;
-
-    const journalPayload = {
-      entry_text: entry,
-      tone_mode: forcedTone,
-      username,
-      user_id: userId,
-      debug_marker: Math.random().toString(36).substring(2, 8),
-    };
-
-    console.log("📝 handleSubmitJournal() triggered.");
-    console.log("🔍 Entry content:", entry);
-    console.log("⏱️ Time since last submit:", timeSinceLastSubmit + "ms");
-    console.log("🚀 Sending payload:", journalPayload);
-
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+   const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(journalPayload),
+      body: JSON.stringify({ entry_text, forcedTone, username }),
     });
+  
+    const data = await res.json();
+    const responseText = data.response || 'No response received.';
 
-    const json = await res.json();
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
 
-    if (!res.ok) {
-      console.error("❌ Server responded with error:", json.error);
-      setIsProcessing(false);
-      return;
+    console.log('✅ Submitting journal for user:', userId);
+
+    const { data: savedEntry, error } = await supabase
+      .from('journals')
+      .insert({
+        user_id: userId,
+        username: username,
+        entry_text: entry_text,
+        response_text: responseText,
+        tone_mode: forcedTone,
+      })
+      .select();
+
+    if (!error && savedEntry && savedEntry[0]) {
+      setLatestEntryId(savedEntry[0].id);
     }
 
     setEntry('');
     setParsedTags([]);
     setSeverityLevel('');
-    setShowSummary(false);
-    setTimeout(fetchHistory, 500);
-  } catch (err) {
-    console.error("❌ Submission failed:", err);
-  } finally {
     setIsProcessing(false);
-  }
-};
-
-
+    setTimeout(fetchHistory, 300);
+  };
   
-    
- 
   // 🔽 Function 4: Fetch Past Journals
 const fetchHistory = async () => {
   const user = session?.user;
