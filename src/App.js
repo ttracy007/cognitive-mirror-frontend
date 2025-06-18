@@ -112,8 +112,17 @@ const App = () => {
       .select('id, entry_text, response_text, tone_mode, timestamp')
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
-    if (!error) setHistory(data || []);
-  };
+      
+    if (!error) {
+    const filtered = (data || []).filter(
+      entry =>
+        entry.response_text &&
+        entry.response_text.trim().toLowerCase() !== 'no response received.' &&
+        entry.debug_marker
+    );
+    setHistory(filtered);
+  }
+};
 
   useEffect(() => {
     if (session) fetchHistory();
