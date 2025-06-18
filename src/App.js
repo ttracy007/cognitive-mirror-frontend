@@ -122,7 +122,7 @@ const App = () => {
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry_text:entry, tone_mode, username, debug_marker }),
+      body: JSON.stringify({ entry_text:entry, tone_mode:foredTone, username, debug_marker }),
     });
 
     const data = await res.json();
