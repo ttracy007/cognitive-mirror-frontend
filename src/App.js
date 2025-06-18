@@ -132,6 +132,7 @@ const App = () => {
     const userId = userData.user?.id;
 
     console.log('✅ Submitting journal for user:', userId);
+    console.log("💡 Fresh deploy trigger");
 
     setEntry('');
     setParsedTags([]);
