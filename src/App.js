@@ -121,6 +121,9 @@ const App = () => {
 
     const debug_marker = Math.random().toString(36).substring(2, 8);
     
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -129,9 +132,6 @@ const App = () => {
 
     const data = await res.json();
     const responseText = data.response || 'No response received.';
-
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
 
     console.log('✅ Submitting journal for user:', username);
     console.log("💡 Fresh deploy trigger");
