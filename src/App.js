@@ -1,4 +1,4 @@
-// 🔼 Imports and Setup
+// 🔼 Imports and Setup 
 import React, { useEffect, useState } from 'react';
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
@@ -133,7 +133,8 @@ const App = () => {
 
     // console.log('✅ Submitting journal for user:', username);
     console.log("💡 Fresh deploy trigger");
-
+    console.log("🚨 App.js version: [insert build label or timestamp]");
+    
     setEntry('');
     setParsedTags([]);
     setSeverityLevel('');
