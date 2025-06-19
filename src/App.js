@@ -6,9 +6,6 @@ import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 
-
-
-
 // 🔽 Component State Initialization
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -99,7 +96,7 @@ const App = () => {
       .then(res => res.txt())
       .then(text => {
          console.log("🛠️ App.js version:", text);
-         console.log(🧱 Frontend build version: ${text});
+         console.log("🧱 Frontend build version": ${text});
       });
   }, []);
   
