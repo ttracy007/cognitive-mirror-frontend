@@ -5,9 +5,9 @@ import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
-// import buildVersion from './build-version.txt?raw';
 
-// console.log(`🧠 BUILD: ${buildVersion}`);
+
+
 
 // 🔽 Component State Initialization
 const App = () => {
@@ -99,6 +99,7 @@ const App = () => {
       .then(res => res.txt())
       .then(text => {
          console.log("🛠️ App.js version:", text);
+         console.log(🧱 Frontend build version: ${text});
       });
   }, []);
   
