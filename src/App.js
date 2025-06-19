@@ -164,7 +164,7 @@ const App = () => {
   //   entry.debug_marker?.trim() !== ''
   // );
   // console.log("📜 Filtered journal history:", filtered);  // <== Required for confirmation
-  setHistory(filtered);
+  // setHistory(filtered);
 };
 
   useEffect(() => {
