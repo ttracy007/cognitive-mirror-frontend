@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
-import buildVersion from './build-version.txt?raw';
+// import buildVersion from './build-version.txt?raw';
 
 console.log(`🧠 BUILD: ${buildVersion}`);
 
