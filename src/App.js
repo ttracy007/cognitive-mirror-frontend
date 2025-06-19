@@ -134,7 +134,7 @@ const App = () => {
     const responseText = data.response || 'No response received.';
 
     console.log('✅ Submitting journal for user:', username);
-    console.log("💡 Fresh deploy trigger");
+    // console.log("💡 Fresh deploy trigger");
     console.log("🚨 App.js version: [insert build label or timestamp]");
     
     setEntry('');
@@ -146,7 +146,6 @@ const App = () => {
 
    // 🔽 Function 6: Fetch Past Journals
   const fetchHistory = async () => {
-    console.log("🔁 fetchHistory ran at", new Date().toISOString());
     const user = session?.user;
     if (!user) return;
     const { data, error } = await supabase
