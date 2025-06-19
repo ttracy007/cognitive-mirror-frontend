@@ -93,6 +93,15 @@ const App = () => {
     }
   }, [history]);
 
+   // 🔽 Function 3a: Build Current Commit Tag 
+  useEffect(() => {
+    fetch('/build-version.txt')
+      .then(res => res.txt())
+      .then(text => {
+         console.log("🛠️ App.js version:", text);
+      });
+  }, []);
+  
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
