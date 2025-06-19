@@ -7,7 +7,7 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 // import buildVersion from './build-version.txt?raw';
 
-console.log(`🧠 BUILD: ${buildVersion}`);
+// console.log(`🧠 BUILD: ${buildVersion}`);
 
 // 🔽 Component State Initialization
 const App = () => {
