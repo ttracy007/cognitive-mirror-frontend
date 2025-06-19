@@ -27,4 +27,8 @@
       "last 1 safari version"
     ]
   }
+  "scripts": {
+  "prebuild": "git rev-parse --short HEAD > src/build-version.txt",
+  "build": "react-scripts build"
+}
 }
