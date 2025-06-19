@@ -94,9 +94,9 @@ const App = () => {
   useEffect(() => {
     fetch('/build-version.txt')
       .then(res => res.txt())
-      .then(text => {
+      .then(text => 
          console.log("🛠️ App.js version:", text);
-         console.log("🧱 Frontend build version": ${text});
+         console.log('🧱 Frontend build version: ${text})';
       });
   }, []);
   
