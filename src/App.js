@@ -138,7 +138,7 @@ const App = () => {
 
     console.log('✅ Submitting journal for user:', username);
     // console.log("💡 Fresh deploy trigger");
-    console.log("🚨 App.js version: [insert build label or timestamp]");
+    // console.log("🚨 App.js version: [insert build label or timestamp]");
     
     setEntry('');
     setParsedTags([]);
