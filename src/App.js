@@ -98,7 +98,7 @@ const App = () => {
          console.log("🛠️ App.js version:", text);
          console.log(`🧱 Frontend build version: ${text}`);
       });
-  }, []);
+   [];
   
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
