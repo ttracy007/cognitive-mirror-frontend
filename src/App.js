@@ -159,11 +159,11 @@ const App = () => {
     return;
   }
 
-  const filtered = (data || []).filter(entry =>
-    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
-    entry.debug_marker?.trim() !== ''
-  );
-  console.log("📜 Filtered journal history:", filtered);  // <== Required for confirmation
+  // const filtered = (data || []).filter(entry =>
+  //   entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
+  //   entry.debug_marker?.trim() !== ''
+  // );
+  // console.log("📜 Filtered journal history:", filtered);  // <== Required for confirmation
   setHistory(filtered);
 };
 
