@@ -95,7 +95,7 @@ const App =
     fetch('/build-version.txt')
       .then(res => {
         if(!res.ok) throw new Error('build-version.txt not found');
-        return rex.txt();
+        return res.txt();
       })
       .then(text => {
          console.log("🛠️ App.js version:", text);
@@ -103,7 +103,7 @@ const App =
       })
       .catch(err => {
         console.error(⚠️ Failed to fetch build version:", err.message);
-    });
+      });
   }, []);
   
   // 🔽 Function 4: Auth Setup
