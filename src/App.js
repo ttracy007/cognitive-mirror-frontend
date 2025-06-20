@@ -169,7 +169,12 @@ const App = () => {
     return;
   }
 
-  const filtered = (data || []).filter(entry =>
+  // 🔽 Function 6a: Filter Out No Respose, No debug markers
+
+  const showAll = true;
+  const filtered = showAll
+    ? (data || [])
+    : (data || []).filter(entry =>
     entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
     entry.debug_marker?.trim() !== ''
   );
