@@ -95,7 +95,7 @@ const App =
     fetch('/build-version.txt')
       .then(res => {
         if(!res.ok) throw new Error('build-version.txt not found');
-        return res.txt();
+        return res.text();
       })
       .then(text => {
          console.log("🛠️ App.js version:", text);
