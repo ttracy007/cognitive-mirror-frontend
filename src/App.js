@@ -90,21 +90,21 @@ const App =
     }
   }, [history]);
 
-   // 🔽 Function 3a: Build Current Commit Tag 
-  useEffect(() => {
-    fetch('/build-version.txt')
-      .then(res => {
-        if(!res.ok) throw new Error('build-version.txt not found');
-        return res.text();
-      })
-      .then(text => {
-         console.log("🛠️ App.js version:", text);
-         console.log(`🧱 Frontend build version: ${text}`);
-      })
-      .catch(err => {
-        console.error(⚠️ Failed to fetch build version:", err.message);
-      });
-  }, []);
+  //  // 🔽 Function 3a: Build Current Commit Tag 
+  // useEffect(() => {
+  //   fetch('/build-version.txt')
+  //     .then(res => {
+  //       if(!res.ok) throw new Error('build-version.txt not found');
+  //       return res.text();
+  //     })
+  //     .then(text => {
+  //        console.log("🛠️ App.js version:", text);
+  //        console.log(`🧱 Frontend build version: ${text}`);
+  //     })
+  //     .catch(err => {
+  //       console.error(⚠️ Failed to fetch build version:", err.message);
+  //     });
+  // }, []);
   
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
