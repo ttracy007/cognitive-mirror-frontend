@@ -7,7 +7,7 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 
 // 🔽 Component State Initialization
-const App = 
+const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
@@ -29,7 +29,7 @@ const App =
   let transcriptBuffer = '';
 
   // 🔽 Function 1: Load Saved Username
-  useEffect(
+  useEffect(() => {
       const savedUsername = localStorage.getItem("username");
       if (savedUsername) {
         setUsername(savedUsername);
@@ -37,7 +37,7 @@ const App =
   }, []);
 
   // 🔽 Function 2: Set Up Voice Recognition
-  useEffect(
+  useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recog = new SpeechRecognition();
@@ -59,7 +59,7 @@ const App =
         }
       };
 
-      recog.onend = 
+      recog.onend = () => {
         setIsListening(false);
       };
 
@@ -67,7 +67,7 @@ const App =
     }
   }, []);
 
-  const startListening = 
+  const startListening = () => {
     if (recognition && !isListening) {
       recognition.start();
       setIsListening(true);
@@ -90,21 +90,15 @@ const App =
     }
   }, [history]);
 
-  //  // 🔽 Function 3a: Build Current Commit Tag 
-  // useEffect(() => {
-  //   fetch('/build-version.txt')
-  //     .then(res => {
-  //       if(!res.ok) throw new Error('build-version.txt not found');
-  //       return res.text();
-  //     })
-  //     .then(text => {
-  //        console.log("🛠️ App.js version:", text);
-  //        console.log(`🧱 Frontend build version: ${text}`);
-  //     })
-  //     .catch(err => {
-  //       console.error(⚠️ Failed to fetch build version:", err.message);
-  //     });
-  // }, []);
+   // 🔽 Function 3a: Build Current Commit Tag 
+  useEffect(() => {
+    fetch('/build-version.txt')
+      .then(res => res.txt())
+      .then(text => {
+         console.log("🛠️ App.js version:", text);
+         console.log(`🧱 Frontend build version: ${text}`);
+      });
+  }, []);
   
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
@@ -114,13 +108,13 @@ const App =
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-    return 
+    return () => {
       listener?.subscription.unsubscribe();
     };
   }, []);
 
   // 🔽 Function 5: Submit New Journal Entry
-  const handleSubmit = async 
+  const handleSubmit = async () => {
         console.warn("🧪 handleSubmit called!");
     const user = session?.user;
     if (!user || !entry.trim()) return;
@@ -161,7 +155,7 @@ const App =
   };
 
    // 🔽 Function 6: Fetch Past Journals
-  const fetchHistory = async 
+  const fetchHistory = async () => {
     const user = session?.user;
     if (!user) return;
     const { data, error } = await supabase
@@ -183,7 +177,7 @@ const App =
   setHistory(filtered);
 };
 
-  useEffect(
+  useEffect(() => {
     if (session) fetchHistory();
   }, [session]);
 
@@ -254,7 +248,7 @@ const App =
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
         <button
-          onClick={async 
+          onClick={async () => {
             await supabase.auth.signOut();
             setSession(null);
           }}
