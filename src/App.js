@@ -171,7 +171,7 @@ const App = () => {
 
   // 🔽 Function 6a: Filter Out No Respose, No debug markers
 
-  const showAll = true;
+  const showAll = false;
   const filtered = showAll
     ? (data || [])
     : (data || []).filter(entry =>
