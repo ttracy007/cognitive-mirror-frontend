@@ -169,16 +169,16 @@ const App = () => {
     return;
   }
 
-  // 🔽 Function 6a: Filter Out No Respose, No debug markers
+  // 🔽 Function 6a: Filter Out No Respose, No debug markers 
 
-  const showAll = false;
+  const showAll = true; // <== True all entries, False filtered 
   const filtered = showAll
     ? (data || [])
     : (data || []).filter(entry =>
     entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
     entry.debug_marker?.trim() !== ''
   );
-  console.log("📜 Filtered journal history:", filtered);  // <== Required for confirmation
+  // console.log("📜 Filtered journal history:", filtered);  // <== Enable if False 
   setHistory(filtered);
 };
 
