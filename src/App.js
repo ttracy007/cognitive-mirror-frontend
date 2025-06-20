@@ -96,7 +96,7 @@ const App = () => {
       .then(res => res.text())
       .then(text => {
          console.log("🛠️ App.js version:", text);
-         console.log(`🧱 Frontend build version: ${text}`);
+         // console.log(`🧱 Frontend build version: ${text}`);
       });
   }, []);
   
