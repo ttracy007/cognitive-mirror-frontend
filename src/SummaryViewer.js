@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import SummaryBlock from './SummaryBlock';
 import React, { useState, useEffect } from 'react';
+import SummaryBlock from './SummaryBlock';
 
 
 const SummaryViewer = ({ history, onClose }) => {
