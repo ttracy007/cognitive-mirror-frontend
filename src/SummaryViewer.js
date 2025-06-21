@@ -50,18 +50,6 @@ const SummaryViewer = ({ history, onClose }) => {
   }
 };   
        
-      const [insight, clinical, narrative] = await Promise.all(
-        types.map((type) => fetchSummary(type))
-      );
-
-      setSummaries({ insight, clinical, narrative });
-    } catch (error) {
-      console.error('Error generating summaries:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Auto-trigger summaries on mount
  
   useEffect(() => {
