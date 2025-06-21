@@ -202,6 +202,32 @@ const App = () => {
     );
   }
 
+// 🔽 Function 7: Generate Handoff Summaries  
+const generateSummary = async (summaryType = 'insight') => {
+  try {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        summary_type: summaryType,
+        history
+      })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log("🧠 Summary received:", data.summary);
+      setSummary(data.summary); // You must define this state earlier
+    } else {
+      console.error("❌ Summary generation failed:", data.error);
+      setSummary('Summary generation failed.');
+    }
+  } catch (err) {
+    console.error("❌ Fetch error:", err.message);
+    setSummary('Summary not available due to an error.');
+  }
+};
+
   // 🔽 Tone Display Utility
   const displayTone = (mode) => {
     const t = mode?.trim().toLowerCase();
