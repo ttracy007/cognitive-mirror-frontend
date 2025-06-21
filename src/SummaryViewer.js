@@ -17,38 +17,38 @@ const SummaryViewer = ({ history, onClose }) => {
   };
 
   const generateAllSummaries = async () => {
-    setIsLoading(true);
-    setIsModalOpen(true);
+  setIsLoading(true);
+  setIsModalOpen(true);
 
-    try {
-      const types = ['insight', 'clinical', 'narrative'];
-      const recentHistory = history.slice(0,10); // Only send 10 entries 
-      
-      const fetchSummary = (type) => {
-        return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            history: recentHistory, 
-            summary_type: type,
-          }),
-        }).then(res => res.json());
+  try {
+    const types = ['insight', 'clinical', 'narrative'];
+    const recentHistory = history.slice(0, 10); // Only last 10
+
+    const fetchSummary = (type) => {
+      return fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          history: recentHistory,
+          summary_type: type,
+        }),
+      }).then(res => res.json());
     };
 
-    const results = await Promise.all(types.map(fetchSummary));
+    // ✅ Await all fetches properly here
+    const results = await Promise.all(types.map(type => fetchSummary(type)));
+
     setSummaries({
       insight: results[0].summary,
       clinical: results[1].summary,
       narrative: results[2].summary,
     });
-
   } catch (err) {
     console.error("❌ Failed to generate summaries:", err);
   } finally {
     setIsLoading(false);
   }
-}; 
-        
+};   
        
       const [insight, clinical, narrative] = await Promise.all(
         types.map((type) => fetchSummary(type))
