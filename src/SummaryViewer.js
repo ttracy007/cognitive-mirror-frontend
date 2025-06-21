@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import SummaryBlock from './SummaryBlock';
+import React, { useState, useEffect } from 'react';
+
 
 const SummaryViewer = ({ history, onClose }) => {
   const [summaries, setSummaries] = useState({
@@ -47,7 +49,7 @@ const SummaryViewer = ({ history, onClose }) => {
   };
 
   // Auto-trigger summaries on mount
- import React, { useState, useEffect } from 'react';
+ 
   useEffect(() => {
     generateAllSummaries();
   }, []);
