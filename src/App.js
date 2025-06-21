@@ -16,6 +16,7 @@ const App = () => {
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summary, setSummary] = useState('');
   const [parsedTags, setParsedTags] = useState([]);
   const [severityLevel, setSeverityLevel] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
