@@ -82,7 +82,7 @@ const SummaryViewer = ({ history, onClose }) => {
           </p>
           <SummaryBlock
             label="Insight Summary"
-            content={summaries.insight?.summary || 'Summary not available.'}
+            content={summaries.insight|| 'Summary not available.'}
             onCopy={() => copyToClipboard(summaries.insight?.summary)}
           />
 
@@ -94,7 +94,7 @@ const SummaryViewer = ({ history, onClose }) => {
           </p>
           <SummaryBlock
             label="Clinical Summary"
-            content={summaries.clinical?.summary || 'Summary not available.'}
+            content={summaries.clinical || 'Summary not available.'}
             onCopy={() => copyToClipboard(summaries.clinical?.summary)}
           />
 
@@ -105,7 +105,7 @@ const SummaryViewer = ({ history, onClose }) => {
           </p>
           <SummaryBlock
             label="Narrative Voice Summary"
-            content={summaries.narrative?.summary || 'Summary not available.'}
+            content={summaries.narrative || 'Summary not available.'}
             onCopy={() => copyToClipboard(summaries.narrative?.summary)}
           />
         </>
