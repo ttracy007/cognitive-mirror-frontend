@@ -135,6 +135,8 @@ const App = () => {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
 
+    console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+    
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
