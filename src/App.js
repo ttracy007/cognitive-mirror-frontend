@@ -396,18 +396,21 @@ return (
           <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
         </div>
       )}
-      {/* Bottom-right fixed tone picker */}
+      {/* Bottom-center fixed tone picker */}
 <div style={{
   position: 'fixed',
   bottom: '20px',
-  right: '20px',
+  left: '50%',
+  transform: 'translateX(-50%)',
   backgroundColor: '#f4f4f4',
   padding: '0.5rem 1rem',
-  border: '1px solid #ccc',
-  borderRadius: '8px',
-  zIndex: 999
+  borderRadius: '5px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
 }}>
-  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+  <span>🗣️ Voice:</span>
   <select
     value={forcedTone}
     onChange={(e) => setForcedTone(e.target.value)}
