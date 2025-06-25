@@ -396,7 +396,6 @@ return (
           <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
         </div>
       )}
-    </div>
       {/* Bottom-right fixed tone picker */}
 <div style={{
   position: 'fixed',
