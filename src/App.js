@@ -392,7 +392,8 @@ const App = () => {
             {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
           </div>
         </div>
-
+        {/* Prompt Instructions */}
+        {/*
         <div style={{
           flex: 1,
           backgroundColor: '#f9f9f9',
@@ -408,6 +409,7 @@ const App = () => {
           Respond honestly to whatever it reflects back. Let it challenge you.<br />
           <strong>The more you give, the more it gives you back.</strong>
         </div>
+        */}
       </div>
     </div>
   );
