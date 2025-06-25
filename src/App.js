@@ -429,30 +429,30 @@ return (
   </select>
 </div>
 //     {/* 🔁 Pinned Bottom-Right: Generate Summary Button */}
-// {history.length >= 5 && (
-//   <div style={{
-//     position: 'fixed',
-//     bottom: '20px',
-//     right: '20px',
-//     backgroundColor: '#333',
-//     borderRadius: '6px',
-//     padding: '0.5rem 0.75rem',
-//     zIndex: 9999
-//   }}>
-//     <button
-//       onClick={() => setShowSummary(true)}
-//       style={{
-//         fontSize: '0.9rem',
-//         color: 'white',
-//         background: 'none',
-//         border: 'none',
-//         cursor: 'pointer'
-//       }}
-//     >
-//       🧠 Summary
-//     </button>
-//   </div>
-// )}
+{/*{history.length >= 5 && (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    backgroundColor: '#333',
+    borderRadius: '6px',
+    padding: '0.5rem 0.75rem',
+    zIndex: 9999
+  }}>
+    <button
+      onClick={() => setShowSummary(true)}
+      style={{
+        fontSize: '0.9rem',
+        color: 'white',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer'
+      }}
+    >
+      🧠 Summary
+    </button>
+  </div>
+)}*/}
   </div>
   );
 };
