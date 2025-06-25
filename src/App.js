@@ -251,168 +251,306 @@ const App = () => {
     }
   };
 // 🔽 UI Rendering
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
-      {/* Header and Logout */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
-        <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            setSession(null);
-          }}
-          style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
-        >
-          Log Out
-        </button>
-      </div>
+return (
+  <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    {/* Header and Logout */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          setSession(null);
+        }}
+        style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
+      >
+        Log Out
+      </button>
+    </div>
 
-      {/* Tone Picker */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-        <select
-          value={forcedTone}
-          onChange={(e) => setForcedTone(e.target.value)}
-          style={{ padding: '0.4rem' }}
-        >
-          <option value="frank">Frank Friend</option>
-          <option value="stoic">Stoic Mentor</option>
-          <option value="therapist">Therapist Mode</option>
-          <option value="movies">Movie Metaphors Man</option>
-        </select>
-      </div>
+    {/* Tone Picker */}
+    <div style={{ marginBottom: '1rem' }}>
+      <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+      <select
+        value={forcedTone}
+        onChange={(e) => setForcedTone(e.target.value)}
+        style={{ padding: '0.4rem' }}
+      >
+        <option value="frank">Frank Friend</option>
+        <option value="stoic">Stoic Mentor</option>
+        <option value="therapist">Therapist Mode</option>
+        <option value="movies">Movie Metaphors Man</option>
+      </select>
+    </div>
 
-      {/* Reflection Thread & Summary */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h3>🧠 Your Reflection Thread</h3>
-        <div style={{ maxHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-
-          {history.length >= 5 ? (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <button
-                onClick={() => setShowSummary(true)}
-                style={{
-                  padding: '1rem 2rem',
-                  fontSize: '1rem',
-                  backgroundColor: '#333',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}
-              >
-                Generate Handoff Summaries
-              </button>
-            </div>
-          ) : (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <button
-                disabled
-                style={{
-                  padding: '1rem 2rem',
-                  fontSize: '1rem',
-                  backgroundColor: '#ccc',
-                  color: '#666',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'not-allowed'
-                }}
-              >
-                Add at least 5 reflections to enable summaries
-              </button>
-            </div>
-          )}
-
-          {showSummary && (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
-            </div>
-          )}
-
-          {history.length > 0 ? (
-            history.map((item, index) => {
-              const style = getToneStyle(item.tone_mode);
-              return (
-                <div key={index} style={{ marginBottom: '1.5rem' }}>
-                  {/* User bubble - left */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                    <div style={{
-                      backgroundColor: '#e0f7fa',
-                      padding: '0.8rem 1rem',
-                      borderRadius: '16px 16px 16px 0',
-                      maxWidth: '75%',
-                      textAlign: 'left',
-                      marginBottom: '0.3rem'
-                    }}>
-                      {item.entry_text}
-                    </div>
-                  </div>
-
-                  {/* Mirror response bubble - right */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <div style={{
-                      backgroundColor: style.backgroundColor,
-                      borderLeft: `4px solid ${style.borderColor}`,
-                      padding: '0.8rem 1rem',
-                      borderRadius: '16px 16px 0 16px',
-                      maxWidth: '75%',
-                      textAlign: 'right'
-                    }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
-                        {style.label}
-                      </div>
-                      {item.response_text}
-                    </div>
-                  </div>
+    {/* Thread Container */}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'auto', paddingBottom: '1rem' }}>
+      {history.length > 0 ? (
+        history.map((item, index) => {
+          const style = getToneStyle(item.tone_mode);
+          return (
+            <div key={index} style={{ marginBottom: '1.5rem' }}>
+              {/* User entry */}
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{
+                  backgroundColor: '#e0f7fa',
+                  padding: '0.8rem 1rem',
+                  borderRadius: '16px 16px 16px 0',
+                  maxWidth: '75%',
+                  textAlign: 'left'
+                }}>
+                  {item.entry_text}
                 </div>
-              );
-            })
-          ) : (
-            <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-          )}
-        </div>
-      </div>
+              </div>
+              {/* Mirror response */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{
+                  backgroundColor: style.backgroundColor,
+                  borderLeft: `4px solid ${style.borderColor}`,
+                  padding: '0.8rem 1rem',
+                  borderRadius: '16px 16px 0 16px',
+                  maxWidth: '75%',
+                  textAlign: 'right'
+                }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: style.borderColor }}>
+                    {style.label}
+                  </div>
+                  {item.response_text}
+                </div>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+      )}
+    </div>
 
-      {/* Journal Input & Instructions (moved after thread) */}
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        <div style={{ flex: 1 }}>
-          <textarea
-            rows="6"
-            cols="60"
-            value={entry}
-            onChange={(e) => setEntry(e.target.value)}
-            placeholder={placeholderPrompt}
-            style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-          />
-          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-            <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
-            <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-            {isListening && <span>🎧 Listening…</span>}
-            {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
-          </div>
-        </div>
-        {/* Prompt Instructions */}
-        {/*
-        <div style={{
-          flex: 1,
-          backgroundColor: '#f9f9f9',
-          padding: '1rem',
-          borderLeft: '4px solid #ffa500',
-          borderRadius: '6px',
-          fontSize: '0.95rem',
-          lineHeight: 1.5,
-          color: '#333'
-        }}>
-          <strong>Pick a real problem. Share it fully.</strong><br />
-          The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
-          Respond honestly to whatever it reflects back. Let it challenge you.<br />
-          <strong>The more you give, the more it gives you back.</strong>
-        </div>
-        */}
+    {/* Input box now at bottom */}
+    <div style={{ marginTop: '1rem' }}>
+      <textarea
+        rows="4"
+        cols="60"
+        value={entry}
+        onChange={(e) => setEntry(e.target.value)}
+        placeholder={placeholderPrompt}
+        style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+      />
+      <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
+        <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
+        <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+        <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+        {isListening && <span>🎧 Listening…</span>}
+        {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
       </div>
     </div>
+
+    {/* Handoff Summary */}
+    <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+      {history.length >= 5 ? (
+        <button
+          onClick={() => setShowSummary(true)}
+          style={{
+            padding: '1rem 2rem',
+            fontSize: '1rem',
+            backgroundColor: '#333',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Generate Handoff Summaries
+        </button>
+      ) : (
+        <button
+          disabled
+          style={{
+            padding: '1rem 2rem',
+            fontSize: '1rem',
+            backgroundColor: '#ccc',
+            color: '#666',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'not-allowed'
+          }}
+        >
+          Add at least 5 reflections to enable summaries
+        </button>
+      )}
+
+      {showSummary && (
+        <div style={{ marginTop: '1rem' }}>
+          <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+        </div>
+      )}
+    </div>
+  </div>
   );
+};
+ // 🔽 UI Rendering
+//   return (
+//     <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+//       {/* Header and Logout */}
+//       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//         <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+//         <button
+//           onClick={async () => {
+//             await supabase.auth.signOut();
+//             setSession(null);
+//           }}
+//           style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
+//         >
+//           Log Out
+//         </button>
+//       </div>
+
+//       {/* Tone Picker */}
+//       <div style={{ marginBottom: '1rem' }}>
+//         <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+//         <select
+//           value={forcedTone}
+//           onChange={(e) => setForcedTone(e.target.value)}
+//           style={{ padding: '0.4rem' }}
+//         >
+//           <option value="frank">Frank Friend</option>
+//           <option value="stoic">Stoic Mentor</option>
+//           <option value="therapist">Therapist Mode</option>
+//           <option value="movies">Movie Metaphors Man</option>
+//         </select>
+//       </div>
+
+//       {/* Reflection Thread & Summary */}
+//       <div style={{ marginBottom: '2rem' }}>
+//         <h3>🧠 Your Reflection Thread</h3>
+//         <div style={{ maxHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+
+//           {history.length >= 5 ? (
+//             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+//               <button
+//                 onClick={() => setShowSummary(true)}
+//                 style={{
+//                   padding: '1rem 2rem',
+//                   fontSize: '1rem',
+//                   backgroundColor: '#333',
+//                   color: 'white',
+//                   border: 'none',
+//                   borderRadius: '5px',
+//                   cursor: 'pointer'
+//                 }}
+//               >
+//                 Generate Handoff Summaries
+//               </button>
+//             </div>
+//           ) : (
+//             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+//               <button
+//                 disabled
+//                 style={{
+//                   padding: '1rem 2rem',
+//                   fontSize: '1rem',
+//                   backgroundColor: '#ccc',
+//                   color: '#666',
+//                   border: 'none',
+//                   borderRadius: '5px',
+//                   cursor: 'not-allowed'
+//                 }}
+//               >
+//                 Add at least 5 reflections to enable summaries
+//               </button>
+//             </div>
+//           )}
+
+//           {showSummary && (
+//             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+//               <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+//             </div>
+//           )}
+
+//           {history.length > 0 ? (
+//             history.map((item, index) => {
+//               const style = getToneStyle(item.tone_mode);
+//               return (
+//                 <div key={index} style={{ marginBottom: '1.5rem' }}>
+//                   {/* User bubble - left */}
+//                   <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+//                     <div style={{
+//                       backgroundColor: '#e0f7fa',
+//                       padding: '0.8rem 1rem',
+//                       borderRadius: '16px 16px 16px 0',
+//                       maxWidth: '75%',
+//                       textAlign: 'left',
+//                       marginBottom: '0.3rem'
+//                     }}>
+//                       {item.entry_text}
+//                     </div>
+//                   </div>
+
+//                   {/* Mirror response bubble - right */}
+//                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+//                     <div style={{
+//                       backgroundColor: style.backgroundColor,
+//                       borderLeft: `4px solid ${style.borderColor}`,
+//                       padding: '0.8rem 1rem',
+//                       borderRadius: '16px 16px 0 16px',
+//                       maxWidth: '75%',
+//                       textAlign: 'right'
+//                     }}>
+//                       <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
+//                         {style.label}
+//                       </div>
+//                       {item.response_text}
+//                     </div>
+//                   </div>
+//                 </div>
+//               );
+//             })
+//           ) : (
+//             <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* Journal Input & Instructions (moved after thread) */}
+//       <div style={{ display: 'flex', gap: '2rem' }}>
+//         <div style={{ flex: 1 }}>
+//           <textarea
+//             rows="6"
+//             cols="60"
+//             value={entry}
+//             onChange={(e) => setEntry(e.target.value)}
+//             placeholder={placeholderPrompt}
+//             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+//           />
+//           <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+//             <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
+//             <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+//             <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+//             {isListening && <span>🎧 Listening…</span>}
+//             {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+//           </div>
+//         </div>
+//         {/* Prompt Instructions */}
+//         {/*
+//         <div style={{
+//           flex: 1,
+//           backgroundColor: '#f9f9f9',
+//           padding: '1rem',
+//           borderLeft: '4px solid #ffa500',
+//           borderRadius: '6px',
+//           fontSize: '0.95rem',
+//           lineHeight: 1.5,
+//           color: '#333'
+//         }}>
+//           <strong>Pick a real problem. Share it fully.</strong><br />
+//           The mirror gets to know you by what you give it—and over time, it starts revealing emotional patterns and loops you didn’t even know you had.<br /><br />
+//           Respond honestly to whatever it reflects back. Let it challenge you.<br />
+//           <strong>The more you give, the more it gives you back.</strong>
+//         </div>
+//         */}
+//       </div>
+//     </div>
+//   );
+// };
 //   // 🔽 UI Rendering
 //   return (
 //     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
@@ -578,6 +716,6 @@ const App = () => {
   //     </div>
   //   </div>
   // );
-};
+// };
 
 export default App;
