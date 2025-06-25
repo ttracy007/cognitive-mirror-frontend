@@ -253,35 +253,35 @@ const App = () => {
 // 🔽 UI Rendering
 return (
   <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-    {/* Header and Logout */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
-      <button
-        onClick={async () => {
-          await supabase.auth.signOut();
-          setSession(null);
-        }}
-        style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
-      >
-        Log Out
-      </button>
-    </div>
-
-    {/* Tone Picker */}
-    <div style={{ marginBottom: '1rem' }}>
-      <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-      <select
-        value={forcedTone}
-        onChange={(e) => setForcedTone(e.target.value)}
-        style={{ padding: '0.4rem' }}
-      >
-        <option value="frank">Frank Friend</option>
-        <option value="stoic">Stoic Mentor</option>
-        <option value="therapist">Therapist Mode</option>
-        <option value="movies">Movie Metaphors Man</option>
-      </select>
-    </div>
-
+ {/* Header with Logout + Summary */}
+<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+  <div style={{ display: 'flex', gap: '1rem' }}>
+    <button
+      onClick={() => setShowSummary(true)}
+      style={{
+        padding: '0.5rem 1rem',
+        backgroundColor: '#333',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      }}
+    >
+      Generate Handoff Summaries
+    </button>
+    <button
+      onClick={async () => {
+        await supabase.auth.signOut();
+        setSession(null);
+      }}
+      style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
+    >
+      Log Out
+    </button>
+  </div>
+</div>
+   
   {/* Thread Container */}
 <div style={{ flex: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'auto', paddingBottom: '1rem' }}>
   {history.length > 0 ? (
@@ -396,6 +396,29 @@ return (
         </div>
       )}
     </div>
+      {/* Bottom-right fixed tone picker */}
+<div style={{
+  position: 'fixed',
+  bottom: '20px',
+  right: '20px',
+  backgroundColor: '#f4f4f4',
+  padding: '0.5rem 1rem',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+  zIndex: 999
+}}>
+  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+  <select
+    value={forcedTone}
+    onChange={(e) => setForcedTone(e.target.value)}
+    style={{ padding: '0.4rem' }}
+  >
+    <option value="frank">Frank Friend</option>
+    <option value="stoic">Stoic Mentor</option>
+    <option value="therapist">Therapist Mode</option>
+    <option value="movies">Movie Metaphors Man</option>
+  </select>
+</div>
   </div>
   );
 };
