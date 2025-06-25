@@ -339,13 +339,21 @@ return (
     {/* Input box now at bottom */}
     <div style={{ marginTop: '1rem' }}>
       <textarea
-        rows="4"
-        cols="60"
-        value={entry}
-        onChange={(e) => setEntry(e.target.value)}
-        placeholder={placeholderPrompt}
-        style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-      />
+  rows="6"
+  cols="60"
+  value={entry}
+  onChange={(e) => setEntry(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (entry.trim() && !isProcessing) {
+        handleSubmit();
+      }
+    }
+  }}
+  placeholder={placeholderPrompt}
+  style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+/>
       <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
         <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
         <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
