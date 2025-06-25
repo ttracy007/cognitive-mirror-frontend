@@ -285,41 +285,52 @@ return (
     {/* Thread Container */}
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column-reverse', overflowY: 'auto', paddingBottom: '1rem' }}>
       {history.length > 0 ? (
-        history.map((item, index) => {
-          const style = getToneStyle(item.tone_mode);
-          return (
-            <div key={index} style={{ marginBottom: '1.5rem' }}>
-              {/* User entry */}
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{
-                  backgroundColor: '#e0f7fa',
-                  padding: '0.8rem 1rem',
-                  borderRadius: '16px 16px 16px 0',
-                  maxWidth: '75%',
-                  textAlign: 'left'
-                }}>
-                  {item.entry_text}
-                </div>
-              </div>
-              {/* Mirror response */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <div style={{
-                  backgroundColor: style.backgroundColor,
-                  borderLeft: `4px solid ${style.borderColor}`,
-                  padding: '0.8rem 1rem',
-                  borderRadius: '16px 16px 0 16px',
-                  maxWidth: '75%',
-                  textAlign: 'right'
-                }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: style.borderColor }}>
-                    {style.label}
-                  </div>
-                  {item.response_text}
-                </div>
-              </div>
-            </div>
-          );
-        })
+        {history.map((item, index) => {
+  const style = getToneStyle(item.tone_mode);
+  const isLatest = index === history.length - 1;
+
+  return (
+    <div
+      key={index}
+      style={{
+        marginBottom: '1.5rem',
+        opacity: isLatest ? 1 : 0.6, // 🟡 Fade out older messages
+        transition: 'opacity 0.3s ease-in-out',
+      }}
+    >
+      {/* User bubble - LEFT */}
+      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <div style={{
+          backgroundColor: '#e0f7fa',
+          padding: '0.8rem 1rem',
+          borderRadius: '16px 16px 16px 0',
+          maxWidth: '75%',
+          textAlign: 'left',
+          marginBottom: '0.3rem'
+        }}>
+          {item.entry_text}
+        </div>
+      </div>
+
+      {/* Mirror bubble - RIGHT */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{
+          backgroundColor: style.backgroundColor,
+          borderLeft: `4px solid ${style.borderColor}`,
+          padding: '0.8rem 1rem',
+          borderRadius: '16px 16px 0 16px',
+          maxWidth: '75%',
+          textAlign: 'right'
+        }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
+            {style.label}
+          </div>
+          {item.response_text}
+        </div>
+      </div>
+    </div>
+  );
+})}
       ) : (
         <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
       )}
