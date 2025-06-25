@@ -369,33 +369,49 @@ const App = () => {
             </div>
           )}
 
-          {history.length > 0 ? (
-            history.map((item, index) => {
-              const style = getToneStyle(item.tone_mode);
-              return (
-                <div key={index} style={{ marginBottom: '2rem' }}>
-                  <div style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
-                    <p><strong>🧠 You:</strong></p>
-                    <p>{item.entry_text}</p>
-                  </div>
-                  <div
-                    style={{
-                      backgroundColor: style.backgroundColor,
-                      padding: '1rem',
-                      borderRadius: '6px',
-                      borderLeft: `4px solid ${style.borderColor}`,
-                      marginTop: '1rem'
-                    }}
-                  >
-                    <p><strong>{style.label}</strong></p>
-                    <p>{item.response_text}</p>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-          )}
+      {/* iMessage Layout */}
+{history.length > 0 ? (
+  history.map((item, index) => {
+    const style = getToneStyle(item.tone_mode);
+    return (
+      <div key={index} style={{ marginBottom: '1.5rem' }}>
+        {/* User bubble */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{
+            backgroundColor: '#e0f7fa',
+            padding: '0.8rem 1rem',
+            borderRadius: '16px 16px 0 16px',
+            maxWidth: '75%',
+            textAlign: 'right',
+            marginBottom: '0.3rem'
+          }}>
+            {item.entry_text}
+          </div>
+        </div>
+
+        {/* Mirror response bubble */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <div style={{
+            backgroundColor: style.backgroundColor,
+            borderLeft: `4px solid ${style.borderColor}`,
+            padding: '0.8rem 1rem',
+            borderRadius: '16px 16px 16px 0',
+            maxWidth: '75%',
+            textAlign: 'left'
+          }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
+              {style.label}
+            </div>
+            {item.response_text}
+          </div>
+        </div>
+      </div>
+    );
+  })
+) : (
+  <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
+)}
+      
         </div>
       </div>
     </div>
