@@ -287,7 +287,8 @@ return (
   {history.length > 0 ? (
     history.map((item, index) => {
       const style = getToneStyle(item.tone_mode);
-      const isLatest = index === history.length - 1;
+      // const isLatest = index === history.length - 1;
+      const isLatest = index === 0;
 
       return (
         <div
