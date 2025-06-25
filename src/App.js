@@ -375,29 +375,29 @@ const App = () => {
     const style = getToneStyle(item.tone_mode);
     return (
       <div key={index} style={{ marginBottom: '1.5rem' }}>
-        {/* User bubble */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        {/* User bubble - now on LEFT */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <div style={{
             backgroundColor: '#e0f7fa',
             padding: '0.8rem 1rem',
-            borderRadius: '16px 16px 0 16px',
+            borderRadius: '16px 16px 16px 0',
             maxWidth: '75%',
-            textAlign: 'right',
+            textAlign: 'left',
             marginBottom: '0.3rem'
           }}>
             {item.entry_text}
           </div>
         </div>
 
-        {/* Mirror response bubble */}
-        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+        {/* Mirror response bubble - now on RIGHT */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div style={{
             backgroundColor: style.backgroundColor,
             borderLeft: `4px solid ${style.borderColor}`,
             padding: '0.8rem 1rem',
-            borderRadius: '16px 16px 16px 0',
+            borderRadius: '16px 16px 0 16px',
             maxWidth: '75%',
-            textAlign: 'left'
+            textAlign: 'right'
           }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
               {style.label}
