@@ -399,20 +399,16 @@ return (
       {/* Bottom-center fixed tone picker */}
 <div style={{
   position: 'fixed',
-  bottom: '0',
+  bottom: '20px',
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '100%',
   backgroundColor: '#f4f4f4',
-  padding: '0.75rem 1rem',
-  borderTop: '1px solid #ccc',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '0.5rem',
+  padding: '0.5rem 1rem',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
   zIndex: 999
 }}>
-  <span>🗣️ Voice:</span>
+  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
   <select
     value={forcedTone}
     onChange={(e) => setForcedTone(e.target.value)}
