@@ -355,7 +355,7 @@ return (
       </div>
     </div>
 
-    {/* Generate Handoff Summary 
+    {/* Generate Handoff Summary Bottom Center
     // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
     //   {history.length >= 5 ? (
     //     <button
@@ -399,16 +399,18 @@ return (
       {/* Bottom-center fixed tone picker */}
 <div style={{
   position: 'fixed',
-  bottom: '20px',
+  bottom: '0',
   left: '50%',
   transform: 'translateX(-50%)',
+  width: '100%',
   backgroundColor: '#f4f4f4',
-  padding: '0.5rem 1rem',
-  borderRadius: '5px',
+  padding: '0.75rem 1rem',
+  borderTop: '1px solid #ccc',
   display: 'flex',
+  justifyContent: 'center',
   alignItems: 'center',
   gap: '0.5rem',
-  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+  zIndex: 999
 }}>
   <span>🗣️ Voice:</span>
   <select
