@@ -355,7 +355,7 @@ return (
       </div>
     </div>
 
-    {/* Generate Handoff Summary */}
+    {/* Generate Handoff Summary 
     // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
     //   {history.length >= 5 ? (
     //     <button
@@ -388,6 +388,8 @@ return (
     //       Add at least 5 reflections to enable summaries
     //     </button>
     //   )}
+      </div>
+      */}   
 
       {showSummary && (
         <div style={{ marginTop: '1rem' }}>
