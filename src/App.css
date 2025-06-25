@@ -12,3 +12,25 @@
     transform: translateY(0);
   }
 }
+/* Layout container */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f4f4f4;
+  padding: 1rem;
+}
+
+/* Scrollable history area */
+.chat-thread {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
+/* Prompt input area */
+.prompt-box {
+  border-top: 1px solid #ccc;
+  padding: 1rem 0 0 0;
+  background-color: #f4f4f4;
+}
