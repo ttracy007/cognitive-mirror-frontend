@@ -287,7 +287,6 @@ return (
   {history.length > 0 ? (
     history.map((item, index) => {
       const style = getToneStyle(item.tone_mode);
-      // const isLatest = index === history.length - 1;
       const isLatest = index === 0;
 
       return (
@@ -356,39 +355,39 @@ return (
       </div>
     </div>
 
-    {/* Handoff Summary */}
-    <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-      {history.length >= 5 ? (
-        <button
-          onClick={() => setShowSummary(true)}
-          style={{
-            padding: '1rem 2rem',
-            fontSize: '1rem',
-            backgroundColor: '#333',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}
-        >
-          Generate Handoff Summaries
-        </button>
-      ) : (
-        <button
-          disabled
-          style={{
-            padding: '1rem 2rem',
-            fontSize: '1rem',
-            backgroundColor: '#ccc',
-            color: '#666',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'not-allowed'
-          }}
-        >
-          Add at least 5 reflections to enable summaries
-        </button>
-      )}
+    {/* Generate Handoff Summary */}
+    // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+    //   {history.length >= 5 ? (
+    //     <button
+    //       onClick={() => setShowSummary(true)}
+    //       style={{
+    //         padding: '1rem 2rem',
+    //         fontSize: '1rem',
+    //         backgroundColor: '#333',
+    //         color: 'white',
+    //         border: 'none',
+    //         borderRadius: '5px',
+    //         cursor: 'pointer'
+    //       }}
+    //     >
+    //       Generate Handoff Summaries
+    //     </button>
+    //   ) : (
+    //     <button
+    //       disabled
+    //       style={{
+    //         padding: '1rem 2rem',
+    //         fontSize: '1rem',
+    //         backgroundColor: '#ccc',
+    //         color: '#666',
+    //         border: 'none',
+    //         borderRadius: '5px',
+    //         cursor: 'not-allowed'
+    //       }}
+    //     >
+    //       Add at least 5 reflections to enable summaries
+    //     </button>
+    //   )}
 
       {showSummary && (
         <div style={{ marginTop: '1rem' }}>
