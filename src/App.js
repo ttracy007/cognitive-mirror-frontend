@@ -428,6 +428,30 @@ return (
     <option value="movies">Movie Metaphors Man</option>
   </select>
 </div>
+    {/* 🔁 Fixed Bottom-Right: Generate Summary Button */}
+{history.length >= 5 && (
+  <div style={{
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    zIndex: 999,
+  }}>
+    <button
+      onClick={() => setShowSummary(true)}
+      style={{
+        padding: '0.5rem 0.75rem',
+        fontSize: '0.9rem',
+        backgroundColor: '#333',
+        color: 'white',
+        border: '1px solid #ccc',
+        borderRadius: '6px',
+        cursor: 'pointer',
+      }}
+    >
+      🧠 Summary
+    </button>
+  </div>
+)}
   </div>
   );
 };
