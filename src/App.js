@@ -363,7 +363,12 @@ return (
         <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
         <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
         {isListening && <span>🎧 Listening…</span>}
-        {isProcessing && <span style={{ color: '#888' }}>⏳ Processing reflection…</span>}
+        {isProcessing && (
+      <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
+        Mirror is typing<span className="dots">...</span>
+  </div>
+)}
+
       </div>
     </div>
 
