@@ -45,5 +45,6 @@
 
 .dots::after {
   content: '';
+  display: inline-block;
   animation: blinkDots 1.2s steps(4, end) infinite;
 }
