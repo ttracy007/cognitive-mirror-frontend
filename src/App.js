@@ -365,7 +365,7 @@ return (
         {isListening && <span>🎧 Listening…</span>}
         {isProcessing && (
       <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
-        Mirror is typing<span className="dots">...</span>
+        Mirror is typing<span className="dots"></span>
   </div>
 )}
 
