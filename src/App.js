@@ -320,7 +320,7 @@ return (
               padding: '0.8rem 1rem',
               borderRadius: '16px 16px 0 16px',
               maxWidth: '75%',
-              textAlign: 'right'
+              textAlign: 'center'
             }}>
               <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
                 {style.label}
