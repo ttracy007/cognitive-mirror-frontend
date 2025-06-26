@@ -34,3 +34,16 @@
   padding: 1rem 0 0 0;
   background-color: #f4f4f4;
 }
+
+/* 🎨 Add this CSS for the animated dots */
+@keyframes blinkDots {
+  0% { content: ""; }
+  33% { content: "."; }
+  66% { content: ".."; }
+  100% { content: "..."; }
+}
+
+.dots::after {
+  content: '';
+  animation: blinkDots 1.2s steps(4, end) infinite;
+}
