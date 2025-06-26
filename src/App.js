@@ -325,7 +325,11 @@ return (
               <div style={{ fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '0.3rem', color: style.borderColor }}>
                 {style.label}
               </div>
-              {item.response_text}
+             {item.response_text
+                .split('\n\n')
+                .map((para, idx) => (
+                  <p key={idx} style={{ margin: '0 0 0.8rem 0' }}>{para}</p>
+              ))}
             </div>
           </div>
         </div>
