@@ -65,9 +65,7 @@ const LoginPage = ({ onAuthSuccess }) => {
        Go deep.  Get real.  Whatever weight you're carrying, describe it as freely as you can. 
          <strong>GET NAKED before the Mirror.</strong><br />  
          Treat it as a conversation--a conversation without judgement, only insights.  
-        /*<strong>It’s not a chatbot. It’s a mirror with memory.</strong><br />
-        // Cognitive Mirror listens across days—not minutes. It sees what loops you’re stuck in, and it nudges you forward.
-      </p>*/
+    
       <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
         Everything you write is private, encrypted, and only visible to you.<br />
         Be fully honest—your reflections don’t leave this mirror.
