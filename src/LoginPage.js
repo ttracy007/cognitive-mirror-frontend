@@ -64,7 +64,8 @@ const LoginPage = ({ onAuthSuccess }) => {
       <p style={{ fontSize: '1.1rem', lineHeight: 1.5 }}>
        Go deep.  Get real.  Whatever weight you're carrying, describe it as freely as you can. 
          <strong>GET NAKED before the Mirror.</strong><br />  
-         Treat it as a conversation--a conversation without judgement, only insights.  
+         Treat it as a conversation--a conversation without judgement, only insights. 
+         </p>*/  
     
       <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
         Everything you write is private, encrypted, and only visible to you.<br />
