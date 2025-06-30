@@ -1,151 +1,130 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient'; 
+import { supabase } from './supabaseClient';
 import dayjs from 'dayjs';
 import groupBy from 'lodash.groupby';
 
-const JournalGroupedView = () => {
+export default function JournalTimeline() {
   const [journalEntries, setJournalEntries] = useState([]);
-  const [collapsedMonths, setCollapsedMonths] = useState({});
-  const [collapsedWeeks, setCollapsedWeeks] = useState({});
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [collapsedDays, setCollapsedDays] = useState({});
   const [allCollapsed, setAllCollapsed] = useState(false);
-  const [topics, setTopics] = useState([]);
-  const [activeTopic, setActiveTopic] = useState(null);
 
   useEffect(() => {
     const fetchEntries = async () => {
+      setLoading(true);
       const { data, error } = await supabase
         .from('journals')
         .select('*')
-        .order('timestamp', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching journal entries:', error.message);
+        console.error('Error fetching journal entries:', error);
       } else {
         setJournalEntries(data);
-        const allTopics = [...new Set(data.flatMap(entry => JSON.parse(entry.emotion_tags || '[]')))].sort();
+
+        const allTopics = [...new Set(
+          data.flatMap(entry => {
+            try {
+              return JSON.parse(entry.emotion_tags || '[]');
+            } catch {
+              return [];
+            }
+          })
+        )].sort();
         setTopics(allTopics);
       }
+      setLoading(false);
     };
 
     fetchEntries();
   }, []);
 
-  const toggleCollapse = (key, stateSetter, stateObj) => {
-    stateSetter({ ...stateObj, [key]: !stateObj[key] });
-  };
+  const groupedByMonth = groupBy(journalEntries, entry =>
+    dayjs(entry.created_at).format('YYYY-MM')
+  );
 
-  const toggleAll = () => {
-    const newCollapsed = !allCollapsed;
-    const nextMonth = {};
-    const nextWeek = {};
-    const nextDay = {};
+  const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
+    const groupedByDay = groupBy(monthEntries, entry =>
+      dayjs(entry.created_at).format('YYYY-MM-DD')
+    );
 
-    journalEntries.forEach(entry => {
-      const monthKey = dayjs(entry.timestamp).format('YYYY-MM');
-      const weekKey = dayjs(entry.timestamp).format('YYYY-[W]WW');
-      const dayKey = dayjs(entry.timestamp).format('YYYY-MM-DD');
-      nextMonth[monthKey] = newCollapsed;
-      nextWeek[weekKey] = newCollapsed;
-      nextDay[dayKey] = newCollapsed;
-    });
+    return {
+      month,
+      days: Object.entries(groupedByDay).map(([day, entries]) => ({
+        day,
+        entries: entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      }))
+    };
+  });
 
-    setCollapsedMonths(nextMonth);
-    setCollapsedWeeks(nextWeek);
-    setCollapsedDays(nextDay);
-    setAllCollapsed(newCollapsed);
-  };
+  if (loading) {
+    return <div>Loading journal entries...</div>;
+  }
 
-  const filteredEntries = activeTopic
-    ? journalEntries.filter(entry => (entry.emotion_tags || '').includes(activeTopic))
-    : journalEntries;
-
-  const groupedByMonth = groupBy(filteredEntries, entry => dayjs(entry.timestamp).format('YYYY-MM'));
+  if (!journalEntries.length) {
+    return <div>No entries found.</div>;
+  }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Journal Entries</h2>
+    <div className="journal-timeline">
+      <div className="mb-4">
         <button
-          className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
-          onClick={toggleAll}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          onClick={() => {
+            const newCollapsed = !allCollapsed;
+            setAllCollapsed(newCollapsed);
+
+            const updatedState = {};
+            timeline.forEach(month =>
+              month.days.forEach(day => {
+                updatedState[day.day] = newCollapsed;
+              })
+            );
+            setCollapsedDays(updatedState);
+          }}
         >
           {allCollapsed ? 'Expand All' : 'Collapse All'}
         </button>
       </div>
 
-      {topics.length > 0 && (
-        <div className="mb-4">
-          <label className="font-medium mr-2">Filter by topic:</label>
-          <select
-            className="border px-2 py-1 rounded"
-            value={activeTopic || ''}
-            onChange={(e) => setActiveTopic(e.target.value || null)}
-          >
-            <option value=''>All</option>
-            {topics.map(topic => (
-              <option key={topic} value={topic}>{topic}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      {timeline.map(monthBlock => (
+        <div key={monthBlock.month} className="month-block">
+          <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
 
-      {Object.entries(groupedByMonth).map(([monthKey, monthEntries]) => {
-        const groupedByWeek = groupBy(monthEntries, entry => dayjs(entry.timestamp).format('YYYY-[W]WW'));
-        return (
-          <div key={monthKey} className="mb-6">
-            <button
-              className="text-lg font-semibold underline mb-2"
-              onClick={() => toggleCollapse(monthKey, setCollapsedMonths, collapsedMonths)}
-            >
-              {dayjs(monthKey).format('MMMM YYYY')}
-            </button>
+          {monthBlock.days.map(dayBlock => {
+            const dayKey = dayBlock.day;
+            const dayEntries = dayBlock.entries;
+            const isCollapsed = collapsedDays[dayKey];
 
-            {!collapsedMonths[monthKey] && (
-              <div className="ml-4">
-                {Object.entries(groupedByWeek).map(([weekKey, weekEntries]) => {
-                  const groupedByDay = groupBy(weekEntries, entry => dayjs(entry.timestamp).format('YYYY-MM-DD'));
-                  return (
-                    <div key={weekKey} className="mb-4">
-                      <button
-                        className="font-medium underline"
-                        onClick={() => toggleCollapse(weekKey, setCollapsedWeeks, collapsedWeeks)}
-                      >
-                        {weekKey}
-                      </button>
-                      {!collapsedWeeks[weekKey] && (
-                        <div className="ml-4">
-                          {Object.entries(groupedByDay).map(([dayKey, dayEntries]) => (
-                            <div key={dayKey} className="mb-2">
-                              <button
-                                className="text-sm underline"
-                                onClick={() => toggleCollapse(dayKey, setCollapsedDays, collapsedDays)}
-                              >
-                                {dayjs(dayKey).format('dddd, MMM D')}
-                              </button>
-                              {!collapsedDays[dayKey] && (
-                                <div className="ml-4 border-l border-gray-300 pl-4">
-                                  {dayEntries.map(entry => (
-                                    <div key={entry.id} className="mb-2 p-2 bg-gray-50 rounded shadow">
-                                      <p>{entry.entry_text}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+            return (
+              <div key={dayKey} className="day-block mb-4">
+                <button
+                  className="text-left font-semibold text-gray-800 underline mb-2"
+                  onClick={() =>
+                    setCollapsedDays(prev => ({
+                      ...prev,
+                      [dayKey]: !prev[dayKey]
+                    }))
+                  }
+                >
+                  {dayjs(dayKey).format('dddd, MMM D')}
+                </button>
+
+                {!isCollapsed && (
+                  <div className="ml-4 border-l border-gray-300 pl-4">
+                    {dayEntries.map(entry => (
+                      <div key={entry.id} className="mb-2 p-2 bg-gray-50 rounded shadow">
+                        <p>{entry.entry_text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
-};
-
-export default JournalGroupedView;
+}
