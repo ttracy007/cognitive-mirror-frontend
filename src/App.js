@@ -5,6 +5,7 @@ import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
+import JournalGroupedView from './JournalGroupedView';
 
 // 🔽 Component State Initialization
 const App = () => {
@@ -24,8 +25,9 @@ const App = () => {
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const prompts = ["What’s weighing you down?"];
+  const [showGroupedView, setShowGroupedView] = useState(false);
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
-    prompts[Math.floor(Math.random() * prompts.length)]
+    prompts[Math.floor(Math.random() * prompts.length)] 
   );
   let transcriptBuffer = '';
 
