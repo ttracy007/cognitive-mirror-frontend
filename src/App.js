@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
-import JournalGroupedView from './journalTimeline';
+import JournalGroupedView from './components/JournalTimeline';
 
 // 🔽 Component State Initialization
 const App = () => {
