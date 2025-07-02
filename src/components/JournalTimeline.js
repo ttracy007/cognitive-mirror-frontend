@@ -54,22 +54,6 @@ export default function JournalTimeline() {
     fetchEntries();
   }, []);
 
-        const allTopics = [...new Set(
-          data.flatMap(entry => {
-            try {
-              return JSON.parse(entry.emotion_tags || '[]');
-            } catch {
-              return [];
-            }
-          })
-        )].sort();
-        setTopics(allTopics);
-        setLoading(false); 
-    };
-
-    fetchEntries();
-  }, []);
-
   const groupedByMonth = groupBy(journalEntries, entry =>
     dayjs(entry.created_at).format('YYYY-MM')
   );
