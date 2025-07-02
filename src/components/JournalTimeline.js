@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
-import { Card } from '../Card';
+import { Card } from './Card';
 import { Button } from '@/components/ui/button';
 
 export default function JournalTimeline() {
