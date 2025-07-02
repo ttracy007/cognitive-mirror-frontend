@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
-import { Card } from '@/components/ui/card';
+import { Card } from '../Card';
 import { Button } from '@/components/ui/button';
 
 export default function JournalTimeline() {
@@ -121,9 +121,9 @@ export default function JournalTimeline() {
                 {!isCollapsed && (
                   <div className="ml-4 border-l border-gray-300 pl-4">
                     {dayEntries.map(entry => (
-                      <div key={entry.id} className="mb-2 p-2 bg-gray-50 rounded shadow">
-                        <p>{entry.entry_text}</p>
-                      </div>
+                     <Card>
+                      <p>{entry.entry_text}<p/>
+                      </Card>
                     ))}
                   </div>
                 )}
