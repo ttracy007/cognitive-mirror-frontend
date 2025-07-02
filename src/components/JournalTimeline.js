@@ -20,15 +20,39 @@ export default function JournalTimeline() {
   useEffect(() => {
     const fetchEntries = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+
+      // Fetch journals
+      const { data: journalData, error: journalError } = await supabase
         .from('journals')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching journal entries:', error);
-      } else {
-        setJournalEntries(data);
+      if (journalError) {
+        console.error('Error fetching journals:', journalError.message);
+        return;
+      }
+
+      //Fetch topics
+      const { data: topicData, error: topicError } = await supabase
+        .from('topic_mentions')
+        .select('journal_id, topic');
+
+      if (topicError) {
+        console.error('Error fetching topics:', topicError.message);
+        return;
+      }
+
+      // Store all entries and all distinct topics
+      setJournalEntries(entriesWithTopics);
+
+      const allTopics = [...new Set(topicData.map(t => t.topic))];
+      setTopics(allTopics);
+
+      setLoading(false);
+    };
+
+    fetchEntries()'
+  }, [];
 
         const allTopics = [...new Set(
           data.flatMap(entry => {
