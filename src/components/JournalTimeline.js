@@ -1,7 +1,12 @@
+// Step 1: Import dependencies at the top of JournalTimeline.js
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
-import groupBy from 'lodash.groupby';
+import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
+import uniq from 'lodash/uniq';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function JournalTimeline() {
   const [journalEntries, setJournalEntries] = useState([]);
@@ -9,6 +14,8 @@ export default function JournalTimeline() {
   const [loading, setLoading] = useState(true);
   const [collapsedDays, setCollapsedDays] = useState({});
   const [allCollapsed, setAllCollapsed] = useState(false);
+  const [selectedTopic, setSelecteTopic] = useState('all');
+  const [collaspedMonths, setCollapsedMonths] = useState({});
 
   useEffect(() => {
     const fetchEntries = async () => {
