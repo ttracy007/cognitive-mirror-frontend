@@ -49,6 +49,10 @@ export default function JournalTimeline() {
       dayjs(entry.created_at).format('YYYY-MM-DD')
     );
 
+  const groupedByMonth = groupBy(entries, (entry) =>
+    daysjs(entry.timestamp).format('MMMM YYYY')
+  );
+    
     return {
       month,
       days: Object.entries(groupedByDay).map(([day, entries]) => ({
