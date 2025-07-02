@@ -64,8 +64,8 @@ export default function JournalTimeline() {
           })
         )].sort();
         setTopics(allTopics);
-      }
-      setLoading(false);
+        setLoading(false);
+      }  
     };
 
     fetchEntries();
