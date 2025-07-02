@@ -101,34 +101,61 @@ export default function JournalTimeline() {
             const dayEntries = dayBlock.entries;
             const isCollapsed = collapsedDays[dayKey];
 
-            return (
-              <div key={dayKey} className="day-block mb-4">
-                <button
-                  className="text-left font-semibold text-gray-800 underline mb-2"
-                  onClick={() =>
-                    setCollapsedDays(prev => ({
-                      ...prev,
-                      [dayKey]: !prev[dayKey]
-                    }))
-                  }
-                >
-                  {dayjs(dayKey).format('dddd, MMM D')}
-                </button>
+ return (
+  <div className="p-4">
+    {timeline.map(({ month, days }) => {
+      const isMonthCollapsed = collapsedMonths[month];
+      return (
+        <div key={month} className="month-block mb-6">
+          <button
+            className="text-xl font-bold text-indigo-700 mb-3"
+            onClick={() =>
+              setCollapsedMonths(prev => ({
+                ...prev,
+                [month]: !prev[month],
+              }))
+            }
+          >
+            {month}
+          </button>
 
-                {!isCollapsed && (
-                  <div className="ml-4 border-l border-gray-300 pl-4">
-                    {dayEntries.map(entry => (
-                      <div key={entry.id} className="mb-2 p-2 bg-gray-50 rounded shadow">
-                        <p>{entry.entry_text}</p>
+          {!isMonthCollapsed && (
+            <div className="ml-4">
+              {days.map(({ day, entries }) => {
+                const isDayCollapsed = collapsedDays[day];
+                return (
+                  <div key={day} className="day-block mb-4">
+                    <button
+                      className="text-left font-semibold text-gray-800 underline mb-2"
+                      onClick={() =>
+                        setCollapsedDays(prev => ({
+                          ...prev,
+                          [day]: !prev[day],
+                        }))
+                      }
+                    >
+                      {dayjs(day).format('dddd, MMM D')}
+                    </button>
+
+                    {!isDayCollapsed && (
+                      <div className="ml-4 border-l border-gray-300 pl-4">
+                        {entries.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="mb-2 p-2 bg-gray-50 rounded shadow"
+                          >
+                            <p>{entry.entry_text}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  );
-}
+      );
+    })}
+  </div>
+);
