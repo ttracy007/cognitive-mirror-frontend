@@ -48,10 +48,6 @@ export default function JournalTimeline() {
     const groupedByDay = groupBy(monthEntries, entry =>
       dayjs(entry.created_at).format('YYYY-MM-DD')
     );
-
-  const groupedByMonth = groupBy(entries, (entry) =>
-    daysjs(entry.timestamp).format('MMMM YYYY')
-  );
     
     return {
       month,
@@ -101,61 +97,65 @@ export default function JournalTimeline() {
             const dayEntries = dayBlock.entries;
             const isCollapsed = collapsedDays[dayKey];
 
- return (
-  <div className="p-4">
-    {timeline.map(({ month, days }) => {
-      const isMonthCollapsed = collapsedMonths[month];
-      return (
-        <div key={month} className="month-block mb-6">
-          <button
-            className="text-xl font-bold text-indigo-700 mb-3"
-            onClick={() =>
-              setCollapsedMonths(prev => ({
-                ...prev,
-                [month]: !prev[month],
-              }))
-            }
-          >
-            {month}
-          </button>
+  return (
+    <div className="journal-timeline">
+      <div className="mb-4">
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          onClick={() => {
+            const newCollapsed = !allCollapsed;
+            setAllCollapsed(newCollapsed);
 
-          {!isMonthCollapsed && (
-            <div className="ml-4">
-              {days.map(({ day, entries }) => {
-                const isDayCollapsed = collapsedDays[day];
-                return (
-                  <div key={day} className="day-block mb-4">
-                    <button
-                      className="text-left font-semibold text-gray-800 underline mb-2"
-                      onClick={() =>
-                        setCollapsedDays(prev => ({
-                          ...prev,
-                          [day]: !prev[day],
-                        }))
-                      }
-                    >
-                      {dayjs(day).format('dddd, MMM D')}
-                    </button>
+            const updatedState = {};
+            timeline.forEach(month =>
+              month.days.forEach(day => {
+                updatedState[day.day] = newCollapsed;
+              })
+            );
+            setCollapsedDays(updatedState);
+          }}
+        >
+          {allCollapsed ? 'Expand All' : 'Collapse All'}
+        </button>
+      </div>
 
-                    {!isDayCollapsed && (
-                      <div className="ml-4 border-l border-gray-300 pl-4">
-                        {entries.map((entry) => (
-                          <div
-                            key={entry.id}
-                            className="mb-2 p-2 bg-gray-50 rounded shadow"
-                          >
-                            <p>{entry.entry_text}</p>
-                          </div>
-                        ))}
+      {timeline.map(monthBlock => (
+        <div key={monthBlock.month} className="month-block">
+          <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
+
+          {monthBlock.days.map(dayBlock => {
+            const dayKey = dayBlock.day;
+            const dayEntries = dayBlock.entries;
+            const isCollapsed = collapsedDays[dayKey];
+
+            return (
+              <div key={dayKey} className="day-block mb-4">
+                <button
+                  className="text-left font-semibold text-gray-800 underline mb-2"
+                  onClick={() =>
+                    setCollapsedDays(prev => ({
+                      ...prev,
+                      [dayKey]: !prev[dayKey]
+                    }))
+                  }
+                >
+                  {dayjs(dayKey).format('dddd, MMM D')}
+                </button>
+
+                {!isCollapsed && (
+                  <div className="ml-4 border-l border-gray-300 pl-4">
+                    {dayEntries.map(entry => (
+                      <div key={entry.id} className="mb-2 p-2 bg-gray-50 rounded shadow">
+                        <p>{entry.entry_text}</p>
                       </div>
-                    )}
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          )}
+                )}
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-);
+      ))}
+    </div>
+  );
+}
