@@ -51,7 +51,7 @@ export default function JournalTimeline() {
       setLoading(false);
     };
 
-    fetchEntries()'
+    fetchEntries();
   }, [];
 
         const allTopics = [...new Set(
