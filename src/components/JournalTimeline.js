@@ -52,7 +52,7 @@ export default function JournalTimeline() {
     };
 
     fetchEntries();
-  }, [];
+  }, []);
 
         const allTopics = [...new Set(
           data.flatMap(entry => {
