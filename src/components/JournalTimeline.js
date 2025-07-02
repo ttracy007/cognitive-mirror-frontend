@@ -122,7 +122,7 @@ export default function JournalTimeline() {
                   <div className="ml-4 border-l border-gray-300 pl-4">
                     {dayEntries.map(entry => (
                      <Card>
-                      <p>{entry.entry_text}<p/>
+                      <p>{entry.entry_text}</p>
                       </Card>
                     ))}
                   </div>
