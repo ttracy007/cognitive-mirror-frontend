@@ -48,7 +48,7 @@ export default function JournalTimeline() {
     const groupedByDay = groupBy(monthEntries, entry =>
       dayjs(entry.created_at).format('YYYY-MM-DD')
     );
-    
+
     return {
       month,
       days: Object.entries(groupedByDay).map(([day, entries]) => ({
@@ -65,37 +65,6 @@ export default function JournalTimeline() {
   if (!journalEntries.length) {
     return <div>No entries found.</div>;
   }
-
-  return (
-    <div className="journal-timeline">
-      <div className="mb-4">
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={() => {
-            const newCollapsed = !allCollapsed;
-            setAllCollapsed(newCollapsed);
-
-            const updatedState = {};
-            timeline.forEach(month =>
-              month.days.forEach(day => {
-                updatedState[day.day] = newCollapsed;
-              })
-            );
-            setCollapsedDays(updatedState);
-          }}
-        >
-          {allCollapsed ? 'Expand All' : 'Collapse All'}
-        </button>
-      </div>
-
-      {timeline.map(monthBlock => (
-        <div key={monthBlock.month} className="month-block">
-          <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
-
-          {monthBlock.days.map(dayBlock => {
-            const dayKey = dayBlock.day;
-            const dayEntries = dayBlock.entries;
-            const isCollapsed = collapsedDays[dayKey];
 
   return (
     <div className="journal-timeline">
