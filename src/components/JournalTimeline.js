@@ -6,7 +6,7 @@ import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { Card } from './Card';
-import { Button } from '@/components/ui/button';
+import { Button } from './Button';
 
 export default function JournalTimeline() {
   const [journalEntries, setJournalEntries] = useState([]);
