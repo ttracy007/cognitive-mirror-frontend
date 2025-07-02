@@ -159,6 +159,4 @@ export default function JournalTimeline() {
     })}
   </div>
 );
-};
-
-export default JournalGroupedView;
+}
