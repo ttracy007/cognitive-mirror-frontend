@@ -42,17 +42,22 @@ export default function JournalTimeline() {
         return;
       }
 
-      // Store all entries and all distinct topics
-      setJournalEntries(entriesWithTopics);
+     // Join topics to journal entries
+const entriesWithTopics = journalData.map(entry => {
+  const relatedTopics = topicData
+    .filter(t => t.journal_id === entry.id)
+    .map(t => t.topic);
 
-      const allTopics = [...new Set(topicData.map(t => t.topic))];
-      setTopics(allTopics);
+  return {
+    ...entry,
+    topics: relatedTopics
+  };
+});
 
-      setLoading(false);
-    };
+setJournalEntries(entriesWithTopics);
 
-    fetchEntries();
-  }, []);
+const allTopics = [...new Set(topicData.map(t => t.topic))];
+setTopics(allTopics);
 
   const groupedByMonth = groupBy(journalEntries, entry =>
     dayjs(entry.created_at).format('YYYY-MM')
