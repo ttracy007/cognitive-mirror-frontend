@@ -82,7 +82,7 @@ setTopics(allTopics);
   
   // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
-    dayjs(entry.created_at).format('YYYY-MM')
+    dayjs(entry.timestamp).format('YYYY-MM')
   );
 
   //Visual Feedback for Empty Results
@@ -94,14 +94,14 @@ setTopics(allTopics);
   
   const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
     const groupedByDay = groupBy(monthEntries, entry =>
-      dayjs(entry.created_at).format('YYYY-MM-DD')
+      dayjs(entry.timestamp).format('YYYY-MM-DD')
     );
 
     return {
       month,
       days: Object.entries(groupedByDay).map(([day, entries]) => ({
         day,
-        entries: entries.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        entries: entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       }))
     };
   });
