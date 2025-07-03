@@ -128,7 +128,7 @@ setTopics(allTopics);
         </button>
       </div>
           
-    // ✅ Add Topic Filter Dropdown Toggle 
+{/* ✅ Add Topic Filter Dropdown Toggle */} 
         <div style={{ marginBottom: '1rem' }}>
       <label htmlFor="topicFilter">🧠 Filter by topic:</label>
       <select
