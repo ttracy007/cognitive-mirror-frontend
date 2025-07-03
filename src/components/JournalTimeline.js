@@ -65,12 +65,14 @@ setTopics(allTopics);
     fetchEntries(); // ✅ Kick off data fetching
   }, []);
 
-  //✅ Filter entries by selected topic (if not "all")
+  // ✅ Step 1: Filter entries by topic before grouping
   const filteredEntries = selectedTopic === 'all'
     ? journalEntries
     : journalEntries.filter(entry =>
         entry.topics && entry.topics.includes(selectedTopic)
+      );
   
+  // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
     dayjs(entry.created_at).format('YYYY-MM')
   );
