@@ -170,7 +170,7 @@ setTopics(allTopics);
                 </button>
 
                 {!isCollapsed && (
-                  <div className="ml-4 border-l border-gray-300 pl-4">
+                  <div style={{ marginLeft: '1rem', borderLeft: '1px solid #d1d5db', paddingLeft: '1rem' }}>
                     {dayEntries.map(entry => (
                      <Card>
                       <p>{entry.entry_text}</p>
