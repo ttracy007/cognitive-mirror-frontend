@@ -16,7 +16,7 @@ import { Button } from './Button';
 import ChatBubble from './ChatBubble';
 
 
-export default function JournalTimeline() {
+export default function JournalTimeline({userId, refreshTrigger }) {
   const [journalEntries, setJournalEntries] = useState([]);
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ setTopics(allTopics);
     };
 
     fetchEntries(); // ✅ Kick off data fetching
-  }, []);
+  }, [refreshTrigger]);
 
   // ✅ Step 1: Filter entries by topic before grouping
   const filteredEntries = selectedTopic === 'all'
