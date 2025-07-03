@@ -53,6 +53,14 @@ const entriesWithTopics = journalData.map(entry => {
     topics: relatedTopics
   };
 });
+     
+
+      setLoading(false); // ✅ Finish loading state
+    };
+
+    fetchEntries(); // ✅ Kick off data fetching
+  }, []);
+
 
 setJournalEntries(entriesWithTopics);
 
