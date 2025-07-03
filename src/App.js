@@ -25,7 +25,7 @@ const App = () => {
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const prompts = ["What’s weighing you down?"];
-  const [showGroupedView, setShowGroupedView] = useState(false);
+  const [showGroupedView, setShowGroupedView] = useState(true);
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)] 
   );
