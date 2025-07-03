@@ -14,7 +14,7 @@ export default function JournalTimeline() {
   const [loading, setLoading] = useState(true);
   const [collapsedDays, setCollapsedDays] = useState({});
   const [allCollapsed, setAllCollapsed] = useState(false);
-  const [selectedTopic, setSelecteTopic] = useState('all');
+  const [selectedTopic, setSelectedTopic] = useState('all');
   const [collaspedMonths, setCollapsedMonths] = useState({});
 
   useEffect(() => {
