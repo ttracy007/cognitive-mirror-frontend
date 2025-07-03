@@ -53,20 +53,19 @@ const entriesWithTopics = journalData.map(entry => {
     topics: relatedTopics
   };
 });
-     
-
-      setLoading(false); // ✅ Finish loading state
-    };
-
-    fetchEntries(); // ✅ Kick off data fetching
-  }, []);
-
 
 setJournalEntries(entriesWithTopics);
 
 const allTopics = [...new Set(topicData.map(t => t.topic))];
 setTopics(allTopics);
 
+     setLoading(false); // ✅ Finish loading state
+    };
+
+    fetchEntries(); // ✅ Kick off data fetching
+  }, []);
+
+      
   const groupedByMonth = groupBy(journalEntries, entry =>
     dayjs(entry.created_at).format('YYYY-MM')
   );
