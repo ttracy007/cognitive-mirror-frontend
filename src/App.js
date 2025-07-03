@@ -29,6 +29,7 @@ const App = () => {
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)] 
   );
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   let transcriptBuffer = '';
 
   // 🔽 Function 1: Load Saved Username
@@ -157,6 +158,7 @@ const App = () => {
     setSeverityLevel('');
     setIsProcessing(false);
     setTimeout(fetchHistory, 300);
+    setRefreshTrigger(prev => prev +1);
   };
 
    // 🔽 Function 6: Fetch Past Journals
@@ -319,7 +321,7 @@ return (
 
 {/* JournalTimeline Render Call */}
 <div style={{ flex: 1, overflowY: 'auto' }}>
-  <JournalTimeline userId={session?.user?.id} />
+  <JournalTimeline userId={session?.user?.id} refreshTrigger={refreshTrigger} />
 </div>
 
    
