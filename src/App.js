@@ -377,7 +377,7 @@ return (
       </div>
     </div>
 
-    {/* Generate Handoff Summary Bottom Center
+    /* Generate Handoff Summary Bottom Center
     // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
     //   {history.length >= 5 ? (
     //     <button
