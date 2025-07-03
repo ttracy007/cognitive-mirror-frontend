@@ -25,7 +25,7 @@ export default function JournalTimeline() {
       const { data: journalData, error: journalError } = await supabase
         .from('journals')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('timestamp', { ascending: false });
 
       if (journalError) {
         console.error('Error fetching journals:', journalError.message);
