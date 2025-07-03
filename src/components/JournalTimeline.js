@@ -77,6 +77,13 @@ setTopics(allTopics);
     dayjs(entry.created_at).format('YYYY-MM')
   );
 
+  //Visual Feedback for Empty Results
+  {filteredEntries.length === 0 && (
+    <p style={{ marginTop:'1rem', fontStyle: 'italic', color: '#666' }}>
+      No journal entries found for this topic. 
+        </p>
+    )}
+  
   const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
     const groupedByDay = groupBy(monthEntries, entry =>
       dayjs(entry.created_at).format('YYYY-MM-DD')
