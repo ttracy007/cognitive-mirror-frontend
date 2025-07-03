@@ -5,8 +5,8 @@ import dayjs from 'dayjs';
 import utc from 'daysjs/plugin/timezone';
 import timezone from 'daysjs/plugin/timezone';
 
-daysjs.extend(utc);
-daysjs.extend(timezone);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
