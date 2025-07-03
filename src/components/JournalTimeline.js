@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
-import utc from 'daysjs/plugin/timezone';
-import timezone from 'daysjs/plugin/timezone';
+import utc from 'dayjs/plugin/timezone';
+import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
