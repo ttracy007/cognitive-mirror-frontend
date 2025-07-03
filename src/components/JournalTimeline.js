@@ -7,6 +7,7 @@ import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import Card from './Card';
 import { Button } from './Button';
+import ChatBubble from './ChatBubble';
 
 export default function JournalTimeline() {
   const [journalEntries, setJournalEntries] = useState([]);
@@ -153,9 +154,12 @@ setTopics(allTopics);
           {monthBlock.days.map(dayBlock => {
             const dayKey = dayBlock.day;
             const dayEntries = dayBlock.entries;
-            const isCollapsed = collapsedDays[dayKey];
-
-            return (
+            // Collapse all days by default except the 5 most recent
+            const allDayKeys = timeline.flatMap(month => month.days.map(d => d.day));
+            const recentDayKeys = allDayKeys.slice(0, 5); // Adjust to 3 or 7 if needed   
+            const isCollapsed = collapsedDays[dayKey] ?? !recentDayKeys.includes(dayKey);
+                        
+          return (
               <div key={dayKey} className="day-block mb-4">
                 <button
                   className="text-left font-semibold text-gray-800 underline mb-2"
@@ -172,9 +176,7 @@ setTopics(allTopics);
                 {!isCollapsed && (
                   <div style={{ marginLeft: '1rem', borderLeft: '1px solid #d1d5db', paddingLeft: '1rem' }}>
                     {dayEntries.map(entry => (
-                     <Card>
-                      <p>{entry.entry_text}</p>
-                      </Card>
+                      <ChatBubble entry={entry} />
                     ))}
                   </div>
                 )}
