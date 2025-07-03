@@ -344,8 +344,8 @@ return (
 //     <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
 //   )}
 // </div>
-
-    {/* Input box now at bottom */}
+        
+      /*JournalTimeline */
     <div style={{ marginTop: '1rem' }}>
       <textarea
   rows="6"
