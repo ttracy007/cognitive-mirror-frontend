@@ -85,10 +85,10 @@ setTopics(allTopics);
         </p>
     )}
   
-  const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
-    const groupedByDay = groupBy(monthEntries, entry =>
-      dayjs(entry.created_at).format('YYYY-MM-DD')
-    );
+    const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
+      const groupedByDay = groupBy(monthEntries, entry =>
+        dayjs.utc(entry.created_at).tz('America/Mexico_City').format('YYYY-MM-DD')
+      );
 
     return {
       month,
@@ -149,7 +149,7 @@ setTopics(allTopics);
 
     {timeline.map(monthBlock => (
         <div key={monthBlock.month} className="month-block">
-          <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
+          <h2>{dayjs.utc(dayData.day).tz('America/Mexico_City').format('dddd, MMMM D')}</h2>
 
           {monthBlock.days.map(dayBlock => {
             const dayKey = dayBlock.day;
