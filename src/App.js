@@ -284,12 +284,7 @@ return (
   </div>
 </div>
 
-{/* JournalTimeline Render Call */}
-<div style={{ flex: 1, overflowY: 'auto' }}>
-  <JournalTimeline userId={session?.user?.id} />
-</div>
-
-    {/* Input box now at bottom */}
+ {/* Input box now at TOP */}
     <div style={{ marginTop: '1rem' }}>
       <textarea
   rows="6"
@@ -321,6 +316,13 @@ return (
       </div>
     </div>
 
+
+{/* JournalTimeline Render Call */}
+<div style={{ flex: 1, overflowY: 'auto' }}>
+  <JournalTimeline userId={session?.user?.id} />
+</div>
+
+   
     {/* Generate Handoff Summary Bottom Center
     // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
     //   {history.length >= 5 ? (
