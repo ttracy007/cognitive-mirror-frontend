@@ -341,7 +341,9 @@ return (
     <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
   )}
 </div>
-//     {/* JournalTimeline Render Call */}
+
+
+{/* JournalTimeline Render Call */}
 // <div style={{ flex: 1, overflowY: 'auto' }}>
 //   <JournalTimeline userId={session?.user?.id} />
 // </div>
