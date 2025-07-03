@@ -65,8 +65,13 @@ setTopics(allTopics);
     fetchEntries(); // ✅ Kick off data fetching
   }, []);
 
-      
-  const groupedByMonth = groupBy(journalEntries, entry =>
+  //✅ Filter entries by selected topic (if not "all")
+  const filteredEntries = selectedTopic === 'all'
+    ? journalEntries
+    : journalEntries.filter(entry =>
+        entry.topics && entry.topics.includes(selectedTopic)
+  
+  const groupedByMonth = groupBy(filteredEntries, entry =>
     dayjs(entry.created_at).format('YYYY-MM')
   );
 
@@ -113,8 +118,26 @@ setTopics(allTopics);
           {allCollapsed ? 'Expand All' : 'Collapse All'}
         </button>
       </div>
+          
+    // ✅ Add Topic Filter Dropdown Toggle 
+        <div style={{ marginBottom: '1rem' }}>
+      <label htmlFor="topicFilter">🧠 Filter by topic:</label>
+      <select
+        id="topicFilter"
+        value={selectedTopic}
+        onChange={(e) => setSelectedTopic(e.target.value)}
+        style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
+      >
+        <option value="all">All Topics</option>
+        {topics.map(topic => (
+          <option key={topic} value={topic}>
+            {topic}
+          </option>
+        ))}
+      </select>
+    </div>
 
-      {timeline.map(monthBlock => (
+    {timeline.map(monthBlock => (
         <div key={monthBlock.month} className="month-block">
           <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
 
