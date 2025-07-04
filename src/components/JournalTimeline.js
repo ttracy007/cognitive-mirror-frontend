@@ -33,6 +33,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       const { data: journalData, error: journalError } = await supabase
         .from('journals')
         .select('*')
+        .eq('user_id', userId)
         .order('timestamp', { ascending: false });
 
       if (journalError) {
