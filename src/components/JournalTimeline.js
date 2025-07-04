@@ -44,6 +44,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       const { data: topicData, error: topicError } = await supabase
         .from('topic_mentions')
         .select('journal_id, topic');
+        .eq('user_id', userId);
 
       if (topicError) {
         console.error('Error fetching topics:', topicError.message);
