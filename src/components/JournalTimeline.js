@@ -35,6 +35,21 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState('all');
   const [collaspedMonths, setCollapsedMonths] = useState({});
+  const extractTopicsAndSeverity = async (entryText) => {
+  const gptResponse = await callOpenAIChat([
+    { role: 'system', content: TOPIC_AND_SEVERITY_PROMPT },
+    { role: 'user', content: entryText }
+  ]);
+  const topicMatch = gptResponse.match(/Topics:\s*\[(.*?)\]/i);
+  const parsedTopics = topicMatch
+    ? topicMatch[1].split(',').map(t => t.trim().toLowerCase())
+    : [];
+  const severityMatch = gptResponse.match(/Severity:\s*(\d)/i);
+  const severityRating = severityMatch && severityMatch[1]
+    ? parseInt(severityMatch[1])
+    : 1;
+  return { parsedTopics, severityRating };
+};
 
   useEffect(() => {
     const fetchEntries = async () => {
