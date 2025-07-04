@@ -223,7 +223,7 @@ const App = () => {
   // 🔽 Tone Display Utility
   const displayTone = (mode) => {
     const t = mode?.trim().toLowerCase();
-    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Stoic Mentor';
+    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Marcus Aurelius';
   };
 
   const getToneStyle = (mode) => {
@@ -238,10 +238,11 @@ const App = () => {
         };
       case 'stoic':
       case 'stoic mentor':
+      case 'marcus':
         return {
           backgroundColor: '#f0fdf4',
           borderColor: '#2e7d32',
-          label: '🟢 Stoic Mentor',
+          label: '🟢 Marcus Aurelius',
         };
       case 'therapist':
         return {
@@ -394,7 +395,7 @@ return (
     style={{ padding: '0.4rem' }}
   >
     <option value="frank">Frank Friend</option>
-    <option value="stoic">Stoic Mentor</option>
+    <option value="marcus">Marcus Aurelius</option>
     <option value="therapist">Therapist Mode</option>
     <option value="movies">Movie Metaphors Man</option>
   </select>
