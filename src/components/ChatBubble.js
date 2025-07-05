@@ -53,7 +53,7 @@ function getToneStyle(tone) {
     case 'frank':
       return { backgroundColor: '#fff3e0', borderColor: '#fb8c00', label: 'Frank Friend' };
     case 'marcus':
-      return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Stoic Mentor' };
+      return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus Aurelius' };
     case 'therapist':
       return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Therapist Mode' };
     case 'movie':
