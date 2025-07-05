@@ -287,7 +287,7 @@ const App = () => {
           label: '🔴 Frank Friend',
         };
       case 'marcus':
-      // case 'marcus aurelius':
+      case 'marcus aurelius':
         return {
           backgroundColor: '#f0fdf4',
           borderColor: '#2e7d32',
