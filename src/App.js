@@ -289,6 +289,7 @@ const App = () => {
       case 'stoic':
       case 'stoic mentor':
       case 'marcus':
+      case 'marcus aurelius':
         return {
           backgroundColor: '#f0fdf4',
           borderColor: '#2e7d32',
