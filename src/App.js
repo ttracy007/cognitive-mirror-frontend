@@ -286,8 +286,6 @@ const App = () => {
           borderColor: '#cc0000',
           label: '🔴 Frank Friend',
         };
-      case 'stoic':
-      case 'stoic mentor':
       case 'marcus':
       case 'marcus aurelius':
         return {
@@ -372,7 +370,7 @@ return (
         {isListening && <span>🎧 Listening…</span>}
         {isProcessing && (
       <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
-        Mirror is typing<span className="dots"></span>
+        Mirror is thinking<span className="dots"></span>
   </div>
 )}
 
