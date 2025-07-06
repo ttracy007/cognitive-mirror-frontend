@@ -59,16 +59,12 @@ const LoginPage = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
+   <div style={{ maxWidth: '500px', margin: '3rem auto', padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Cognitive Mirror</h1>
       <p style={{ fontSize: '1.1rem', lineHeight: 1.5 }}>
-         Whatever weight you're carrying, describe it as freely as you can. 
-         
-         <strong>GET NAKED before the Mirror.</strong><br />  
-         
-         Treat it as a conversation--a conversation without judgement, only insights. 
-         </p>
-    
+        <strong>It’s not a chatbot. It’s a mirror with memory.</strong><br />
+        Cognitive Mirror listens across days—not minutes. It sees what loops you’re stuck in, and it nudges you forward.
+      </p>
       <p style={{ marginTop: '1rem', color: '#444', fontSize: '0.95rem' }}>
         Everything you write is private, encrypted, and only visible to you.<br />
         Be fully honest—your reflections don’t leave this mirror.
