@@ -52,7 +52,7 @@ function getToneStyle(tone) {
   switch (tone.toLowerCase()) {
     case 'frank':
       return { backgroundColor: '#fff3e0', borderColor: '#fb8c00', label: 'Frank Friend' };
-    case 'marcus aurelius':
+    // case 'marcus aurelius':
     case 'marcus':
       return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus Aurelius' };
     case 'therapist':
