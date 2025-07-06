@@ -41,9 +41,9 @@ const LandingPage = ({ onStart }) => {
       </h3>
 
       <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>💪🍷 Frank Friend</p>
+        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>💪🍷 Tony</p>
         <p>
-          A fiercely loyal, no-bullshit friend. Cuts through avoidance and calls out self-defeating patterns.
+          A fiercely loyal, no-bullshit frank friend. Cuts through avoidance and calls out self-defeating patterns.
           Speaks with brutal clarity and humor.
         </p>
       </div>
@@ -57,7 +57,7 @@ const LandingPage = ({ onStart }) => {
       </div>
 
       <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧑🏽‍⚕️ Therapist</p>
+        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧑🏽‍⚕️ Clara</p>
         <p>
           A warm, nonjudgmental listener. Assists user in exploring emotions, providing validation,
           and nudging toward gentle self-awareness.
