@@ -298,6 +298,7 @@ const App = () => {
           backgroundColor: '#fef6ff',
           borderColor: '#b755e5',
           label: '🟣 Therapist Mode',
+          label: '🟣 Clara',
         };
       case 'movies':
         return {
