@@ -49,10 +49,10 @@ const LandingPage = ({ onStart }) => {
       </div>
 
       <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧘 Stoic Mentor</p>
+        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧘 Marcus Aurelius</p>
         <p>
-          A calm, wise mentor in the spirit of Stoic philosophy. Helps user find clarity in discomfort.
-          Offers grounded truths with simplicity and stillness.
+          A calm, wise mentor in the spirit of Stoic philosophy.
+          Offers grounded truths with simplicity and stillness.  Speaks as if journaling in *Meditations*.',      
         </p>
       </div>
 
