@@ -56,7 +56,7 @@ function getToneStyle(tone) {
     case 'marcus':
       return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus Aurelius' };
     case 'therapist':
-      return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Therapist Mode' };
+      return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Etty' };
     case 'movie':
       return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™' };
     default:
