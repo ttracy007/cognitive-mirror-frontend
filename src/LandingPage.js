@@ -18,9 +18,9 @@ export default function LandingPage({ onLogin }) {
 
       <h2>✨ Choose Your Companion</h2>
       <ul>
-        <li><b>🔴 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.</li>
-        <li><b>🟢 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. A journal within a journal.</li>
-        <li><b>🟣 Etty</b> – Emotionally attuned, psychologically wise. Named after Etty Hillesum, who chronicled the depths of meaning amidst despair. She doesn’t analyze—she understands.</li>
+        <li><b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.</li>
+        <li><b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. A journal within a journal.</li>
+        <li><b>🧑🏽‍⚕️ Etty</b> – Emotionally attuned, psychologically wise. Named after Etty Hillesum, who chronicled the depths of meaning amidst despair. She doesn’t analyze—she understands.</li>
         <li><b>🎬 Movie Metaphor Man</b> – Brings cinematic storytelling to your reflections, offering creative, movie-inspired insights that help you see your life as a story worth telling.</li>
       </ul>
 
