@@ -59,3 +59,4 @@ const LandingPage = ({ onStart }) => {
     </div>
   );
 }
+export default LandingPage;
