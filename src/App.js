@@ -4,7 +4,7 @@ import SummaryViewer from './SummaryViewer';
 import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
-import LoginPage from './LoginPage';
+// import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 // 🔽 Component State Initialization
@@ -38,6 +38,18 @@ const callOpenAIChat = async (messages) => {
   return data.choices?.[0]?.message?.content || "No response";
 };
 
+const [username, setUsername] = useState(null);
+const [password, setPassword] = useState(null); // if needed for future
+
+const handleLogin = (enteredUsername, enteredPassword) => {
+  setUsername(enteredUsername);
+  setPassword(enteredPassword);
+};
+
+// Early exit: show landing first
+if (!username) {
+  return <LandingPage onLogin={handleLogin} />;
+}
 
 const extractTopicsAndSeverity = async (entryText) => {
   const gptResponse = await callOpenAIChat([
