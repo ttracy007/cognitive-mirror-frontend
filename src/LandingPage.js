@@ -98,7 +98,7 @@ export default function LandingPage({ onLogin }) {
           onChange={e => setPassword(e.target.value)}
           style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
         />
-        <button onClick={handleEnter} style={{ padding: '0.6rem 1.5rem' }}>
+        <button onClick={handleLoginOrSignup} style={{ padding: '0.6rem 1.5rem' }}>
           Start Journaling →
         </button>
       </div>
