@@ -284,7 +284,7 @@ const App = () => {
         return {
           backgroundColor: '#fff1f1',
           borderColor: '#cc0000',
-          label: '🔴 Frank Friend',
+          label: '🔴 Tony',
         };
       case 'marcus':
       case 'marcus aurelius':
@@ -297,7 +297,6 @@ const App = () => {
         return {
           backgroundColor: '#fef6ff',
           borderColor: '#b755e5',
-          label: '🟣 Therapist Mode',
           label: '🟣 Clara',
         };
       case 'movies':
@@ -444,9 +443,9 @@ return (
     onChange={(e) => setForcedTone(e.target.value)}
     style={{ padding: '0.4rem' }}
   >
-    <option value="frank">Frank Friend</option>
+    <option value="frank">Tony</option>
     <option value="marcus">Marcus Aurelius</option>
-    <option value="therapist">Therapist Mode</option>
+    <option value="therapist">Clara</option>
     <option value="movies">Movie Metaphors Man</option>
   </select>
 </div>
