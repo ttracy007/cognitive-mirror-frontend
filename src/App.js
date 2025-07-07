@@ -8,7 +8,7 @@ import LandingPage from './LandingPage';
 import JournalTimeline from './components/JournalTimeline';
 
 // 🔽 Main App Component  
-function App() {
+// function App() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null); // Optional
 
@@ -22,7 +22,7 @@ function App() {
         }}
       />
     );
-  }
+  // }
 
   // 🔽 Render the journal timeline once logged in
   return (
