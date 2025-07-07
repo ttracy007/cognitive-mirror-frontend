@@ -4,6 +4,7 @@ import { supabase } from './supabaseClient';
 const LoginPage = ({ onAuthSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [session, setSession] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
