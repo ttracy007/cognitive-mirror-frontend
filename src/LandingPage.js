@@ -1,64 +1,15 @@
 import React, { useState } from 'react';
-import { supabase } from './supabaseClient';
 
-export default function LandingPage({ onAuthSuccess }) {
+export default function LandingPage({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLoginOrSignup = async () => {
-    setErrorMsg('');
-
-    if (!username || !password) {
-      setErrorMsg('Username and password are required.');
-      return;
-    }
-
-    // Build a fake email to satisfy Supabase but make email irrelevant to the user
-    const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '')}@cognitivemirror.ai`;
-    const authData = {
-      email: fakeEmail,
-      password,
-    };
-
-    try {
-      // Try logging in first
-      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
-
-      if (loginError) {
-        // If login fails, try sign-up
-        let { error: signupError } = await supabase.auth.signUp(authData);
-
-        if (signupError) {
-          setErrorMsg(signupError.message);
-          return;
-        }
-
-        // If sign-up succeeds, log them in
-        let { error: retryLoginError } = await supabase.auth.signInWithPassword(authData);
-        if (retryLoginError) {
-          setErrorMsg(retryLoginError.message);
-          return;
-        }
-      }
-
-      // Fetch session after successful login
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        setErrorMsg('Authentication failed.');
-        return;
-      }
-
-      // Pass username manually to App
-      onAuthSuccess(sessionData.session, username);
-    } catch (err) {
-      console.error(err);
-      setErrorMsg('Unexpected error. Please try again.');
+  const handleEnter = () => {
+    if (username.trim()) {
+      onLogin(username.trim(), password); // Pass both
     }
   };
-
-  return (
+ return (
     <div style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto', fontFamily: 'sans-serif' }}>
       <h1 style={{ fontSize: '2rem' }}>🪞 Meet your Insightful Companion</h1>
       <p>Cognitive Mirror isn’t just another journaling tool.<br />
@@ -99,7 +50,7 @@ export default function LandingPage({ onAuthSuccess }) {
           onChange={e => setPassword(e.target.value)}
           style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
         />
-        <button onClick={handleLoginOrSignup} style={{ padding: '0.6rem 1.5rem' }}>
+        <button onClick={handleEnter} style={{ padding: '0.6rem 1.5rem' }}>
           Start Journaling →
         </button>
       </div>
