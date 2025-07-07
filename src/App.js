@@ -12,15 +12,21 @@ function App() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null); // Optional
 
-  const handleLogin = (enteredUsername, enteredPassword) => {
+  const handleLoginOrSignup = (enteredUsername, enteredPassword) => {
     setUsername(enteredUsername);
     setPassword(enteredPassword);
   };
 
-  if (!username) {
-    return <LandingPage onLogin={handleLogin} />;
+  if (!session) {
+    return (
+      <LandingPage
+        onAuthSuccess={(session, username) => {
+          setSession(session);
+          setUsername(username);
+        }}
+      />
+    );
   }
-
 // 🔽 Component State Initialization
 const TOPIC_AND_SEVERITY_PROMPT = `
 You are an emotional insight detector. Given a user's journal reflection, extract two things:
