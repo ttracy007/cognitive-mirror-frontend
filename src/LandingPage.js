@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
 
-export default function LandingPage({ onLogin }) {
+export default function LandingPage({ onAuthSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
