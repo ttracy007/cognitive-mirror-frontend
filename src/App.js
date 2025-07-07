@@ -4,36 +4,8 @@ import SummaryViewer from './SummaryViewer';
 import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
-// import LoginPage from './LoginPage';
+import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
-
-// 🔽 Main App Component  
-// function App() {
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null); // Optional
-
-  // 🔽 Once username is set, proceed to journaling view
-  if (!username) {
-    return (
-      <LandingPage
-        onLogin={(enteredUsername, enteredPassword) => {
-          setUsername(enteredUsername);
-          setPassword(enteredPassword);
-        }}
-      />
-    );
-  // }
-
-  // 🔽 Render the journal timeline once logged in
-  return (
-    <div className="App">
-      <JournalTimeline username={username} />
-      <SummaryViewer />
-    </div>
-  );
-// }
-
-// export default App;
 
 // 🔽 Component State Initialization
 const TOPIC_AND_SEVERITY_PROMPT = `
