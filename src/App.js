@@ -10,7 +10,8 @@ import JournalTimeline from './components/JournalTimeline';
   // 🔽 Login Function 
 function App() {
   const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null); // Optional
+  const [password, setPassword] = useState(null);
+  const [session, setSession] = useState(null);
 
   const handleLoginOrSignup = (enteredUsername, enteredPassword) => {
     setUsername(enteredUsername);
