@@ -201,6 +201,7 @@ const App = () => {
         username,
         user_id: userId,
         severity_override: severityRating,
+        topic: parsed_Topics[0],
         debug_marker,
       }),
     });
