@@ -7,6 +7,20 @@ import LandingPage from './LandingPage';
 // import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
+  // 🔽 Login Function 
+function App() {
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null); // Optional
+
+  const handleLogin = (enteredUsername, enteredPassword) => {
+    setUsername(enteredUsername);
+    setPassword(enteredPassword);
+  };
+
+  if (!username) {
+    return <LandingPage onLogin={handleLogin} />;
+  }
+
 // 🔽 Component State Initialization
 const TOPIC_AND_SEVERITY_PROMPT = `
 You are an emotional insight detector. Given a user's journal reflection, extract two things:
@@ -37,19 +51,6 @@ const callOpenAIChat = async (messages) => {
   const data = await response.json();
   return data.choices?.[0]?.message?.content || "No response";
 };
-
-const [username, setUsername] = useState(null);
-const [password, setPassword] = useState(null); // if needed for future
-
-const handleLogin = (enteredUsername, enteredPassword) => {
-  setUsername(enteredUsername);
-  setPassword(enteredPassword);
-};
-
-// Early exit: show landing first
-if (!username) {
-  return <LandingPage onLogin={handleLogin} />;
-}
 
 const extractTopicsAndSeverity = async (entryText) => {
   const gptResponse = await callOpenAIChat([
