@@ -4,30 +4,9 @@ import SummaryViewer from './SummaryViewer';
 import { supabase } from './supabaseClient';
 import './App.css';
 import LandingPage from './LandingPage';
-// import LoginPage from './LoginPage';
+import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
-  // 🔽 Login Function 
-function App() {
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [session, setSession] = useState(null);
-
-  const handleLoginOrSignup = (enteredUsername, enteredPassword) => {
-    setUsername(enteredUsername);
-    setPassword(enteredPassword);
-  };
-
-  if (!session) {
-    return (
-      <LandingPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
-  }
 // 🔽 Component State Initialization
 const TOPIC_AND_SEVERITY_PROMPT = `
 You are an emotional insight detector. Given a user's journal reflection, extract two things:
@@ -58,6 +37,7 @@ const callOpenAIChat = async (messages) => {
   const data = await response.json();
   return data.choices?.[0]?.message?.content || "No response";
 };
+
 
 const extractTopicsAndSeverity = async (entryText) => {
   const gptResponse = await callOpenAIChat([
@@ -498,5 +478,4 @@ return (
   </div>
   );
 };
-}
 export default App;
