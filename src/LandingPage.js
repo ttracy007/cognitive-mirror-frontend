@@ -3,10 +3,57 @@ import React, { useState } from 'react';
 export default function LandingPage({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleEnter = () => {
-    if (username.trim()) {
-      onLogin(username.trim(), password); // Pass both
+  const handleLoginOrSignup = async () => {
+    setErrorMsg('');
+
+    if (!username || !password) {
+      setErrorMsg('Username and password are required.');
+      return;
+    }
+
+    // Build a fake email to satisfy Supabase but make email irrelevant to the user
+    const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '')}@cognitivemirror.ai`;
+    const authData = {
+      email: fakeEmail,
+      password,
+    };
+
+    try {
+      // Try logging in first
+      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
+
+      if (loginError) {
+        // If login fails, try sign-up
+        let { error: signupError } = await supabase.auth.signUp(authData);
+
+        if (signupError) {
+          setErrorMsg(signupError.message);
+          return;
+        }
+
+        // If sign-up succeeds, log them in
+        let { error: retryLoginError } = await supabase.auth.signInWithPassword(authData);
+        if (retryLoginError) {
+          setErrorMsg(retryLoginError.message);
+          return;
+        }
+      }
+
+      // Fetch session after successful login
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        setErrorMsg('Authentication failed.');
+        return;
+      }
+
+      // Pass username manually to App
+      onAuthSuccess(sessionData.session, username);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Unexpected error. Please try again.');
     }
   };
 
