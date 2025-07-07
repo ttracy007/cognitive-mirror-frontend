@@ -12,101 +12,50 @@ const LandingPage = ({ onStart }) => {
   };
 
   return (
-    <div
-      style={{
-        padding: '1.5rem',
-        fontFamily: 'sans-serif',
-        maxWidth: '700px',
-        margin: '0 auto',
-        lineHeight: '1.6',
-        fontSize: 'clamp(0.95rem, 2.5vw, 1.05rem)'
-      }}
-    >
-      <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 'bold' }}>
-        🪞 Welcome to Cognitive Mirror (Beta)
-      </h1>
+    <div style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+      <h1 style={{ fontSize: '2rem' }}>🪞 Meet your Insightful Companion</h1>
+      <p>Cognitive Mirror isn’t just another journaling tool.<br />
+         It’s a reflective companion—powered by AI, shaped by real philosophy and therapy—that listens to what you write and responds like someone who truly sees you.</p>
 
-      <p>
-        <strong>Cognitive Mirror</strong> is a journaling experiment designed for anyone who wants to understand themselves more clearly—
-        and for therapists looking to track what happens between sessions.
-      </p>
-      <p>
-        <strong>It’s not a substitute for professional help.</strong> If you're in serious distress, please reach out to a licensed mental health provider.
-        But if you’re simply stuck, spiraling, or unsure what’s going on inside you—this mirror might help you see it.
-      </p>
-      <p>You can write freely, or speak your thoughts aloud. Either way, the mirror listens.</p>
+      <h2>✨ Choose Your Companion</h2>
+      <ul>
+        <li><b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.</li>
+        <li><b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. A journal within a journal.</li>
+        <li><b>🧑🏽‍⚕️ Etty</b> – Emotionally attuned, psychologically wise. Named after Etty Hillesum, who chronicled the depths of meaning amidst despair. She doesn’t analyze—she understands.</li>
+        <li><b>🎬 Movie Metaphor Man</b> – Brings cinematic storytelling to your reflections, offering creative, movie-inspired insights that help you see your life as a story worth telling.</li>
+      </ul>
 
-      <h3 style={{ marginTop: '2rem', fontSize: 'clamp(1.1rem, 4vw, 1.25rem)' }}>
-        Choose an assistant’s tone:
-      </h3>
+      <h2>✏️ How It Works</h2>
+      <ul>
+        <li>Just write what’s on your mind. Cognitive Mirror will respond with a voice you choose—offering reflection, not advice.</li>
+        <li>🧠 Generate a summary of your recent reflections</li>
+        <li>🎭 Switch voices at any time</li>
+        <li>🔐 Keep your entries private and secure</li>
+      </ul>
 
-      <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>💪🍷 Tony</p>
-        <p>
-          A fiercely loyal, no-bullshit frank friend. Cuts through avoidance and calls out self-defeating patterns.
-          Speaks with brutal clarity and humor.
-        </p>
+      <h2>🧭 Ready to begin?</h2>
+      <p>Choose your voice below, start journaling, and let your mirror speak.<br />
+      <b>You might be surprised by what you see.</b></p>
+
+      <div style={{ marginTop: '2rem' }}>
+        <input
+          type="text"
+          placeholder="Enter your username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
+        />
+        <input
+          type="password"
+          placeholder="Optional: enter password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
+        />
+        <button onClick={handleEnter} style={{ padding: '0.6rem 1.5rem' }}>
+          Start Journaling →
+        </button>
       </div>
-
-      <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧘 Marcus Aurelius</p>
-        <p>
-          A calm, wise mentor in the spirit of Stoic philosophy.
-          Offers grounded truths with simplicity and stillness.  Speaks as if journaling in *Meditations*.',      
-        </p>
-      </div>
-
-      <div style={{ marginBottom: '1.5rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🧑🏽‍⚕️ Clara</p>
-        <p>
-          A warm, nonjudgmental listener. Assists user in exploring emotions, providing validation,
-          and nudging toward gentle self-awareness.
-        </p>
-      </div>
-
-      <div style={{ marginBottom: '2rem', padding: '0.5rem 0.25rem' }}>
-        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>🎬 Movie Metaphors Man</p>
-        <p>
-          A cinema buff who speaks almost entirely in movie quotes. Finds the plot hole and helps user rewrite their story.
-          May get emotional.
-        </p>
-      </div>
-
-      <p>The more honest you are, the more the mirror reflects back what really matters.</p>
-
-      <input
-        type="text"
-        placeholder="Username (required)"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '0.75rem',
-          fontSize: '1rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          marginTop: '2rem'
-        }}
-      />
-
-      <button
-        onClick={handleStart}
-        style={{
-          padding: '0.75rem 1.5rem',
-          fontSize: '1rem',
-          backgroundColor: '#000',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '6px',
-          marginTop: '1rem',
-          cursor: 'pointer',
-          width: '100%'
-        }}
-      >
-        Start Journaling →
-      </button>
     </div>
   );
-};
-
-export default LandingPage;
+}
