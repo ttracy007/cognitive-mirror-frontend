@@ -37,26 +37,39 @@ const LandingPage = ({ onStart }) => {
       <p>Choose your voice below, start journaling, and let your mirror speak.<br />
       <b>You might be surprised by what you see.</b></p>
 
-      <div style={{ marginTop: '2rem' }}>
-        <input
-          type="text"
-          placeholder="Enter your username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
-        />
-        <input
-          type="password"
-          placeholder="Optional: enter password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
-        />
-        <button onClick={handleEnter} style={{ padding: '0.6rem 1.5rem' }}>
-          Start Journaling →
-        </button>
-      </div>
+      <input
+        type="text"
+        placeholder="Username (required)"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '0.75rem',
+          fontSize: '1rem',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          marginTop: '2rem'
+        }}
+      />
+
+      <button
+        onClick={handleStart}
+        style={{
+          padding: '0.75rem 1.5rem',
+          fontSize: '1rem',
+          backgroundColor: '#000',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          marginTop: '1rem',
+          cursor: 'pointer',
+          width: '100%'
+        }}
+      >
+        Start Journaling →
+      </button>
     </div>
   );
-}
+};
+
 export default LandingPage;
