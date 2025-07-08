@@ -187,6 +187,8 @@ setJournalEntries(entriesWithTopics);
     return <div>No entries found.</div>;
   }
 
+const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
+
   return (
     <div className="journal-timeline">
       <div className="mb-4">
@@ -211,9 +213,7 @@ setJournalEntries(entriesWithTopics);
           
 {/* ✅ Add Topic Filter Dropdown Toggle */} 
         <div style={{ marginBottom: '1rem' }}>
-      <label htmlFor="topicFilter">🧠 Filter by topic:</label>
-
-       const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
+      <label htmlFor="topicFilter">🧠 Filter by topic:</label>   
 
          <select
       id="topicFilter"
