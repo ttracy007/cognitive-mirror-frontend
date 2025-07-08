@@ -169,8 +169,6 @@ setJournalEntries(entriesWithTopics);
     const groupedByDay = groupBy(monthEntries, entry =>
       dayjs(entry.timestamp).format('YYYY-MM-DD')
     );
-
-  const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
     
     return {
       month,
@@ -214,6 +212,9 @@ setJournalEntries(entriesWithTopics);
 {/* ✅ Add Topic Filter Dropdown Toggle */} 
         <div style={{ marginBottom: '1rem' }}>
       <label htmlFor="topicFilter">🧠 Filter by topic:</label>
+
+       const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
+
          <select
       id="topicFilter"
       value={selectedTopic}
