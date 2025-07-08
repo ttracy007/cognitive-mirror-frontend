@@ -70,11 +70,11 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     // ✅ Step 2: Fetch topic_mentions to join with user_topic_aliases
     const { data: topicData, error: topicError } = await supabase
       .from('topic_mentions')
-      .select('
+      .select(`
           journal_id, 
           topic, 
           user_topic_aliases(alias)
-        ')
+        `)
       .eq('user_id', userId)
       .order('journal_id', {ascending: false });
 
