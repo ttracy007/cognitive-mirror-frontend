@@ -108,7 +108,8 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     //   return {
     //     ...entry, aliases: relatedAliases }; 
     // });
-    ✅ Step 5: Map Journal Entries To Alias
+   
+    // ✅ Step 5: Map Journal Entries To Alias
     const entriesWithTopics = journalData.map(entry => {
       const relatedAliases = topicData.filter(t => t.journal_id === entry.id);
       const topics = relatedTopics.map(t => t.topic);
