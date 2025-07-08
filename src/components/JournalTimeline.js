@@ -51,71 +51,75 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   return { parsedTopics, severityRating };
 };
 
-  useEffect(() => {
-    const fetchEntries = async () => {
-      setLoading(true);
+ useEffect(() => {
+  const fetchEntries = async () => {
+    setLoading(true);
 
-  // Fetch journals
-      const { data: journalData, error: journalError } = await supabase
-        .from('journals')
-        .select('*')
-        .eq('user_id', userId)
-        .order('timestamp', { ascending: false });
+    // ✅ Step 1: Fetch journals
+    const { data: journalData, error: journalError } = await supabase
+      .from('journals')
+      .select('*')
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: false });
 
-      if (journalError) {
-        console.error('Error fetching journals:', journalError.message);
-        return;
-      }
+    if (journalError) {
+      console.error('❌ Error fetching journals:', journalError.message);
+      return;
+    }
 
-  //Fetch topics
-      const { data: topicData, error: topicError } = await supabase
-        .from('topic_mentions')
-        .select('journal_id, topic')
-        .eq('user_id', userId);
+    // ✅ Step 2: Fetch topic_mentions
+    const { data: topicData, error: topicError } = await supabase
+      .from('topic_mentions')
+      .select('journal_id, topic')
+      .eq('user_id', userId);
 
-      if (topicError) {
-        console.error('Error fetching topics:', topicError.message);
-        return;
-      }
+    if (topicError) {
+      console.error('❌ Error fetching topics:', topicError.message);
+      return;
+    }
 
-  // Fetch aliases
-      const { data: aliasData, error: aliasError } = await supabase
-        .from('user_topic_aliases')
-        .select('alias, variant')
-        .eq('user_id', userId);
-      
-      if (aliasError) {
-        console.error('Error fetching aliases:', aliasError.message);
-        return;
-      }
+    // ✅ Step 3: Fetch user_topic_aliases
+    const { data: aliasData, error: aliasError } = await supabase
+      .from('user_topic_aliases')
+      .select('alias, variant')
+      .eq('user_id', userId);
 
-        const aliasMap = {};
-  aliasData.forEach(({ alias, variant }) => {
-    aliasMap[variant] = alias;
-  });
-      
-     // Join topics to journal entries
-const entriesWithTopics = journalData.map(entry => {
-  const relatedTopics = topicData
-    .filter(t => t.journal_id === entry.id)
-    .map(t => aliasMap[t.topic] || t.topic);
+    if (aliasError) {
+      console.error('❌ Error fetching aliases:', aliasError.message);
+      return;
+    }
 
-  return {
-    ...entry,
-    topics: relatedTopics
+    // ✅ Step 4: Build alias lookup map (variant → alias)
+    const aliasMap = {};
+    aliasData.forEach(({ alias, variant }) => {
+      aliasMap[variant] = alias;
+    });
+
+    // ✅ Step 5: Normalize topics and attach to journal entries
+    const entriesWithTopics = journalData.map(entry => {
+      const relatedTopics = topicData
+        .filter(t => t.journal_id === entry.id)
+        .map(t => aliasMap[t.topic] || t.topic);
+
+      return {
+        ...entry,
+        topics: relatedTopics
+      };
+    });
+
+    setJournalEntries(entriesWithTopics);
+
+    // ✅ Step 6: Normalize topic list for dropdown
+    const allTopics = [...new Set(
+      topicData.map(t => aliasMap[t.topic] || t.topic)
+    )];
+    setTopics(allTopics);
+
+    setLoading(false);
   };
-});
 
-setJournalEntries(entriesWithTopics);
-
-const allTopics = [...new Set(topicData.map(t => aliasMap[t.topic] || t.topic))];
-setTopics(allTopics);
-
-     setLoading(false); // ✅ Finish loading state
-    };
-
-    fetchEntries(); // ✅ Kick off data fetching
-  }, [refreshTrigger]);
+  fetchEntries(); // Kick off data fetching
+}, [refreshTrigger]);
 
   // ✅ Step 1: Filter entries by topic before grouping
   const filteredEntries = selectedTopic === 'all'
