@@ -108,7 +108,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
         
           return {
             ...entry,
-            topics: relatedTopics,
+            aliases: relatedAliases,
           };
         });
 
