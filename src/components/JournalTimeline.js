@@ -144,7 +144,7 @@ setJournalEntries(entriesWithTopics);
   const filteredEntries = selectedTopic === 'all'
   ? journalEntries
   : journalEntries.filter(entry =>
-      entry.aliases?.includes(selectedTopic)
+      entry.aliases && entry.aliases.includes(selectedTopic)
     );
 
 console.log('🧠 selectedTopic:', selectedTopic);
