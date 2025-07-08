@@ -70,7 +70,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     // ✅ Step 2: Fetch topic_mentions
     const { data: topicData, error: topicError } = await supabase
       .from('topic_mentions')
-      .select('journal_id, topic')
+      .select('journal_id, topic, user_id, user_topic_aliases(alias)')
       .eq('user_id', userId);
 
     if (topicError) {
