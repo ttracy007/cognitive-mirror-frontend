@@ -67,7 +67,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       return;
     }
 
-    // ✅ Step 2: Fetch topic_mentions
+    // ✅ Step 2: Fetch topic_mentions to join with user_topic_aliases
     const { data: topicData, error: topicError } = await supabase
       .from('topic_mentions')
       .select('journal_id, topic, user_id, user_topic_aliases(alias)')
@@ -95,16 +95,13 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       aliasMap[variant] = alias;
     });
 
-    // ✅ Step 5: Normalize topics and attach to journal entries
+    // ✅ Step 5: Map Journal Entries To Alias
     const entriesWithTopics = journalData.map(entry => {
-      const relatedTopics = topicData
+      const relatedAliases = topicData
         .filter(t => t.journal_id === entry.id)
-        .map(t => aliasMap[t.topic] || t.topic);
-
+        .map(t => t.user_topic_aliases?.alias || t.topic); // fallback to topic
       return {
-        ...entry,
-        topics: relatedTopics
-      };
+        ...entry, aliases: relatedAliases }; 
     });
 
     setJournalEntries(entriesWithTopics);
