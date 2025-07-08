@@ -125,7 +125,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   const filteredEntries = selectedTopic === 'all'
     ? journalEntries
     : journalEntries.filter(entry =>
-        entry.topics?.includes(selectedTopic)
+        entry.aliases && entry.aliases.includes(selectedTopic)
       );
   
   // ✅ Then group filtered entries by month
