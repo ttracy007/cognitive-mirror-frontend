@@ -109,18 +109,32 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     //     ...entry, aliases: relatedAliases }; 
     // });
    
-    // ✅ Step 5: Map Journal Entries To Alias
-    const entriesWithTopics = journalData.map(entry => {
-      const relatedAliases = topicData.filter(t => t.journal_id === entry.id);
-      const topics = relatedTopics.map(t => t.topic);
-      const aliases = relatedTopics.map(t => t.user_topicAliases?.alias).filter(Boolean);
-        return {
-        ...entry, 
-        topics,
-        aliases, }; 
-    });
+    // // ✅ Step 5: Map Journal Entries To Alias
+    // const entriesWithTopics = journalData.map(entry => {
+    //   const relatedTopics = topicData.filter(t => t.journal_id === entry.id);
+    //   const topics = relatedTopics.map(t => t.topic);
+    //   const aliases = relatedTopics.map(t => t.user_topicAliases?.alias).filter(Boolean);
+    //     return {
+    //     ...entry, 
+    //     topics,
+    //     aliases, }; 
+    // });
+       // setJournalEntries(entriesWithTopics);
+    
+    // ✅ Join topic_mentions to journal entries with resolved aliases
+        const entriesWithTopics = journalData.map(entry => {
+          const relatedTopics = topicData
+            .filter(t => t.journal_id === entry.id)
+            .map(t => t.user_topic_aliases?.alias || t.topic); // use alias if available
+        
+          return {
+            ...entry,
+            topics: relatedTopics,
+          };
+        });
 
-    setJournalEntries(entriesWithTopics);
+setJournalEntries(entriesWithTopics);
+   
 
     // ✅ Step 6: Normalize topic list for dropdown
     const allAliases = [...new Set(topicData.map(t => t.user_topic_aliases?.alias).filter(Boolean))];
