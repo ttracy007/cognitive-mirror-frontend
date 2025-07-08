@@ -105,7 +105,7 @@ setTopics(allTopics);
   const filteredEntries = selectedTopic === 'all'
     ? journalEntries
     : journalEntries.filter(entry =>
-        entry.topics && entry.topics.includes(selectedTopic)
+        entry.topics?.includes(selectedTopic)
       );
   
   // ✅ Then group filtered entries by month
