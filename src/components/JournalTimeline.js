@@ -142,6 +142,8 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       dayjs(entry.timestamp).format('YYYY-MM-DD')
     );
 
+  const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
+    
     return {
       month,
       days: Object.entries(groupedByDay).map(([day, entries]) => ({
@@ -184,19 +186,19 @@ export default function JournalTimeline({userId, refreshTrigger }) {
 {/* ✅ Add Topic Filter Dropdown Toggle */} 
         <div style={{ marginBottom: '1rem' }}>
       <label htmlFor="topicFilter">🧠 Filter by topic:</label>
-      <select
-        id="topicFilter"
-        value={selectedTopic}
-        onChange={(e) => setSelectedTopic(e.target.value)}
-        style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
-      >
-        <option value="all">All Topics</option>
-        {topics.map(topic => (
-          <option key={topic} value={topic}>
-            {topic}
-          </option>
-        ))}
-      </select>
+         <select
+      id="topicFilter"
+      value={selectedTopic}
+      onChange={(e) => setSelectedTopic(e.target.value)}
+      style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
+    >
+      <option value="all">All Topics</option>
+      {aliasOptions.map(topic => (
+        <option key={topic} value={topic}>
+          {topic}
+        </option>
+      ))}
+</select>
     </div>
 
     {timeline.map(monthBlock => (
