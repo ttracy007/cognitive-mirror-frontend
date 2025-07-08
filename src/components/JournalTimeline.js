@@ -66,6 +66,21 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       console.error('❌ Error fetching journals:', journalError.message);
       return;
     }
+    else {
+  // Enrich topic mentions with aliases
+  const enriched = data.map(entry => {
+    const relatedAliases = aliasMap
+      .filter(alias => alias.variant === entry.topic)
+      .map(alias => alias.alias);
+
+    return {
+      ...entry,
+      aliases: relatedAliases.length > 0 ? relatedAliases : [entry.topic]
+    };
+  });
+
+  setJournalEntries(enriched);
+}
 
     // ✅ Step 2: Fetch topic_mentions to join with user_topic_aliases
     const { data: topicData, error: topicError } = await supabase
