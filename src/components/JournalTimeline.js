@@ -70,8 +70,13 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     // ✅ Step 2: Fetch topic_mentions to join with user_topic_aliases
     const { data: topicData, error: topicError } = await supabase
       .from('topic_mentions')
-      .select('journal_id, topic, user_id, user_topic_aliases(alias)')
-      .eq('user_id', userId);
+      .select('
+          journal_id, 
+          topic, 
+          user_topic_aliases(alias)
+        ')
+      .eq('user_id', userId)
+      .order('journal_id', {ascending: false });
 
     if (topicError) {
       console.error('❌ Error fetching topics:', topicError.message);
@@ -95,22 +100,30 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       aliasMap[variant] = alias;
     });
 
-    // ✅ Step 5: Map Journal Entries To Alias
+    // // ✅ Step 5: Map Journal Entries To Alias
+    // const entriesWithTopics = journalData.map(entry => {
+    //   const relatedAliases = topicData
+    //     .filter(t => t.journal_id === entry.id)
+    //     .map(t => t.user_topic_aliases?.alias || t.topic); // fallback to topic
+    //   return {
+    //     ...entry, aliases: relatedAliases }; 
+    // });
+    ✅ Step 5: Map Journal Entries To Alias
     const entriesWithTopics = journalData.map(entry => {
-      const relatedAliases = topicData
-        .filter(t => t.journal_id === entry.id)
-        .map(t => t.user_topic_aliases?.alias || t.topic); // fallback to topic
-      return {
-        ...entry, aliases: relatedAliases }; 
+      const relatedAliases = topicData.filter(t => t.journal_id === entry.id);
+      const topics = relatedTopics.map(t => t.topic);
+      const aliases = relatedTopics.map(t => t.user_topicAliases?.alias).filter(Boolean);
+        return {
+        ...entry, 
+        topics,
+        aliases, }; 
     });
 
     setJournalEntries(entriesWithTopics);
 
     // ✅ Step 6: Normalize topic list for dropdown
-    const allTopics = [...new Set(
-      topicData.map(t => aliasMap[t.topic] || t.topic)
-    )];
-    setTopics(allTopics);
+    const allAliases = [...new Set(topicData.map(t => t.user_topic_aliases?.alias).filter(Boolean))];
+    setTopics(allAliases);
 
     setLoading(false);
   };
@@ -120,10 +133,10 @@ export default function JournalTimeline({userId, refreshTrigger }) {
 
   // ✅ Step 1: Filter entries by topic before grouping
   const filteredEntries = selectedTopic === 'all'
-    ? journalEntries
-    : journalEntries.filter(entry =>
-        entry.aliases && entry.aliases.includes(selectedTopic)
-      );
+  ? journalEntries
+  : journalEntries.filter(entry =>
+      entry.aliases?.includes(selectedTopic)
+    );
   
   // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
