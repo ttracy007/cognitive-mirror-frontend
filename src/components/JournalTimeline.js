@@ -153,8 +153,12 @@ setJournalEntries(entriesWithTopics);
       entry.aliases?.includes(selectedTopic)
     );
 
-console.log('Selected topic:', selectedTopic);
-console.log('Filtered entries:', filteredEntries);
+console.log('🧠 selectedTopic:', selectedTopic);
+console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
+  id: e.id,
+  aliases: e.aliases,
+  timestamp: e.timestamp
+})));
   
   // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
