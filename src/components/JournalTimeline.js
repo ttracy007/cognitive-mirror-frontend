@@ -55,7 +55,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
     const fetchEntries = async () => {
       setLoading(true);
 
-      // Fetch journals
+  // Fetch journals
       const { data: journalData, error: journalError } = await supabase
         .from('journals')
         .select('*')
@@ -67,7 +67,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
         return;
       }
 
-      //Fetch topics
+  //Fetch topics
       const { data: topicData, error: topicError } = await supabase
         .from('topic_mentions')
         .select('journal_id, topic')
@@ -78,11 +78,27 @@ export default function JournalTimeline({userId, refreshTrigger }) {
         return;
       }
 
+  // Fetch aliases
+      const { data: aliasData, error: aliasError } = await supabase
+        .from('user_topic_aliases')
+        .select('alias, variant')
+        .eq('user_id', userId);
+      
+      if (aliasError) {
+        console.error('Error fetching aliases:', aliasError.message);
+        return;
+      }
+
+        const aliasMap = {};
+  aliasData.forEach(({ alias, variant }) => {
+    aliasMap[variant] = alias;
+  });
+      
      // Join topics to journal entries
 const entriesWithTopics = journalData.map(entry => {
   const relatedTopics = topicData
     .filter(t => t.journal_id === entry.id)
-    .map(t => t.topic);
+    .map(t => aliasMap[t.topic] || t.topic);
 
   return {
     ...entry,
@@ -92,7 +108,7 @@ const entriesWithTopics = journalData.map(entry => {
 
 setJournalEntries(entriesWithTopics);
 
-const allTopics = [...new Set(topicData.map(t => t.topic))];
+const allTopics = [...new Set(topicData.map(t => aliasMap[t.topic] || t.topic))];
 setTopics(allTopics);
 
      setLoading(false); // ✅ Finish loading state
