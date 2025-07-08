@@ -123,7 +123,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
         
           return {
             ...entry,
-            aliases: relatedAliases,
+            aliases: relatedTopics,
           };
         });
 
