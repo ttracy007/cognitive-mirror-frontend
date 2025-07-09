@@ -72,7 +72,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
       .from('topic_mentions')
       .select(`
           journal_id, 
-          topic, 
+          topic 
         `)
       .eq('user_id', userId)
       .order('journal_id', {ascending: false });
