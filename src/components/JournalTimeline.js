@@ -104,7 +104,8 @@ export default function JournalTimeline({userId, refreshTrigger }) {
 const entriesWithTopics = journalData.map(entry => {
   const relatedTopics = topicData
     .filter(t => t.journal_id === entry.id)
-    .map(t => aliasMap[t.topic] || t.topic); // Use alias if available
+    .map(t => aliasMap[t.topic]) // Only use mapped aliases
+    .filter(Boolean); // Remove undefineds
 
   return {
     ...entry,
