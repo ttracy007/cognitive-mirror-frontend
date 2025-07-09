@@ -173,14 +173,14 @@ console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
     return <div>No entries found.</div>;
   }
 
-// const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
-  const aliasOptions = [
-  ...new Set(
-    journalEntries
-      .filter(entry => Array.isArray(entry.aliases)) // Only entries with canonical aliases
-      .flatMap(entry => entry.aliases)
-  )
-].sort();
+const aliasOptions = [...new Set(journalEntries.flatMap(entry => entry.aliases || []))].sort();
+//   const aliasOptions = [
+//   ...new Set(
+//     journalEntries
+//       .filter(entry => Array.isArray(entry.aliases)) // Only entries with canonical aliases
+//       .flatMap(entry => entry.aliases)
+//   )
+// ].sort();
 
   return (
     <div className="journal-timeline">
