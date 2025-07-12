@@ -53,6 +53,29 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   return { parsedTopics, severityRating };
 };
 
+useEffect(() => {
+  const fetchJournals = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from('journals')
+      .select('*')  // ✅ Include all fields for flexibility
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('❌ Error fetching journals:', error.message);
+      setLoading(false);
+      return;
+    }
+
+    setJournalEntries(data || []);
+    console.log('✅ journalEntries populated:', data); // Add this
+    setLoading(false);
+  };
+
+  fetchJournals();
+}, [userId, refreshTrigger]);
 
 
 
