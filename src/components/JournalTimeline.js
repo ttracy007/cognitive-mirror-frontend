@@ -54,32 +54,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
 };
 
 
-// ✅ PRIMARY/SECONDARY THEME PROCESS
- useEffect(() => {
-    const fetchThemes = async () => {
-      const { data, error } = await supabase
-      .from('journals')
-      .select('primary_theme, secondary_theme')
-      .not('primary_theme', 'is', null);
 
-   if (error) {
-     console.error('Error fetching themes:', error);
-     return;
-   }
-
-    // Flatten and normalize both primary and secondary themes
-   const themeSet =new Set(); 
-   data.forEach(entry => {
-     if (entry.primary_theme) themeSet.add(entry.primary_theme);
-     if (entry.secondary_theme) themeSet.add(entry.secondary_theme);
-   });
-
-   const themes = Array.from(themeSet).sort();
-   setAvailableThemes(themes);
- };
-
- fetchThemes();
-}, []);
 
  // ✅ FILTER THEMES: Step 1: Filter entries by selected theme before grouping
 const filteredEntries = selectedTheme
@@ -131,7 +106,17 @@ console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
     return <div>No entries found.</div>;
   }
 
-  const themeOptions = availableThemes;
+  const themeSet = new Set();
+
+journalEntries.forEach(entry => {
+  if (entry.primary_theme) themeSet.add(entry.primary_theme);
+  if (entry.secondary_theme && entry.secondary_theme !== 'NONE') {
+    themeSet.add(entry.secondary_theme);
+  }
+});
+
+const themeOptions = Array.from(themeSet).sort();
+
 
   return (
     <div className="journal-timeline">
