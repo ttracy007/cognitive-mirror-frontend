@@ -84,7 +84,8 @@ export default function JournalTimeline({userId, refreshTrigger }) {
  // ✅ FILTER THEMES: Step 1: Filter entries by selected theme before grouping
 const filteredEntries = selectedTheme
   ? journalEntries.filter(entry =>
-      entry.primary_theme === selectedTheme || entry.secondary_theme === selectedTheme
+      entry.primary_theme?.toLowerCase() === selectedTheme.toLowerCase() || 
+      entry.secondary_theme?.toLowerCase() === selectedTheme.toLowerCase()
     )
   : journalEntries;
 
