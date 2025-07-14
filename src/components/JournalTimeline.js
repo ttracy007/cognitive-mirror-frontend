@@ -287,15 +287,12 @@ journalEntries.forEach(entry => {
       </select>
     </div>
 
-    <ul style={{ marginTop: '1rem', paddingLeft: '1.25rem', listStyle: 'none' }}>
-      <li>
-  📚 You’ve <strong>mentioned {insightTheme || 'this theme'}</strong> {monthlyMentions} times this month.
-</li>
-
-      <li>⏰ Your reflections about <strong>stress</strong> seem to spike on <strong>weekends</strong>.</li>
-      <li>📈 The topic <strong>conflict</strong> has shown up more often in the past <strong>10 days</strong>.</li>
-    </ul>
-  </div>
+{themeInsight && (
+  <ul className="list-disc list-inside mt-2 text-sm text-gray-700">
+    <li>🧠 You’ve mentioned this theme <strong>{themeInsight.totalMentions}</strong> times total.</li>
+    <li>🗓️ <strong>{themeInsight.recentMentions}</strong> entries were in the past 10 days.</li>
+    <li>📉 Compared to <strong>{themeInsight.earlierMentions}</strong> earlier entries, your pattern is trending <strong>{themeInsight.trend}</strong>.</li>
+  </ul>
 )}
 
     {timeline.map(monthBlock => (
