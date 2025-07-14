@@ -67,7 +67,11 @@ const canonicalThemes = [
   'Motivation / Change',
   'Grief / Loss'
 ];
-  setThemeOptions(canonicalThemes);
+
+  
+useEffect(() => {
+setThemeOptions(canonicalThemes);
+}, []);
 
   
 useEffect(() => {
