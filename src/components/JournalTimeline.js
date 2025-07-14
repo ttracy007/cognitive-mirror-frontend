@@ -68,7 +68,7 @@ const canonicalThemes = [
   'Grief / Loss'
 ];
   setThemeOptions(canonicalThemes);
-}, []);
+
   
 useEffect(() => {
   const fetchJournals = async () => {
@@ -155,7 +155,7 @@ journalEntries.forEach(entry => {
   }
 });
 
-const themeOptions = Array.from(themeSet).sort();
+setThemeOptions(canonicalThemes);
 
 
   return (
