@@ -4,6 +4,8 @@ import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/timezone';
 import timezone from 'dayjs/plugin/timezone';
+import { useMemo } from 'react'; 
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -87,8 +89,6 @@ const monthlyMentions = insightTheme
       return isMatch && inThisMonth;
     }).length
   : 0;
-
-  import { useMemo } from 'react'; // (you may already have this—skip if it's there)
 
 const themeInsight = useMemo(() => {
   if (!insightTheme || !journalEntries.length) return null;
