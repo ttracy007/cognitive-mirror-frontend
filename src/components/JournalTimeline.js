@@ -36,6 +36,7 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   // const [selectedTopic, setSelectedTopic] = useState('all');
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [availableThemes, setAvailableThemes] = useState([]);
+  const [themeOptions, setThemeOptions] = useState([]);
   const [collaspedMonths, setCollapsedMonths] = useState({});
   const extractTopicsAndSeverity = async (entryText) => {
   const gptResponse = await callOpenAIChat([
