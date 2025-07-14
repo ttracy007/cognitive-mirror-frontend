@@ -148,6 +148,7 @@ console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
     return <div>No entries found.</div>;
   }
 
+useEffect(() => {
   const themeSet = new Set();
 
 journalEntries.forEach(entry => {
@@ -157,8 +158,9 @@ journalEntries.forEach(entry => {
   }
 });
 
-setThemeOptions(Array.from(themeSet).sort());
-
+  setThemeOptions(Array.from(themeSet).sort());
+}, [journalEntries]);
+  
   return (
     <div className="journal-timeline">
       <div className="mb-4">
