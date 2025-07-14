@@ -158,8 +158,6 @@ journalEntries.forEach(entry => {
   }
 });
 
-setThemeOptions(canonicalThemes);
-
 
   return (
     <div className="journal-timeline">
