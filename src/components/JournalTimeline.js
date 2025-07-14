@@ -72,6 +72,23 @@ useEffect(() => {
 setThemeOptions(canonicalThemes);
 }, []);
 
+// Smart Insight Card 
+const [showSmartInsight, setShowSmartInsight] = useState(true);
+const [insightTheme, setInsightTheme] = useState('');
+
+// 🧠 Compute monthly mention count for selected theme
+const monthlyMentions = insightTheme
+  ? journalEntries.filter(entry => {
+      const isMatch =
+        entry.primary_theme === insightTheme ||
+        entry.secondary_theme === insightTheme;
+      const inThisMonth =
+        dayjs(entry.timestamp).isSame(dayjs(), 'month');
+      return isMatch && inThisMonth;
+    }).length
+  : 0;
+
+   
   
 useEffect(() => {
   const fetchJournals = async () => {
@@ -199,6 +216,54 @@ journalEntries.forEach(entry => {
       ))}
 </select>
     </div>
+
+{/* 🧠 Smart Topic Insight Card */}
+{showSmartInsight && (
+  <div style={{ 
+    border: '1px solid #e5e7eb', 
+    borderRadius: '12px', 
+    padding: '1rem', 
+    marginBottom: '2rem',
+    backgroundColor: '#f9fafb',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+  }}>
+    <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Smart Topic Insight</h2>
+
+    <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.75rem' }}>
+      <label style={{ display: 'flex', alignItems: 'center' }}>
+        <input 
+          type="checkbox" 
+          checked={showSmartInsight} 
+          onChange={() => setShowSmartInsight(!showSmartInsight)} 
+          style={{ marginRight: '0.5rem' }}
+        />
+        Filter by theme:
+      </label>
+
+      <select
+        value={insightTheme}
+        onChange={(e) => setInsightTheme(e.target.value)}
+        style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
+      >
+        <option value="">Select theme</option>
+        {themeOptions.map(theme => (
+          <option key={theme} value={theme}>
+            {theme}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <ul style={{ marginTop: '1rem', paddingLeft: '1.25rem', listStyle: 'none' }}>
+      <li>
+  📚 You’ve <strong>mentioned {insightTheme || 'this theme'}</strong> {monthlyMentions} times this month.
+</li>
+
+      <li>⏰ Your reflections about <strong>stress</strong> seem to spike on <strong>weekends</strong>.</li>
+      <li>📈 The topic <strong>conflict</strong> has shown up more often in the past <strong>10 days</strong>.</li>
+    </ul>
+  </div>
+)}
 
     {timeline.map(monthBlock => (
         <div key={monthBlock.month} className="month-block">
