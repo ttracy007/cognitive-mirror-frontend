@@ -88,7 +88,41 @@ const monthlyMentions = insightTheme
     }).length
   : 0;
 
-   
+  import { useMemo } from 'react'; // (you may already have this—skip if it's there)
+
+const themeInsight = useMemo(() => {
+  if (!insightTheme || !journalEntries.length) return null;
+
+  const now = dayjs();
+  const entriesForTheme = journalEntries.filter(entry =>
+    [entry.primary_theme, entry.secondary_theme]
+      .map(t => t?.toLowerCase())
+      .includes(insightTheme.toLowerCase())
+  );
+
+  const recentEntries = entriesForTheme.filter(entry =>
+    dayjs(entry.timestamp).isAfter(now.subtract(10, 'day'))
+  );
+
+  const earlierEntries = entriesForTheme.filter(entry =>
+    dayjs(entry.timestamp).isBefore(now.subtract(10, 'day'))
+  );
+
+  const totalMentions = entriesForTheme.length;
+  const recentMentions = recentEntries.length;
+  const earlierMentions = earlierEntries.length;
+
+  let trend = 'steady';
+  if (recentMentions > earlierMentions) trend = 'spike';
+  else if (recentMentions < earlierMentions) trend = 'decline';
+
+  return {
+    totalMentions,
+    recentMentions,
+    earlierMentions,
+    trend,
+  };
+}, [insightTheme, journalEntries]); 
   
 useEffect(() => {
   const fetchJournals = async () => {
