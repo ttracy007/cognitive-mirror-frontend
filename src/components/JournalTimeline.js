@@ -53,6 +53,20 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   return { parsedTopics, severityRating };
 };
 
+// ✅ Canonical theme list for dropdown
+const canonicalThemes = [
+  'Meaning / Existential Anxiety',
+  'Identity / Role Confusion',
+  'Purpose / Direction',
+  'Control / Safety',
+  'Attachment / Relationships',
+  'Autonomy / Power',
+  'Vulnerability / Trust',
+  'Self-worth / Shame',
+  'Motivation / Change',
+  'Grief / Loss'
+];
+  
 useEffect(() => {
   const fetchJournals = async () => {
     setLoading(true);
