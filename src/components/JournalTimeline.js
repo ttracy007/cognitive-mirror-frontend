@@ -1,10 +1,9 @@
 // Step 1: Import dependencies at the top of JournalTimeline.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/timezone';
 import timezone from 'dayjs/plugin/timezone';
-import { useMemo } from 'react'; 
 
 
 dayjs.extend(utc);
