@@ -295,6 +295,9 @@ journalEntries.forEach(entry => {
   </ul>
 )}
 
+ </div>
+)}
+
     {timeline.map(monthBlock => (
         <div key={monthBlock.month} className="month-block">
           <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
