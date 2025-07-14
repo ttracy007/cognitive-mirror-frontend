@@ -78,6 +78,8 @@ useEffect(() => {
 }, [userId, refreshTrigger]);
 
   const [themeOptions, setThemeOptions] = useState([]);
+  // // Reuse existing state
+  // const [availableThemes, setAvailableThemes] = useState([]);
 
  // Smart Insight Card 
 const [showSmartInsight, setShowSmartInsight] = useState(true);
@@ -155,7 +157,7 @@ journalEntries.forEach(entry => {
   }
 });
 
-
+setThemeOptions(Array.from(themeSet).sort());
 
   return (
     <div className="journal-timeline">
