@@ -89,8 +89,34 @@ const monthlyMentions = insightTheme
     }).length
   : 0;
 
-const themeInsight = useMemo(() => {
-  if (!insightTheme || !journalEntries.length) return null;
+const [themeInsight, setThemeInsight] = useState(null);
+
+useEffect(() => {
+  const fetchInsight = async () => {
+    if (!insightTheme || !userId) {
+      setThemeInsight(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/mention-count?user_id=${userId}&theme=${encodeURIComponent(insightTheme)}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setThemeInsight(data);
+      } else {
+        console.error('❌ Error fetching theme insight:', data.error);
+        setThemeInsight(null);
+      }
+    } catch (err) {
+      console.error('❌ Fetch failed:', err);
+      setThemeInsight(null);
+    }
+  };
+
+  fetchInsight();
+}, [insightTheme, userId]);
 
   const now = dayjs();
   const entriesForTheme = journalEntries.filter(entry =>
