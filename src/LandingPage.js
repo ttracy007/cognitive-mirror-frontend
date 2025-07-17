@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 
 const LandingPage = ({ onStart }) => {
   const [username, setUsername] = useState('');
