@@ -22,8 +22,8 @@ const LandingPage = ({ onStart }) => {
       <li><b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.</li>
       <li><b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. If inspired he may quote from his own journal, Meditations.</li>
       <li><b>🩺 Clara</b> – A warm, grounded therapist who sees the pattern beneath the panic.</li>
-      <li><b>🎬 Movie Metaphor Man</b> – Cinematic insight meets emotional depth. Only thinks in movie metaphors--no matter what you say.  Your problems are part of the hero's journey.</li>
-      <li><b>🌸 Verena</b> – An emotionally spacious career coach who helps you align with where you’re meant to go—and take action to get there. Verena's calm, clear, and quietly relentless. She doesn’t push. She orients.</li>
+      <li><b>🎬 Movie Metaphor Man</b> – Only thinks in movie metaphors--no matter what you say.  Your problems are part of the hero's journey.</li>
+      <li><b>🌸 Verena</b> – Verena is a clarity-driven career coach who helps you stop spinning your wheels and start building something real.</li>
     </ul>
 
 
