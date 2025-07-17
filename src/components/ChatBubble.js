@@ -52,13 +52,14 @@ function getToneStyle(tone) {
   switch (tone.toLowerCase()) {
     case 'frank':
       return { backgroundColor: '#fff3e0', borderColor: '#fb8c00', label: 'Tony' };
-    // case 'marcus aurelius':
     case 'marcus':
       return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus' };
     case 'therapist':
       return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Clara' };
     case 'movie':
       return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™' };
+    case 'verena':
+      return { backgroundColor: '#ffeaf0', borderColor: '#ec407a', label: '🌸 Verena' };
     default:
       return { backgroundColor: '#f0f0f0', borderColor: '#ccc', label: 'Mirror' };
   }
