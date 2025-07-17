@@ -306,6 +306,12 @@ const App = () => {
           borderColor: '#ff8c00',
           label: '🎬 Movie Metaphors Man',
         };
+      case 'verena':
+          return {
+            backgroundColor: '#ffeaf0',
+            borderColor: '#ec407a',
+            label: '🌸 Verena',
+        };  
       default:
         return {
           backgroundColor: '#eeeeee',
@@ -445,9 +451,10 @@ return (
     style={{ padding: '0.4rem' }}
   >
     <option value="frank">Tony</option>
-    <option value="marcus">Marcus Aurelius</option>
+    <option value="marcus">Marcus</option>
     <option value="therapist">Clara</option>
-    <option value="movies">Movie Metaphors Man</option>
+    <option value="movies">Movies</option>
+    <option value="verena">Verena</option>
   </select>
 </div>
 //     {/* 🔁 Pinned Bottom-Right: Generate Summary Button */}
