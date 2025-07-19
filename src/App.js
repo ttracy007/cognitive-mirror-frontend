@@ -15,10 +15,35 @@ You are an emotional insight detector. Given a user's journal reflection, extrac
 
 2. Severity: the level of emotional entrenchment or distress, on a scale of 1–5.
 
+3. Entry Type: Classify the entry into one of these categories:
+- Question
+- Self-reflection
+- Emotional Venting
+- Goal Setting
+- Planning
+- Celebration/Success
+- Creative Ideation
+- Casual Remark
+- Voice Challenge
+- Hybrid (if the entry clearly blends two types, e.g., "Self-reflection + Question")
+- Other (if none of the categories above apply) 
+
+Examples for each category:
+- Question: "What should I do about this?" / "Do you think I'm on the right path?"
+- Self-reflection: "I keep repeating the same mistakes and I don't know why." / "I feel like I'm stuck in a loop."
+- Emotional Venting: "I'm so frustrated with this whole situation!" / "This is all just bullshit and I'm tired of it."
+- Goal Setting: "This week I want to focus on finishing my side project." / "My goal is to run three times this week."
+- Planning: "Tomorrow I'll start early and complete tasks A, B, and C." / "Next month I'll launch my website."
+- Celebration/Success: "I crushed it at work today!" / "I'm so proud of how I handled that situation."
+- Creative Ideation: "I have this new idea for an app that might solve X." / "I'm brainstorming ways to make this project stand out."
+- Casual Remark: "Just a quick thought before I go to bed." / "Random note: I saw something interesting today."
+- Voice Challenge: "Verena, you keep saying the same thing!" / "You don’t understand me at all, do you?"
+- Hybrid: "I feel stuck. What do you think I should do?" / "I'm happy about this progress, but should I be doing something different?"
+
 Format:
 Topics: [comma-separated, lowercase, literal phrases]
 Severity: [1–5]
-`;
+Entry Type: [one of the categories listed above, or "Hybrid + <secondary type>" if applicable]
 
 const callOpenAIChat = async (messages) => {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
