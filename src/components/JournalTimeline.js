@@ -152,8 +152,8 @@ const filteredEntries = selectedTheme
     )
   : journalEntries;
 
-console.log('🧠 selectedTheme:', selectedTheme);
-console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
+// console.log('🧠 selectedTheme:', selectedTheme);
+// console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
   id: e.id,
   primary_theme: e.primary_theme,
   secondary_theme: e.secondary_theme,
