@@ -154,11 +154,11 @@ const filteredEntries = selectedTheme
 
 // console.log('🧠 selectedTheme:', selectedTheme);
 // console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
-  id: e.id,
-  primary_theme: e.primary_theme,
-  secondary_theme: e.secondary_theme,
-  timestamp: e.timestamp
-})));
+//   id: e.id,
+//   primary_theme: e.primary_theme,
+//   secondary_theme: e.secondary_theme,
+//   timestamp: e.timestamp
+// })));
 
    // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
