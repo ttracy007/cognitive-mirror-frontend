@@ -71,18 +71,26 @@ const extractTopicsAndSeverity = async (entryText) => {
     { role: 'user', content: entryText }
   ]);
 
+  console.log("🧪 GPT Analysis Raw Response:", gptResponse);
+  
   const topicMatch = gptResponse.match(/Topics:\s*\[(.*?)\]/i);
+  console.log("🧪 Topics Match:", topicMatch ? topicMatch[1] : "No match");
+  
   const parsedTopics = topicMatch
     ? topicMatch[1].split(',').map(t => t.trim().toLowerCase())
     : [];
 
   const severityMatch = gptResponse.match(/Severity:\s*(\d)/i);
+  console.log("🧪 Severity Match:", severityMatch ? severityMatch[1] : "No match");
+
   const severityRating = severityMatch && severityMatch[1]
     ? parseInt(severityMatch[1])
     : 1;
 
    // Parse Entry Type
    const entryTypeMatch = gptResponse.match(/Entry Type:\s*(.+)/i);
+   console.log("🧪 Entry Type Match:", entryTypeMatch ? entryTypeMatch[1] : "No match");
+   
    const entryType = entryTypeMatch && entryTypeMatch[1]
      ? entryTypeMatch[1].trim()
      : 'Other';
