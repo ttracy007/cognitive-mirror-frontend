@@ -81,7 +81,12 @@ const extractTopicsAndSeverity = async (entryText) => {
     ? parseInt(severityMatch[1])
     : 1;
 
-  return { parsedTopics, severityRating };
+   // Parse Entry Type
+   const entryTypeMatch = responseText.match(/Entry Type:\s*(.+)/i);
+   const entryType = entryTypeMatch && entryTypeMatch[1]
+     ? entryTypeMatch[1].trim()
+     : 'Other';
+   return { parsedTopics, severityRating, entryType };
 };
 
 const App = () => {
@@ -216,7 +221,7 @@ const App = () => {
 
     console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
 
-    const { parsedTopics, severityRating } = await extractTopicsAndSeverity(entry);
+    const { parsedTopics, severityRating, entryType } = await extractTopicsAndSeverity(entry);
 
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
@@ -227,6 +232,7 @@ const App = () => {
         username,
         user_id: userId,
         severity_override: severityRating,
+        entry_type, entryType,
         topic: parsedTopics[0],
         debug_marker,
       }),
