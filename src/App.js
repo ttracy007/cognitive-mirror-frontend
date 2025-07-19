@@ -82,7 +82,7 @@ const extractTopicsAndSeverity = async (entryText) => {
     : 1;
 
    // Parse Entry Type
-   const entryTypeMatch = responseText.match(/Entry Type:\s*(.+)/i);
+   const entryTypeMatch = gptResponse.match(/Entry Type:\s*(.+)/i);
    const entryType = entryTypeMatch && entryTypeMatch[1]
      ? entryTypeMatch[1].trim()
      : 'Other';
@@ -232,7 +232,7 @@ const App = () => {
         username,
         user_id: userId,
         severity_override: severityRating,
-        entry_type, entryType,
+        entry_type: entryType,
         topic: parsedTopics[0],
         debug_marker,
       }),
