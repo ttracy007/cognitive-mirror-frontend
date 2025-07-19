@@ -44,6 +44,7 @@ Format:
 Topics: [comma-separated, lowercase, literal phrases]
 Severity: [1–5]
 Entry Type: [one of the categories listed above, or "Hybrid + <secondary type>" if applicable]
+`;
 
 const callOpenAIChat = async (messages) => {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
