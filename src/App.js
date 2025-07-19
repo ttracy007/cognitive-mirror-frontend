@@ -8,8 +8,8 @@ import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 // 🔽 Component State Initialization
-const TOPIC_AND_SEVERITY_PROMPT = `
-You are an emotional insight detector. Given a user's journal reflection, extract two things:
+const ENTRY_ANALYSIS_PROMPT = `
+You are an emotional insight detector. Given a user's journal reflection, extract three things:
 
 1. Topics: the literal subjects driving the reflection — people, situations, unfinished tasks, real-world concerns. Each should be 1–3 word noun phrases. No vague emotions. Ask: “What are they actually talking about?”
 
@@ -66,7 +66,7 @@ const callOpenAIChat = async (messages) => {
 
 const extractTopicsAndSeverity = async (entryText) => {
   const gptResponse = await callOpenAIChat([
-    { role: 'system', content: TOPIC_AND_SEVERITY_PROMPT },
+    { role: 'system', content: ENTRY_ANALYSIS_PROMPT },
     { role: 'user', content: entryText }
   ]);
 
