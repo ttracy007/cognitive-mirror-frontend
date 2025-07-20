@@ -46,55 +46,26 @@ Severity: [1–5]
 Entry Type: [one of the categories listed above, or "Hybrid + <secondary type>" if applicable]
 `;
 
-const callOpenAIChat = async (messages) => {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.REACT_APP_OPENAI_KEY}`, // Ensure this is in your .env
-    },
-    body: JSON.stringify({
-      model: "gpt-4", // or gpt-3.5-turbo if you're using that
-      messages,
-      temperature: 0.7,
-    }),
-  });
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || "No response";
-};
-
-
 const extractTopicsAndSeverity = async (entryText) => {
-  const gptResponse = await callOpenAIChat([
-    { role: 'system', content: ENTRY_ANALYSIS_PROMPT },
-    { role: 'user', content: entryText }
-  ]);
+  try {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/analysis`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entry_text: entryText }),
+    });
 
-  console.log("🧪 GPT Analysis Raw Response:", gptResponse);
-  
-  const topicMatch = gptResponse.match(/Topics:\s*\[(.*?)\]/i);
-  console.log("🧪 Topics Match:", topicMatch ? topicMatch[1] : "No match");
-  
-  const parsedTopics = topicMatch
-    ? topicMatch[1].split(',').map(t => t.trim().toLowerCase())
-    : [];
+    if (!response.ok) {
+      console.error("❌ Analysis request failed:", response.status);
+      return { parsedTopics: [], severityRating: 1, entryType: "Other" };
+    }
 
-  const severityMatch = gptResponse.match(/Severity:\s*(\d)/i);
-  console.log("🧪 Severity Match:", severityMatch ? severityMatch[1] : "No match");
-
-  const severityRating = severityMatch && severityMatch[1]
-    ? parseInt(severityMatch[1])
-    : 1;
-
-   // Parse Entry Type
-   const entryTypeMatch = gptResponse.match(/Entry Type:\s*(.+)/i);
-   console.log("🧪 Entry Type Match:", entryTypeMatch ? entryTypeMatch[1] : "No match");
-   
-   const entryType = entryTypeMatch && entryTypeMatch[1]
-     ? entryTypeMatch[1].trim()
-     : 'Other';
-   return { parsedTopics, severityRating, entryType };
+    const data = await response.json();
+    console.log("🧪 Analysis Response:", data);
+    return data;
+  } catch (err) {
+    console.error("❌ Analysis call error:", err);
+    return { parsedTopics: [], severityRating: 1, entryType: "Other" };
+  }
 };
 
 const App = () => {
