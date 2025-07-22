@@ -16,17 +16,17 @@ import Card from './Card';
 import { Button } from './Button';
 import ChatBubble from './ChatBubble';
 
-const TOPIC_AND_SEVERITY_PROMPT = `
-You are an emotional insight detector. Given a user's journal reflection, extract two things:
+// const TOPIC_AND_SEVERITY_PROMPT = `
+// You are an emotional insight detector. Given a user's journal reflection, extract two things:
 
-1. Topics: the literal subjects driving the reflection — people, situations, unfinished tasks, real-world concerns. Each should be 1–3 word noun phrases. No vague emotions. Ask: “What are they actually talking about?”
+// 1. Topics: the literal subjects driving the reflection — people, situations, unfinished tasks, real-world concerns. Each should be 1–3 word noun phrases. No vague emotions. Ask: “What are they actually talking about?”
 
-2. Severity: the level of emotional entrenchment or distress, on a scale of 1–5.
+// 2. Severity: the level of emotional entrenchment or distress, on a scale of 1–5.
 
-Format:
-Topics: [comma-separated, lowercase, literal phrases]
-Severity: [1–5]
-`;
+// Format:
+// Topics: [comma-separated, lowercase, literal phrases]
+// Severity: [1–5]
+// `;
 
 export default function JournalTimeline({userId, refreshTrigger }) {
   const [journalEntries, setJournalEntries] = useState([]);
@@ -38,21 +38,21 @@ export default function JournalTimeline({userId, refreshTrigger }) {
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [availableThemes, setAvailableThemes] = useState([]);
   const [collaspedMonths, setCollapsedMonths] = useState({});
-  const extractTopicsAndSeverity = async (entryText) => {
-  const gptResponse = await callOpenAIChat([
-    { role: 'system', content: TOPIC_AND_SEVERITY_PROMPT },
-    { role: 'user', content: entryText }
-  ]);
-  const topicMatch = gptResponse.match(/Topics:\s*\[(.*?)\]/i);
-  const parsedTopics = topicMatch
-    ? topicMatch[1].split(',').map(t => t.trim().toLowerCase())
-    : [];
-  const severityMatch = gptResponse.match(/Severity:\s*(\d)/i);
-  const severityRating = severityMatch && severityMatch[1]
-    ? parseInt(severityMatch[1])
-    : 1;
-  return { parsedTopics, severityRating };
-};
+//   const extractTopicsAndSeverity = async (entryText) => {
+//   const gptResponse = await callOpenAIChat([
+//     { role: 'system', content: TOPIC_AND_SEVERITY_PROMPT },
+//     { role: 'user', content: entryText }
+//   ]);
+//   const topicMatch = gptResponse.match(/Topics:\s*\[(.*?)\]/i);
+//   const parsedTopics = topicMatch
+//     ? topicMatch[1].split(',').map(t => t.trim().toLowerCase())
+//     : [];
+//   const severityMatch = gptResponse.match(/Severity:\s*(\d)/i);
+//   const severityRating = severityMatch && severityMatch[1]
+//     ? parseInt(severityMatch[1])
+//     : 1;
+//   return { parsedTopics, severityRating };
+// };
 
 // ✅ Canonical theme list for dropdown
 const canonicalThemes = [
