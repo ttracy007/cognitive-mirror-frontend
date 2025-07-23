@@ -46,27 +46,27 @@ import JournalTimeline from './components/JournalTimeline';
 // Entry Type: [one of the categories listed above, or "Hybrid + <secondary type>" if applicable]
 // `;
 
-const extractTopicsAndSeverity = async (entryText) => {
-  try {
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/analysis`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ entry_text: entryText }),
-    });
+// const extractTopicsAndSeverity = async (entryText) => {
+//   try {
+//     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/analysis`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ entry_text: entryText }),
+//     });
 
-    if (!response.ok) {
-      console.error("❌ Analysis request failed:", response.status);
-      return { parsedTopics: [], severityRating: 1, entryType: "Other" };
-    }
+//     if (!response.ok) {
+//       console.error("❌ Analysis request failed:", response.status);
+//       return { parsedTopics: [], severityRating: 1, entryType: "Other" };
+//     }
 
-    const data = await response.json();
-    console.log("🧪 Analysis Response:", data);
-    return data;
-  } catch (err) {
-    console.error("❌ Analysis call error:", err);
-    return { parsedTopics: [], severityRating: 1, entryType: "Other" };
-  }
-};
+//     const data = await response.json();
+//     console.log("🧪 Analysis Response:", data);
+//     return data;
+//   } catch (err) {
+//     console.error("❌ Analysis call error:", err);
+//     return { parsedTopics: [], severityRating: 1, entryType: "Other" };
+//   }
+// };
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
