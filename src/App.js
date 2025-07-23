@@ -200,7 +200,7 @@ const App = () => {
 
     console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
 
-    // const { parsedTopics, severityRating, entryType } = await extractTopicsAndSeverity(entry);
+    const { parsedTopics, severityRating, entryType } = await extractTopicsAndSeverity(entry);
     const parsedTopics = [];
     const severityRating = 1;
     const entryType = 'Other';
