@@ -7,67 +7,6 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
-// // 🔽 Component State Initialization
-// const ENTRY_ANALYSIS_PROMPT = `
-// You are an emotional insight detector. Given a user's journal reflection, extract three things:
-
-// 1. Topics: the literal subjects driving the reflection — people, situations, unfinished tasks, real-world concerns. Each should be 1–3 word noun phrases. No vague emotions. Ask: “What are they actually talking about?”
-
-// 2. Severity: the level of emotional entrenchment or distress, on a scale of 1–5.
-
-// 3. Entry Type: Classify the entry into one of these categories:
-// - Question
-// - Self-reflection
-// - Emotional Venting
-// - Goal Setting
-// - Planning
-// - Celebration/Success
-// - Creative Ideation
-// - Casual Remark
-// - Voice Challenge
-// - Hybrid (if the entry clearly blends two types, e.g., "Self-reflection + Question")
-// - Other (if none of the categories above apply) 
-
-// Examples for each category:
-// - Question: "What should I do about this?" / "Do you think I'm on the right path?"
-// - Self-reflection: "I keep repeating the same mistakes and I don't know why." / "I feel like I'm stuck in a loop."
-// - Emotional Venting: "I'm so frustrated with this whole situation!" / "This is all just bullshit and I'm tired of it."
-// - Goal Setting: "This week I want to focus on finishing my side project." / "My goal is to run three times this week."
-// - Planning: "Tomorrow I'll start early and complete tasks A, B, and C." / "Next month I'll launch my website."
-// - Celebration/Success: "I crushed it at work today!" / "I'm so proud of how I handled that situation."
-// - Creative Ideation: "I have this new idea for an app that might solve X." / "I'm brainstorming ways to make this project stand out."
-// - Casual Remark: "Just a quick thought before I go to bed." / "Random note: I saw something interesting today."
-// - Voice Challenge: "Verena, you keep saying the same thing!" / "You don’t understand me at all, do you?"
-// - Hybrid: "I feel stuck. What do you think I should do?" / "I'm happy about this progress, but should I be doing something different?"
-
-// Format:
-// Topics: [comma-separated, lowercase, literal phrases]
-// Severity: [1–5]
-// Entry Type: [one of the categories listed above, or "Hybrid + <secondary type>" if applicable]
-// `;
-
-// const extractTopicsAndSeverity = async (entryText) => {
-//   try {
-//     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/analysis`, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ entry_text: entryText }),
-//     });
-
-//     if (!response.ok) {
-//       console.error("❌ Analysis request failed:", response.status);
-//       return { parsedTopics: [], severityRating: 1, entryType: "Other" };
-//     }
-
-//     const data = await response.json();
-//     console.log("🧪 Analysis Response:", data);
-//     return data;
-//   } catch (err) {
-//     console.error("❌ Analysis call error:", err);
-//     return { parsedTopics: [], severityRating: 1, entryType: "Other" };
-//   }
-// };
-
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
@@ -200,11 +139,6 @@ const App = () => {
 
     console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
 
-    // const { parsedTopics, severityRating, entryType } = await extractTopicsAndSeverity(entry);
-    const parsedTopics = [];
-    const severityRating = 1;
-    const entryType = 'Other';
-
     const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -213,9 +147,6 @@ const App = () => {
         tone_mode: forcedTone,
         username,
         user_id: userId,
-        severity_override: severityRating,
-        entry_type: entryType,
-        topic: parsedTopics[0],
         debug_marker,
       }),
     });
