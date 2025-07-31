@@ -166,6 +166,36 @@ const App = () => {
     setRefreshTrigger(prev => prev +1);
   };
 
+  // 🔽 Function 5b: Generate Pattern Insight
+const handlePatternInsight = async () => {
+  const user = session?.user;
+  if (!user) return;
+
+  try {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-pattern-insight`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id })
+    });
+
+    const data = await response.json();
+    if (data.insight) {
+      setHistory(prev => [
+        ...prev,
+        {
+          type: 'pattern_insight',
+          content: data.insight,
+          timestamp: new Date().toISOString()
+        }
+      ]);
+    } else {
+      console.warn('No insight returned from pattern route');
+    }
+  } catch (err) {
+    console.error('❌ Pattern Insight fetch failed:', err);
+  }
+};
+
    // 🔽 Function 6: Fetch Past Journals
   const fetchHistory = async () => {
     const user = session?.user;
