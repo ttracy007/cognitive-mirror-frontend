@@ -63,7 +63,7 @@ const bubbleStyle = (() => {
 return (
   <div style={{ 
     display: 'flex',
-    justifyContent: isUser ? 'flex-start' : 'flex-end',
+    ...bubbleStyle.alignment,
     marginBottom: '1.2rem'
   }}>
     <div style={{
@@ -102,11 +102,6 @@ return (
         {dayjs(entry.timestamp).format('h:mm A')}
       </div>
 
-      // {entry.timestamp && (
-      //   <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.25rem', textAlign: 'right' }}>
-      //     {dayjs(entry.timestamp).format('h:mm A')}
-      //   </div>
-      )}
     </div>
   </div>
 );
