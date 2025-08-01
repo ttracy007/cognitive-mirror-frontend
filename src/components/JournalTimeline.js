@@ -192,8 +192,26 @@ return (
           {entries
             .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
             .map(entry => (
-              <ChatBubble entry={entry} styleVariant={styleVariant} />
-            ))}
+              <div key={entry.id || entry.timestamp} style={{ marginBottom: '1rem' }}>
+                {entry.entry_text && (
+                  <ChatBubble
+                    entry={{
+                      entry_text: entry.entry_text,
+                      tone_mode: 'user',
+                      entry_type: 'reflection'
+                    }}
+                    styleVariant={styleVariant}
+                  />
+                )}
+          
+                {entry.response_text && (
+                  <ChatBubble
+                    entry={entry}
+                    styleVariant={styleVariant}
+                  />
+                )}
+              </div>
+          ))}
         </div>
       ))}
   </div>
