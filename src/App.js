@@ -329,88 +329,76 @@ return (
   </div>
 </div>
 
- {/* Input box now at TOP */}
-    <div style={{ marginTop: '1rem' }}>
-      <textarea
-  rows="6"
-  cols="60"
-  value={entry}
-  onChange={(e) => setEntry(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (entry.trim() && !isProcessing) {
-        handleSubmit();
+{/* Sticky Input Bar */}
+<div style={{
+  position: 'fixed',
+  bottom: '70px',
+  left: 0,
+  right: 0,
+  padding: '1rem',
+  backgroundColor: '#ffffff',
+  boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+  zIndex: 999
+}}>
+  <textarea
+    rows="3"
+    value={entry}
+    onChange={(e) => setEntry(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (entry.trim() && !isProcessing) {
+          handleSubmit();
+        }
       }
-    }
-  }}
-  placeholder={placeholderPrompt}
-  style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-/>
-      <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
-        <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
-        <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-        <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-        {/* <button
-            onClick={handlePatternInsight}
-            disabled={isProcessing}
-            style={{
-              backgroundColor: '#444',
-              color: 'white',
-              border: 'none',
-              padding: '0.4rem 0.75rem',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            🔍 See Pattern Insight
-          </button> */}
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <button
-              onClick={handlePatternInsight}
-              onMouseEnter={() => setTooltipVisible(true)}
-              onMouseLeave={() => setTooltipVisible(false)}
-             style={{
-              backgroundColor: '#374151',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-            >
-              🧭 See Pattern Insight
-            </button>
-
-            {tooltipVisible && (
-              <div style={{
-                position: 'absolute',
-                top: '-2.5rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: '#333',
-                color: '#fff',
-                padding: '0.4rem 0.6rem',
-                borderRadius: '6px',
-                fontSize: '0.75rem',
-                whiteSpace: 'nowrap',
-                zIndex: 1000
-              }}>
-                Generates a unified insight based on your recent themes, topics, and emotional loops.
-              </div>
-            )}
-          </div>
-
-        {isListening && <span>🎧 Listening…</span>}
-        {isProcessing && (
+    }}
+    placeholder={placeholderPrompt}
+    style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid #ccc' }}
+  />
+  <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+    <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
+    <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+    <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+    <button
+      onClick={handlePatternInsight}
+      onMouseEnter={() => setTooltipVisible(true)}
+      onMouseLeave={() => setTooltipVisible(false)}
+      style={{
+        backgroundColor: '#374151',
+        color: 'white',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.375rem',
+        fontWeight: 'bold',
+        cursor: 'pointer'
+      }}
+    >
+      🧭 See Pattern Insight
+    </button>
+    {tooltipVisible && (
+      <div style={{
+        position: 'absolute',
+        top: '-2.5rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#333',
+        color: '#fff',
+        padding: '0.4rem 0.6rem',
+        borderRadius: '6px',
+        fontSize: '0.75rem',
+        whiteSpace: 'nowrap',
+        zIndex: 1000
+      }}>
+        Generates a unified insight based on your recent themes, topics, and emotional loops.
+      </div>
+    )}
+    {isListening && <span>🎧 Listening…</span>}
+    {isProcessing && (
       <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
         Mirror is thinking<span className="dots"></span>
-  </div>
-)}
-
       </div>
-    </div>
-
+    )}
+  </div>
+</div>
 
 {/* JournalTimeline Render Call */}
 <div style={{ flex: 1, overflowY: 'auto' }}>
