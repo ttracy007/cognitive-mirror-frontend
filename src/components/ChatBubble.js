@@ -62,7 +62,17 @@ const bubbleStyle = (() => {
 return (
   <div style={{ display: 'flex', ...bubbleStyle.alignment }}>
     <div style={{ ...bubbleStyle.base }}>
-      {isInsight && <div style={{ marginBottom: '0.3rem', fontWeight: 'bold' }}>🧠 Insight</div>}
+      {!isUserEntry && (
+        <div style={{
+          fontSize: '0.85rem',
+          fontWeight: 'bold',
+          color: style.borderColor,
+          marginBottom: '0.25rem'
+        }}>
+          {style.label} {isInsight && '• Insight'}
+        </div>
+      )}
+
       {entry.response_text
         ? entry.response_text.split('\n').map((para, idx) => (
             <p key={idx} style={{ margin: '0 0 0.8rem 0' }}>{para}</p>
