@@ -19,7 +19,7 @@ const bubbleStyle = (() => {
           maxWidth: '80%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUser ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUser ? 'flex-start' : 'flex-end' }
       };
     case "C":
       return {
@@ -30,7 +30,7 @@ const bubbleStyle = (() => {
           maxWidth: '85%',
           fontSize: '1rem',
         },
-        alignment: { alignSelf: isUser ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUser ? 'flex-start' : 'flex-end' }
       };
     case "D":
       return {
@@ -43,7 +43,7 @@ const bubbleStyle = (() => {
           maxWidth: '75%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUser ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUser ? 'flex-start' : 'flex-end' }
       };
     case "A":
     default:
@@ -55,7 +55,7 @@ const bubbleStyle = (() => {
           marginBottom: '0.75rem',
           maxWidth: '75%',
         },
-        alignment: { alignSelf: isUser ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUser ? 'flex-start' : 'flex-end' }
       };
   }
 })();
@@ -63,7 +63,7 @@ const bubbleStyle = (() => {
 return (
   <div style={{ 
     display: 'flex',
-    justifyContent: isUser ? 'flex-start' : 'flex-end',
+    justifyContent: isUser ? 'flex-end' : 'flex-start',
     marginBottom: '1.2rem'
   }}>
     <div style={{
