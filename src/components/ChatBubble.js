@@ -1,4 +1,4 @@
-// ChatBubble.js
+// ChatBubble.js 
 export default function ChatBubble({ entry }) {
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isInsight = entry.entry_type === 'insight';
