@@ -1,9 +1,10 @@
 // Step 1: Import dependencies at the top of JournalTimeline.js
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/timezone';
 import timezone from 'dayjs/plugin/timezone';
+
 
 
 dayjs.extend(utc);
@@ -26,6 +27,7 @@ export default function JournalTimeline({userId, refreshTrigger, styleVariant })
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [availableThemes, setAvailableThemes] = useState([]);
   const [collaspedMonths, setCollapsedMonths] = useState({});
+  const bottomRef = useRef(null);
 
 // ✅ Canonical theme list for dropdown
 const canonicalThemes = [
@@ -115,7 +117,11 @@ useEffect(() => {
   fetchJournals();
 }, [userId, refreshTrigger]);
 
-
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [journalEntries]);
 
  // ✅ FILTER THEMES: Step 1: Filter entries by selected theme before grouping
 const filteredEntries = selectedTheme
@@ -214,6 +220,7 @@ return (
           ))}
         </div>
       ))}
+      <div ref={bottomRef} />
   </div>
 );
 
