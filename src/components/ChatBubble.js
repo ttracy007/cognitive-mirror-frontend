@@ -1,110 +1,107 @@
 // ChatBubble.js  
 import dayjs from 'dayjs';
+
 export default function ChatBubble({ entry, styleVariant = "A" }) {
-  const isUser = entry.tone_mode === 'user'
+  const isUser = entry.tone_mode === 'user';
   const isInsight = entry.entry_type === 'insight';
-  const style = getToneStyle(entry.tone_mode || 'frank');
   const isUserEntry = !entry.response_text && !isInsight;
+  const style = getToneStyle(entry.tone_mode || 'frank');
 
-const bubbleStyle = (() => {
-  switch (styleVariant) {
-    case "B":
-      return {
-        base: {
-          backgroundColor: '#fefefe',
-          border: '1px solid #ddd',
-          padding: '1rem',
-          borderRadius: '12px',
-          marginBottom: '0.75rem',
-          maxWidth: '80%',
-          fontSize: '0.95rem',
-        },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
-      };
-    case "C":
-      return {
-        base: {
-          backgroundColor: 'transparent',
-          padding: '0.5rem 0',
-          marginBottom: '0.5rem',
-          maxWidth: '85%',
-          fontSize: '1rem',
-        },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
-      };
-    case "D":
-      return {
-        base: {
-          backgroundColor: isInsight ? '#f4f0ff' : style.backgroundColor,
-          borderLeft: `5px solid ${style.borderColor}`,
-          padding: '0.9rem 1rem',
-          borderRadius: '12px',
-          marginBottom: '0.75rem',
-          maxWidth: '75%',
-          fontSize: '0.95rem',
-        },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
-      };
-    case "A":
-    default:
-      return {
-        base: {
-          backgroundColor: isInsight ? '#f4f0ff' : '#e0f7fa',
-          padding: '0.8rem 1rem',
-          borderRadius: isUserEntry ? '16px 16px 0 16px' : '16px 16px 16px 0',
-          marginBottom: '0.75rem',
-          maxWidth: '75%',
-        },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
-      };
-  }
-})();
+  const bubbleStyle = (() => {
+    switch (styleVariant) {
+      case "B":
+        return {
+          base: {
+            backgroundColor: '#fefefe',
+            border: '1px solid #ddd',
+            padding: '1rem',
+            borderRadius: '12px',
+            marginBottom: '0.75rem',
+            maxWidth: '80%',
+            fontSize: '0.95rem',
+          },
+          alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        };
+      case "C":
+        return {
+          base: {
+            backgroundColor: 'transparent',
+            padding: '0.5rem 0',
+            marginBottom: '0.5rem',
+            maxWidth: '85%',
+            fontSize: '1rem',
+          },
+          alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        };
+      case "D":
+        return {
+          base: {
+            backgroundColor: isInsight ? '#f4f0ff' : style.backgroundColor,
+            borderLeft: `5px solid ${style.borderColor}`,
+            padding: '0.9rem 1rem',
+            borderRadius: '12px',
+            marginBottom: '0.75rem',
+            maxWidth: '75%',
+            fontSize: '0.95rem',
+          },
+          alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        };
+      case "A":
+      default:
+        return {
+          base: {
+            backgroundColor: isInsight ? '#f4f0ff' : '#e0f7fa',
+            padding: '0.8rem 1rem',
+            borderRadius: isUserEntry ? '16px 16px 0 16px' : '16px 16px 16px 0',
+            marginBottom: '0.75rem',
+            maxWidth: '75%',
+          },
+          alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        };
+    }
+  })();
 
-return (
-  <div style={{ 
-    display: 'flex',
-    ...bubbleStyle.alignment,
-    marginBottom: '1.2rem'
-  }}>
-    <div style={{
-      backgroundColor: isUser ? '#f0f0f0' : style.backgroundColor,
-      borderLeft: isInsight ? '4px solid #5c6ac4' : `4px solid ${style.borderColor}`,
-      padding: '0.8rem 1rem',
-      borderRadius: isUser ? '16px 16px 16px 0' : '16px 16px 0 16px',
-      maxWidth: '75%',
-      textAlign: 'left',
-      fontWeight: isInsight ? '600' : 'normal',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
+  return (
+    <div style={{ 
+      display: 'flex',
+      ...bubbleStyle.alignment,
+      marginBottom: '1.2rem'
     }}>
       <div style={{
-        fontSize: '0.8rem',
-        fontWeight: 'bold',
-        marginBottom: '0.4rem',
-        color: isUser ? '#444' : style.borderColor
+        ...bubbleStyle.base,
+        borderLeft: isInsight ? '4px solid #5c6ac4' : `4px solid ${style.borderColor}`,
+        textAlign: 'left',
+        fontWeight: isInsight ? '600' : 'normal',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
       }}>
-        {isUser ? 'You' : style.label}{isInsight ? ' • Insight' : ''}
+        <div style={{
+          fontSize: '0.8rem',
+          fontWeight: 'bold',
+          marginBottom: '0.4rem',
+          color: isUserEntry ? '#444' : style.borderColor
+        }}>
+          {isUserEntry ? 'You' : style.label}{isInsight ? ' • Insight' : ''}
+        </div>
+
+        {entry.entry_text && <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>}
+        {entry.response_text && (
+          entry.response_text.split('\n').map((para, idx) => (
+            <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
+          ))
+        )}
+
+        {/* Timestamp */}
+        <div style={{
+          fontSize: '0.75rem',
+          color: '#999',
+          marginTop: '0.4rem',
+          textAlign: isUserEntry ? 'right' : 'left'
+        }}>
+          {dayjs(entry.timestamp).format('h:mm A')}
+        </div>
       </div>
-
-      {entry.entry_text && <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>}
-      {entry.response_text && (
-        entry.response_text.split('\n').map((para, idx) => (
-          <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
-        ))
-      )}
-
-      {/* Timestamp */}
-      <div style={{
-        fontSize: '0.75rem',
-        color: '#999',
-        marginTop: '0.4rem',
-        textAlign: isUser ? 'left' : 'right'
-      }}>
-        {dayjs(entry.timestamp).format('h:mm A')}
-      </div>
-
     </div>
-  </div>
-);
+  );
 }
 
 function getToneStyle(tone) {
@@ -116,7 +113,8 @@ function getToneStyle(tone) {
     case 'therapist':
       return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Clara' };
     case 'movie':
-      return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™' };
+    case 'movies':
+      return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™️' };
     case 'verena':
       return { backgroundColor: '#ffeaf0', borderColor: '#ec407a', label: '🌸 Verena' };
     default:
