@@ -3,6 +3,7 @@ export default function ChatBubble({ entry, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
   const style = getToneStyle(entry.tone_mode || 'frank');
+  const isUserEntry = entry.tone_mode === 'user' || !entry.response_text;
 
 const bubbleStyle = (() => {
   switch (styleVariant) {
