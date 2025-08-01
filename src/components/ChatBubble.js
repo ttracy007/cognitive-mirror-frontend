@@ -4,7 +4,7 @@ export default function ChatBubble({ entry, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
   const style = getToneStyle(entry.tone_mode || 'frank');
-  const isUserEntry = entry.tone_mode === 'user' || !entry.response_text;
+  const isUserEntry = !entry.response_text && !isInsight;
 
 const bubbleStyle = (() => {
   switch (styleVariant) {
@@ -19,7 +19,7 @@ const bubbleStyle = (() => {
           maxWidth: '80%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
       };
     case "C":
       return {
@@ -30,7 +30,7 @@ const bubbleStyle = (() => {
           maxWidth: '85%',
           fontSize: '1rem',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
+        alignment: { alignSelf: 'flex-start' }
       };
     case "D":
       return {
@@ -43,7 +43,7 @@ const bubbleStyle = (() => {
           maxWidth: '75%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
       };
     case "A":
     default:
@@ -55,7 +55,7 @@ const bubbleStyle = (() => {
           marginBottom: '0.75rem',
           maxWidth: '75%',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
       };
   }
 })();
@@ -101,6 +101,12 @@ return (
       }}>
         {dayjs(entry.timestamp).format('h:mm A')}
       </div>
+
+      {entry.timestamp && (
+        <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.25rem', textAlign: 'right' }}>
+          {dayjs(entry.timestamp).format('h:mm A')}
+        </div>
+      )}
     </div>
   </div>
 );
