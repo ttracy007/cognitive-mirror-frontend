@@ -180,7 +180,7 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          tone_mode: toneMode  // ✅ pass selected voice
+          tone_mode: forcedTone // ✅ pass selected voice
         })
       });
   
