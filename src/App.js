@@ -402,8 +402,13 @@ return (
 
 {/* JournalTimeline Render Call */}
 <div style={{ flex: 1, overflowY: 'auto' }}>
-  <JournalTimeline userId={session?.user?.id} refreshTrigger={refreshTrigger} />
+  <JournalTimeline
+    userId={session?.user?.id}
+    refreshTrigger={refreshTrigger}
+    chronological={true}
+  />
 </div>
+   
 
    
     {/* Generate Handoff Summary Bottom Center
