@@ -172,6 +172,9 @@ const App = () => {
     setIsProcessing(true); // ⏳ Mirror is thinking...
   
     try {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-pattern-insight`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
