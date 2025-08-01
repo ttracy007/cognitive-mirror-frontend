@@ -185,7 +185,7 @@ const App = () => {
   
       if (response.ok) {
         console.log('✅ Insight:', data.insight);
-        refreshTrigger(); // 🔁 refresh timeline with new entry
+        setRefreshTrigger(prev => prev + 1); // 🔁 trigger timeline refresh
       } else {
         console.error('❌ Insight error:', data.error);
       }
