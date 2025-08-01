@@ -349,6 +349,20 @@ return (
         <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
         <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
         <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+        <button
+            onClick={handlePatternInsight}
+            disabled={isProcessing}
+            style={{
+              backgroundColor: '#444',
+              color: 'white',
+              border: 'none',
+              padding: '0.4rem 0.75rem',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            🔍 See Pattern Insight
+          </button>
         {isListening && <span>🎧 Listening…</span>}
         {isProcessing && (
       <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
