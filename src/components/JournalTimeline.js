@@ -16,7 +16,7 @@ import Card from './Card';
 import { Button } from './Button';
 import ChatBubble from './ChatBubble';
 
-export default function JournalTimeline({userId, refreshTrigger }) {
+export default function JournalTimeline({userId, refreshTrigger, styleVariant }) {
   const [journalEntries, setJournalEntries] = useState([]);
   // const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,14 +125,6 @@ const filteredEntries = selectedTheme
     )
   : journalEntries;
 
-// console.log('🧠 selectedTheme:', selectedTheme);
-// console.log('🧾 filteredEntries:', filteredEntries.map(e => ({
-//   id: e.id,
-//   primary_theme: e.primary_theme,
-//   secondary_theme: e.secondary_theme,
-//   timestamp: e.timestamp
-// })));
-
    // ✅ Then group filtered entries by month
   const groupedByMonth = groupBy(filteredEntries, entry =>
     dayjs(entry.timestamp).format('YYYY-MM')
@@ -200,7 +192,7 @@ return (
           {entries
             .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
             .map(entry => (
-              <ChatBubble key={entry.id || entry.timestamp} entry={entry} />
+              <ChatBubble entry={entry} styleVariant={styleVariant} />
             ))}
         </div>
       ))}
