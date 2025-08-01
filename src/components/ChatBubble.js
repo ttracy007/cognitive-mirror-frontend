@@ -85,7 +85,9 @@ return (
         {isUser ? 'You' : style.label}{isInsight ? ' • Insight' : ''}
       </div>
 
-      {entry.entry_text && <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>}
+      {isUser && entry.entry_text && (
+        <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>
+        )}
       {entry.response_text && (
         entry.response_text.split('\n').map((para, idx) => (
           <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
