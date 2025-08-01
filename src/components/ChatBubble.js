@@ -4,6 +4,7 @@ export default function ChatBubble({ entry, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
   const style = getToneStyle(entry.tone_mode || 'frank');
+  const isUserEntry = !entry.response_text && !isInsight;
 
 const bubbleStyle = (() => {
   switch (styleVariant) {
@@ -62,7 +63,7 @@ const bubbleStyle = (() => {
 return (
   <div style={{ 
     display: 'flex',
-    ...bubbleStyle.alignment,
+    justifyContent: isUser ? 'flex-start' : 'flex-end',
     marginBottom: '1.2rem'
   }}>
     <div style={{
