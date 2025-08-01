@@ -1,57 +1,77 @@
 // ChatBubble.js 
-export default function ChatBubble({ entry }) {
+export default function ChatBubble({ entry, styleVariant = "A" }) {
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isInsight = entry.entry_type === 'insight';
 
-  return (
-    <div style={{ marginBottom: '1.5rem' }}>
-      {/* User bubble - LEFT */}
-      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-        <div style={{
-          backgroundColor: '#e0f7fa',
-          padding: '0.8rem 1rem',
-          borderRadius: '16px 16px 16px 0',
-          maxWidth: '75%',
-          textAlign: 'left',
-          marginBottom: '0.3rem',
-          display: 'flex',
-          alignItems: 'center',
-          fontWeight: isInsight ? '600' : 'normal'
-        }}>
-          {isInsight && <span style={{ marginRight: '0.5rem' }}>🧭</span>}
-          {entry.entry_text}
-        </div>
-      </div>
+  const isUserEntry = !entry.response_text && !isInsight;
 
-      {/* Mirror bubble - RIGHT */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <div style={{
-          backgroundColor: style.backgroundColor,
-          backgroundColor: isInsight ? '#f4f0ff' :style.backgroundColor,
-          borderLeft: isInsight ? '4px solid #5c6ac4' : `4px solid ${style.borderColor}`,
-          padding: '0.8rem 1rem',
-          borderRadius: '16px 16px 0 16px',
+const bubbleStyle = (() => {
+  switch (styleVariant) {
+    case "B":
+      return {
+        base: {
+          backgroundColor: '#fefefe',
+          border: '1px solid #ddd',
+          padding: '1rem',
+          borderRadius: '12px',
+          marginBottom: '0.75rem',
+          maxWidth: '80%',
+          fontSize: '0.95rem',
+        },
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+      };
+    case "C":
+      return {
+        base: {
+          backgroundColor: 'transparent',
+          padding: '0.5rem 0',
+          marginBottom: '0.5rem',
+          maxWidth: '85%',
+          fontSize: '1rem',
+        },
+        alignment: { alignSelf: 'flex-start' }
+      };
+    case "D":
+      return {
+        base: {
+          backgroundColor: isInsight ? '#f4f0ff' : style.backgroundColor,
+          borderLeft: `5px solid ${style.borderColor}`,
+          padding: '0.9rem 1rem',
+          borderRadius: '12px',
+          marginBottom: '0.75rem',
           maxWidth: '75%',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            fontSize: '0.85rem',
-            fontWeight: 'bold',
-            marginBottom: '0.3rem',
-            color: style.borderColor
-          }}>
-            {style.label}
-          </div>
-          {entry.response_text
-            ? entry.response_text.split('\n').map((para, idx) => (
-                <p key={idx} style={{ margin: '0 0 0.8rem 0' }}>{para}</p>
-              ))
-            : <p style={{ color: '#777' }}><em>No reflections yet.</em></p>
-          }
-        </div>
-      </div>
+          fontSize: '0.95rem',
+        },
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+      };
+    case "A":
+    default:
+      return {
+        base: {
+          backgroundColor: isInsight ? '#f4f0ff' : '#e0f7fa',
+          padding: '0.8rem 1rem',
+          borderRadius: isUserEntry ? '16px 16px 0 16px' : '16px 16px 16px 0',
+          marginBottom: '0.75rem',
+          maxWidth: '75%',
+        },
+        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+      };
+  }
+})();
+
+return (
+  <div style={{ display: 'flex', ...bubbleStyle.alignment }}>
+    <div style={{ ...bubbleStyle.base }}>
+      {isInsight && <div style={{ marginBottom: '0.3rem', fontWeight: 'bold' }}>🧠 Insight</div>}
+      {entry.response_text
+        ? entry.response_text.split('\n').map((para, idx) => (
+            <p key={idx} style={{ margin: '0 0 0.8rem 0' }}>{para}</p>
+          ))
+        : <p>{entry.entry_text}</p>}
     </div>
-  );
+  </div>
+);
+
 }
 
 function getToneStyle(tone) {
