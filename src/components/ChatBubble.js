@@ -1,6 +1,7 @@
 // ChatBubble.js
 export default function ChatBubble({ entry }) {
   const style = getToneStyle(entry.tone_mode || 'frank');
+  const isInsight = entry.entry_type === 'insight';
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>
@@ -12,14 +13,13 @@ export default function ChatBubble({ entry }) {
           borderRadius: '16px 16px 16px 0',
           maxWidth: '75%',
           textAlign: 'left',
-          marginBottom: '0.3rem'
+          marginBottom: '0.3rem',
+          display: 'flex',
+          alignItems: 'center',
+          fontWeight: isInsight ? '600' : 'normal'
         }}>
-          <span>
-            <strong>
-              {entry.entry_type === 'insight' ? '🧭 ' : ''}
-            </strong>
-            {entry.entry_text}
-          </span>
+          {isInsight && <span style={{ marginRight: '0.5rem' }}>🧭</span>}
+          {entry.entry_text}
         </div>
       </div>
 
@@ -27,7 +27,8 @@ export default function ChatBubble({ entry }) {
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <div style={{
           backgroundColor: style.backgroundColor,
-          borderLeft: `4px solid ${style.borderColor}`,
+          backgroundColor: isInsight ? '#f4f0ff' :style.backgroundColor,
+          borderLeft: isInsight ? '4px solid #5c6ac4' : `4px solid ${style.borderColor}`,
           padding: '0.8rem 1rem',
           borderRadius: '16px 16px 0 16px',
           maxWidth: '75%',
