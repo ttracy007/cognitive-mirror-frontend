@@ -367,7 +367,14 @@ return (
               onClick={handlePatternInsight}
               onMouseEnter={() => setTooltipVisible(true)}
               onMouseLeave={() => setTooltipVisible(false)}
-              style={{ ...yourButtonStyle }}
+             style={{
+              backgroundColor: '#374151',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
             >
               🧭 See Pattern Insight
             </button>
