@@ -169,7 +169,12 @@ journalEntries.forEach(entry => {
 });
 
 return (
-  <div style={{ padding: '1rem', paddingBottom: '5rem' }}>
+  <div style={{
+    padding: '1rem',
+    paddingBottom: '2rem',
+    maxHeight: 'calc(100vh - 200px)', // Leaves room for input box
+    overflowY: 'auto'
+  }}>
     {Object.entries(
       journalEntries.reduce((acc, entry) => {
         const dateKey = dayjs(entry.timestamp).format('YYYY-MM-DD');
