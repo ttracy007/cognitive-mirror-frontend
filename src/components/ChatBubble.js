@@ -106,7 +106,7 @@ return (
       //   <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.25rem', textAlign: 'right' }}>
       //     {dayjs(entry.timestamp).format('h:mm A')}
       //   </div>
-      // )}
+      )}
     </div>
   </div>
 );
