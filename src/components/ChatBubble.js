@@ -19,7 +19,7 @@ const bubbleStyle = (() => {
           maxWidth: '80%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
       };
     case "C":
       return {
@@ -30,7 +30,7 @@ const bubbleStyle = (() => {
           maxWidth: '85%',
           fontSize: '1rem',
         },
-        alignment: { alignSelf: 'flex-start' }
+        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
       };
     case "D":
       return {
@@ -43,7 +43,7 @@ const bubbleStyle = (() => {
           maxWidth: '75%',
           fontSize: '0.95rem',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
       };
     case "A":
     default:
@@ -55,7 +55,7 @@ const bubbleStyle = (() => {
           marginBottom: '0.75rem',
           maxWidth: '75%',
         },
-        alignment: { alignSelf: isUserEntry ? 'flex-end' : 'flex-start' }
+        alignment: { alignSelf: isUserEntry ? 'flex-start' : 'flex-end' }
       };
   }
 })();
