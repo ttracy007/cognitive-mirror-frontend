@@ -167,35 +167,33 @@ const App = () => {
   };
 
   // 🔽 Function 5b: Generate Pattern Insight
-const handlePatternInsight = async () => {
-  const user = session?.user;
-  if (!user) return;
-
-  try {
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-pattern-insight`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id })
-    });
-
-    const data = await response.json();
-    if (data.insight) {
-      setHistory(prev => [
-        ...prev,
-        {
-          type: 'pattern_insight',
-          content: data.insight,
-          timestamp: new Date().toISOString()
-        }
-      ]);
-    } else {
-      console.warn('No insight returned from pattern route');
+  const handlePatternInsight = async () => {
+    setIsProcessing(true); // ⏳ Mirror is thinking...
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-pattern-insight`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          tone_mode: toneMode  // ✅ pass selected voice
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log('✅ Insight:', data.insight);
+        refreshTrigger(); // 🔁 refresh timeline with new entry
+      } else {
+        console.error('❌ Insight error:', data.error);
+      }
+    } catch (err) {
+      console.error('❌ Insight fetch failed:', err);
+    } finally {
+      setIsProcessing(false);
     }
-  } catch (err) {
-    console.error('❌ Pattern Insight fetch failed:', err);
-  }
-};
-
+  };
    // 🔽 Function 6: Fetch Past Journals
   const fetchHistory = async () => {
     const user = session?.user;
@@ -349,7 +347,7 @@ return (
         <button onClick={startListening} disabled={isListening}>🎙️ Start Talking</button>
         <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
         <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-        <button
+        {/* <button
             onClick={handlePatternInsight}
             disabled={isProcessing}
             style={{
@@ -362,7 +360,13 @@ return (
             }}
           >
             🔍 See Pattern Insight
-          </button>
+          </button> */}
+          <div title="Click to generate a high-level reflection based on your recent patterns.">
+            <Button onClick={handlePatternInsight} disabled={isProcessing}>
+              {isProcessing ? '🧠 Reflecting...' : '🧭 See Pattern Insight'}
+            </Button>
+          </div>
+
         {isListening && <span>🎧 Listening…</span>}
         {isProcessing && (
       <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
