@@ -232,6 +232,7 @@ return (
                     styleVariant={styleVariant}
                   />
                 )}
+                <div style={{ height: '2.5rem' }} />
               </div>
           ))}
         </div>
