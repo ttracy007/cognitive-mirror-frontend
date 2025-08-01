@@ -30,6 +30,7 @@ const App = () => {
   );
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   let transcriptBuffer = '';
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
@@ -361,10 +362,33 @@ return (
           >
             🔍 See Pattern Insight
           </button> */}
-          <div title="Click to generate a high-level reflection based on your recent patterns.">
-            <Button onClick={handlePatternInsight} disabled={isProcessing}>
-              {isProcessing ? '🧠 Reflecting...' : '🧭 See Pattern Insight'}
-            </Button>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <button
+              onClick={handlePatternInsight}
+              onMouseEnter={() => setTooltipVisible(true)}
+              onMouseLeave={() => setTooltipVisible(false)}
+              style={{ ...yourButtonStyle }}
+            >
+              🧭 See Pattern Insight
+            </button>
+
+            {tooltipVisible && (
+              <div style={{
+                position: 'absolute',
+                top: '-2.5rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: '#333',
+                color: '#fff',
+                padding: '0.4rem 0.6rem',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                whiteSpace: 'nowrap',
+                zIndex: 1000
+              }}>
+                Generates a unified insight based on your recent themes, topics, and emotional loops.
+              </div>
+            )}
           </div>
 
         {isListening && <span>🎧 Listening…</span>}
