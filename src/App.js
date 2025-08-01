@@ -31,6 +31,7 @@ const App = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   let transcriptBuffer = '';
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [styleVariant, setStyleVariant] = useState("D")
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
