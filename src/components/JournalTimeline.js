@@ -28,6 +28,14 @@ export default function JournalTimeline({userId, refreshTrigger, styleVariant })
   const [availableThemes, setAvailableThemes] = useState([]);
   const [collaspedMonths, setCollapsedMonths] = useState({});
   const bottomRef = useRef(null);
+  const timelineRef = useRef(null);
+
+  useEffect(() => {
+    if (timelineRef.current) {
+      timelineRef.current.scrollTop = timelineRef.current.scrollHeight;
+    }
+  }, [journalEntries]);
+
 
 // ✅ Canonical theme list for dropdown
 const canonicalThemes = [
@@ -173,14 +181,6 @@ journalEntries.forEach(entry => {
     themeSet.add(entry.secondary_theme);
   }
 });
-
-const timelineRef = useRef(null);
-
-useEffect(() => {
-  if (timelineRef.current) {
-    timelineRef.current.scrollTop = timelineRef.current.scrollHeight;
-  }
-}, [journalEntries]);
 
 return (
   <div
