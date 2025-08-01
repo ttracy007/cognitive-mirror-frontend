@@ -1,9 +1,8 @@
 // ChatBubble.js 
 export default function ChatBubble({ entry, styleVariant = "A" }) {
-  const style = getToneStyle(entry.tone_mode || 'frank');
+  const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
-
-  const isUserEntry = !entry.response_text && !isInsight;
+  const style = getToneStyle(entry.tone_mode || 'frank');
 
 const bubbleStyle = (() => {
   switch (styleVariant) {
@@ -60,28 +59,49 @@ const bubbleStyle = (() => {
 })();
 
 return (
-  <div style={{ display: 'flex', ...bubbleStyle.alignment }}>
-    <div style={{ ...bubbleStyle.base }}>
-      {!isUserEntry && (
-        <div style={{
-          fontSize: '0.85rem',
-          fontWeight: 'bold',
-          color: style.borderColor,
-          marginBottom: '0.25rem'
-        }}>
-          {style.label} {isInsight && '• Insight'}
-        </div>
+  <div style={{ 
+    display: 'flex',
+    justifyContent: isUser ? 'flex-start' : 'flex-end',
+    marginBottom: '1.2rem'
+  }}>
+    <div style={{
+      backgroundColor: isUser ? '#f0f0f0' : style.backgroundColor,
+      borderLeft: isInsight ? '4px solid #5c6ac4' : `4px solid ${style.borderColor}`,
+      padding: '0.8rem 1rem',
+      borderRadius: isUser ? '16px 16px 16px 0' : '16px 16px 0 16px',
+      maxWidth: '75%',
+      textAlign: 'left',
+      fontWeight: isInsight ? '600' : 'normal',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
+    }}>
+      <div style={{
+        fontSize: '0.8rem',
+        fontWeight: 'bold',
+        marginBottom: '0.4rem',
+        color: isUser ? '#444' : style.borderColor
+      }}>
+        {isUser ? 'You' : style.label}{isInsight ? ' • Insight' : ''}
+      </div>
+
+      {entry.entry_text && <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>}
+      {entry.response_text && (
+        entry.response_text.split('\n').map((para, idx) => (
+          <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
+        ))
       )}
 
-      {entry.response_text
-        ? entry.response_text.split('\n').map((para, idx) => (
-            <p key={idx} style={{ margin: '0 0 0.8rem 0' }}>{para}</p>
-          ))
-        : <p>{entry.entry_text}</p>}
+      {/* Timestamp */}
+      <div style={{
+        fontSize: '0.75rem',
+        color: '#999',
+        marginTop: '0.4rem',
+        textAlign: isUser ? 'left' : 'right'
+      }}>
+        {dayjs(entry.timestamp).format('h:mm A')}
+      </div>
     </div>
   </div>
 );
-
 }
 
 function getToneStyle(tone) {
