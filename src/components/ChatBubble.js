@@ -14,7 +14,12 @@ export default function ChatBubble({ entry }) {
           textAlign: 'left',
           marginBottom: '0.3rem'
         }}>
-          {entry.entry_text}
+          <span>
+            <strong>
+              {entry.entry_type === 'insight' ? '🧭 ' : ''}
+            </strong>
+            {entry.entry_text}
+          </span>
         </div>
       </div>
 
