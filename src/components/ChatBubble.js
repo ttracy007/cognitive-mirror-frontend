@@ -1,4 +1,4 @@
-// ChatBubble.js 
+// ChatBubble.js  
 import dayjs from 'dayjs';
 export default function ChatBubble({ entry, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
