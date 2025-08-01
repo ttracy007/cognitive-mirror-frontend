@@ -176,136 +176,37 @@ journalEntries.forEach(entry => {
   }
 });
 
-
-  return (
-    <div className="journal-timeline">
-      <div className="mb-4">
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-          onClick={() => {
-            const newCollapsed = !allCollapsed;
-            setAllCollapsed(newCollapsed);
-
-            const updatedState = {};
-            timeline.forEach(month =>
-              month.days.forEach(day => {
-                updatedState[day.day] = newCollapsed;
-              })
-            );
-            setCollapsedDays(updatedState);
-          }}
-        >
-          {allCollapsed ? 'Expand All' : 'Collapse All'}
-        </button>
-      </div>
-          
-{/* ✅ Add Theme Filter Dropdown Toggle */} 
-        <div style={{ marginBottom: '1rem' }}>
-      <label htmlFor="themeFilter">🧠 Filter by theme:</label>   
-
-         <select
-      id="themeFilter"
-      value={selectedTheme}
-      onChange={(e) => setSelectedTheme(e.target.value)}
-      style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
-    >
-      <option value="all">All Themes</option>
-      {themeOptions.map(theme => (
-        <option key={theme} value={theme}>
-          {theme}
-        </option>
-      ))}
-</select>
-    </div>
-
-{/* 🧠 Smart Topic Insight Card */}
-{showSmartInsight && (
-  <div style={{ 
-    border: '1px solid #e5e7eb', 
-    borderRadius: '12px', 
-    padding: '1rem', 
-    marginBottom: '2rem',
-    backgroundColor: '#f9fafb',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-  }}>
-    <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Smart Topic Insight</h2>
-
-    <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.75rem' }}>
-      <label style={{ display: 'flex', alignItems: 'center' }}>
-        <input 
-          type="checkbox" 
-          checked={showSmartInsight} 
-          onChange={() => setShowSmartInsight(!showSmartInsight)} 
-          style={{ marginRight: '0.5rem' }}
-        />
-        Filter by theme:
-      </label>
-
-      <select
-        value={insightTheme}
-        onChange={(e) => setInsightTheme(e.target.value)}
-        style={{ marginLeft: '0.5rem', padding: '0.3rem' }}
-      >
-        <option value="">Select theme</option>
-        {themeOptions.map(theme => (
-          <option key={theme} value={theme}>
-            {theme}
-          </option>
-        ))}
-      </select>
-    </div>
-
-{themeInsight && (
-  <ul className="list-disc list-inside mt-2 text-sm text-gray-700">
-    <li>🧠 You’ve mentioned this theme <strong>{themeInsight.totalMentions}</strong> times total.</li>
-    <li>🗓️ <strong>{themeInsight.recentMentions}</strong> entries were in the past 10 days.</li>
-    <li>📉 Compared to <strong>{themeInsight.earlierMentions}</strong> earlier entries, your pattern is trending <strong>{themeInsight.trend}</strong>.</li>
-  </ul>
-)}
-
- </div>
-)}
-
-    {timeline.map(monthBlock => (
-        <div key={monthBlock.month} className="month-block">
-          <h2>{dayjs(monthBlock.month).format('MMMM YYYY')}</h2>
-
-          {monthBlock.days.map(dayBlock => {
-            const dayKey = dayBlock.day;
-            const dayEntries = dayBlock.entries;
-            // Collapse all days by default except the 5 most recent
-            const allDayKeys = timeline.flatMap(month => month.days.map(d => d.day));
-            const recentDayKeys = allDayKeys.slice(0, 5); // Adjust to 3 or 7 if needed   
-            const isCollapsed = collapsedDays[dayKey] ?? !recentDayKeys.includes(dayKey);
-                        
-          return (
-              <div key={dayKey} className="day-block mb-4">
-                <button
-                  className="text-left font-semibold text-gray-800 underline mb-2"
-                  onClick={() =>
-                    setCollapsedDays(prev => ({
-                      ...prev,
-                      [dayKey]: !prev[dayKey]
-                    }))
-                  }
-                >
-                  {dayjs(dayKey).format('dddd, MMM D')}
-                </button>
-
-                {!isCollapsed && (
-                  <div style={{ marginLeft: '1rem', borderLeft: '1px solid #d1d5db', paddingLeft: '1rem' }}>
-                    {dayEntries.map(entry => (
-                      <ChatBubble entry={entry} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+return (
+  <div style={{ padding: '1rem', paddingBottom: '5rem' }}>
+    {Object.entries(
+      journalEntries.reduce((acc, entry) => {
+        const dateKey = dayjs(entry.timestamp).format('YYYY-MM-DD');
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(entry);
+        return acc;
+      }, {})
+    )
+      .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+      .map(([dateKey, entries]) => (
+        <div key={dateKey} style={{ marginBottom: '2rem' }}>
+          <h3 style={{
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            color: '#444'
+          }}>
+            {dayjs(dateKey).format('MMMM D, YYYY')}
+          </h3>
+          {entries
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+            .map(entry => (
+              <ChatBubble key={entry.id || entry.timestamp} entry={entry} />
+            ))}
         </div>
       ))}
-    </div>
-  );
+  </div>
+);
+
 }
 
   
