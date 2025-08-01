@@ -146,7 +146,7 @@ const filteredEntries = selectedTheme
       month,
       days: Object.entries(groupedByDay).map(([day, entries]) => ({
         day,
-        entries: entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // 📈 Old-to-new per day
+        entries: entries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)) // 📈 Old-to-new per day
       }))
     };
   });
@@ -178,7 +178,7 @@ return (
         return acc;
       }, {})
     )
-      .sort((a, b) => new Date(b[0]) - new Date(a[0])) // 🪃 Recent date first
+      .sort((a, b) => new Date(a[0]) - new Date(b[0])) // 🪃 Recent date first
       .map(([dateKey, entries]) => (
         <div key={dateKey} style={{ marginBottom: '2rem' }}>
           <h3 style={{
