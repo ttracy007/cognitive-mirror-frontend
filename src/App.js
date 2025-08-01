@@ -403,11 +403,11 @@ return (
 
 {/* JournalTimeline Render Call */}
 <div style={{ flex: 1, overflowY: 'auto' }}>
-  <JournalTimeline
-    userId={session?.user?.id}
-    refreshTrigger={refreshTrigger}
-    chronological={true}
-  />
+<JournalTimeline
+  userId={session?.user?.id}
+  refreshTrigger={refreshTrigger}
+  styleVariant={styleVariant}
+/>
 </div>
    
 
