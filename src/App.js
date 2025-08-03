@@ -353,7 +353,16 @@ return (
       }
     }}
     placeholder={placeholderPrompt}
-    style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid #ccc' }}
+    style={{
+      width: '100%',
+      padding: '1rem',
+      fontSize: '1rem',
+      backgroundColor: 'rgba(255, 255, 255, 0.85)',
+      border: '1px solid rgba(0, 0, 0, 0.1)',
+      borderRadius: '10px',
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+      backdropFilter: 'blur(2px)' // optional: gives a slight frosted glass effect
+    }}
   />
   <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
     <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
