@@ -6,8 +6,10 @@ export default function ChatBubble({ entry, styleVariant = "A" }) {
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isUserEntry = !entry.response_text && !isInsight;
 
-  console.log('Tone Mode:', entry.tone_mode);
-  console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
+  if (entry.isMostRecent) {
+    console.log('Tone Mode:', entry.tone_mode);
+    console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
+  }
 
 const bubbleStyle = (() => {
   switch (styleVariant) {
