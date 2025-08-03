@@ -109,6 +109,9 @@ return (
 );
 }
 
+console.log('Tone Mode:', entry.tone_mode);
+console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
+
 function getToneStyle(tone) {
   switch (tone.toLowerCase()) {
     case 'frank':
