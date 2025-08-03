@@ -356,6 +356,8 @@ return (
     placeholder={placeholderPrompt}
     style={{
       width: '100%',
+      maxWidth: '100%',
+      boxSizing: 'border-box',
       padding: '1rem',
       fontSize: '1rem',
       backgroundColor: 'rgba(255, 255, 255, 0.85)',
