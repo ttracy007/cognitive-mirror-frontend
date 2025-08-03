@@ -21,13 +21,6 @@
   padding: 1rem;
 }
 
-/* ✅ Override texture for reflection input area */
-.reflection-input-container {
-  background: white;
-  padding: 1rem;
-  border-radius: 6px;
-}
-
 /* Scrollable history area */
 .chat-thread {
   flex: 1;
@@ -69,3 +62,9 @@
   background-repeat: repeat;
 }
 
+/* ✅ Override texture for reflection input area */
+.reflection-input-container {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+}
