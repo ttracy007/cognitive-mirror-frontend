@@ -6,6 +6,9 @@ export default function ChatBubble({ entry, styleVariant = "A" }) {
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isUserEntry = !entry.response_text && !isInsight;
 
+  console.log('Tone Mode:', entry.tone_mode);
+  console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
+
 const bubbleStyle = (() => {
   switch (styleVariant) {
     case "B":
@@ -109,9 +112,6 @@ return (
 );
 }
 
-console.log('Tone Mode:', entry.tone_mode);
-console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
-
 function getToneStyle(tone) {
   switch (tone.toLowerCase()) {
     case 'frank':
@@ -120,7 +120,7 @@ function getToneStyle(tone) {
       return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus' };
     case 'therapist':
       return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Clara' };
-    case 'movies':
+    case 'movie':
       return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™' };
     case 'verena':
       return { backgroundColor: '#ffeaf0', borderColor: '#ec407a', label: '🌸 Verena' };
