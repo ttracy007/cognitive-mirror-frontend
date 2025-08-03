@@ -331,15 +331,16 @@ return (
   </div>
 </div>
 
-{/* Sticky Input Bar */}
-<div className="reflection-input-container" style={{
-  position: 'fixed',
-  bottom: '70px',
-  left: 0,
-  right: 0,
-  zIndex: 999,
-  boxShadow: '0 -2px 6px rgba(0,0,0,0.05)'
-}}>
+<div
+  className="reflection-input-container"
+  style={{
+    position: 'fixed',
+    bottom: '70px',
+    left: 0,
+    right: 0,
+    zIndex: 999
+  }}
+>
   <textarea
     rows="3"
     value={entry}
