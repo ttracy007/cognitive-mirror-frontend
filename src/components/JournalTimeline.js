@@ -223,6 +223,7 @@ return (
                       entry_type: 'reflection'
                     }}
                     styleVariant={styleVariant}
+                    isMostRecent={entry.id === latestEntryId}
                   />
                 )}
           
@@ -230,6 +231,7 @@ return (
                   <ChatBubble
                     entry={entry}
                     styleVariant={styleVariant}
+                    isMostRecent={entry.id === latestEntryId}
                   />
                 )}
                 <div style={{ height: '2.5rem' }} />
