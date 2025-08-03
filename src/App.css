@@ -21,6 +21,13 @@
   padding: 1rem;
 }
 
+/* ✅ Override texture for reflection input area */
+.reflection-input-container {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
 /* Scrollable history area */
 .chat-thread {
   flex: 1;
@@ -48,3 +55,17 @@
   display: inline-block;
   animation: blinkDots 1.2s steps(4, end) infinite;
 }
+/* Background Textures */
+
+.background-option-1 {
+  background-image: url('/textures/soft-wave-paper-texture.png');
+  background-size: cover;
+  background-repeat: repeat;
+}
+
+.background-option-2 {
+  background-image: url('/textures/pencil-stroke-texture.png');
+  background-size: cover;
+  background-repeat: repeat;
+}
+
