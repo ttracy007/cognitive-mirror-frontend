@@ -51,13 +51,13 @@
 /* Background Textures */
 
 .background-option-1 {
-  background-image: url('/textures/soft-wave-paper-texture.png');
+  background-image: url('/public/textures/soft-wave-paper-texture.png');
   background-size: cover;
   background-repeat: repeat;
 }
 
 .background-option-2 {
-  background-image: url('/textures/pencil-stroke-texture.png');
+  background-image: url('/public/textures/pencil-stroke-texture.png');
   background-size: cover;
   background-repeat: repeat;
 }
