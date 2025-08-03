@@ -489,7 +489,7 @@ return (
     <option value="verena">Verena</option>
   </select>
 </div>
-//     {/* 🔁 Pinned Bottom-Right: Generate Summary Button */}
+    {/* 🔁 Pinned Bottom-Right: Generate Summary Button */}
 {/*{history.length >= 5 && (
   <div style={{
     position: 'fixed',
