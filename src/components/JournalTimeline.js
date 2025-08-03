@@ -174,6 +174,7 @@ const filteredEntries = selectedTheme
   }
 
   const themeSet = new Set();
+  const latestEntryId = entries[entries.length - 1]?.id;
 
 journalEntries.forEach(entry => {
   if (entry.primary_theme) themeSet.add(entry.primary_theme);
