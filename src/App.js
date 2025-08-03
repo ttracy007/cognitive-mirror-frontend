@@ -301,7 +301,7 @@ const App = () => {
 // 🔽 UI Rendering
 return (
   // <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-     <div className="chat-container background-option2">
+     <div className="chat-container background-option-2">
  {/* Header with Logout + Summary */}
 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
   <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
