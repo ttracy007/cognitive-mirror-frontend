@@ -59,13 +59,13 @@
 
 .background-option-1 {
   background-image: url('/public/textures/soft-wave-paper-texture.png');
-  background-size: cover;
+  background-size: contain;
   background-repeat: repeat;
 }
 
 .background-option-2 {
   background-image: url('/public/textures/pencil-stroke-texture.png');
-  background-size: cover;
+  background-size: contain;
   background-repeat: repeat;
 }
 
