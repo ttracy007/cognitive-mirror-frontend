@@ -1,24 +1,22 @@
 // src/components/SofiaReflectionCard.jsx
 
 import React from 'react';
-import '../pages/DemoSofia.css';
+import './SofiaReflectionCard.css';
 
 const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorResponse }) => {
   return (
     <div className="sofia-card">
-      <div className="sofia-entry">
+      <div className="entry-text">
         <em>“{entryText}”</em>
-        <div className="sofia-meta">
-          <div>🔁 <strong>{loopName}</strong></div>
-          <div>🏷️ {themeTags.join(', ')}</div>
-          <div>🔥 Severity: {severity}</div>
-        </div>
       </div>
 
-      <div className="sofia-response">
-        <strong>Mirror:</strong>
-        <p>{mirrorResponse}</p>
+      <div className="mirror-response">
+        <strong>Mirror:</strong> {mirrorResponse}
       </div>
+
+      <div className="loop-name">🔁 {loopName}</div>
+      <div className="tags">🏷️ {themeTags.join(', ')}</div>
+      <div className="severity">🔥 Severity: {severity}</div>
     </div>
   );
 };
