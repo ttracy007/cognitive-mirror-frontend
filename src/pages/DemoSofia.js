@@ -1,4 +1,4 @@
-// src/pages/DemoSofia.js
+// src/pages/DemoSofia.js 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
