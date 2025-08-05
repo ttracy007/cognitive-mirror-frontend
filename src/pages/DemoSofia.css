@@ -1,0 +1,13 @@
+/* DemoSofia.css – placeholder styles */
+.sofia-entry {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-left: 4px solid #b56576;
+  border-radius: 6px;
+}
+.sofia-header {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
