@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
-import DemoSofiaPage from './pages/DemoSofiaPage ';
+import DemoSofia from './pages/DemoSofia ';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
@@ -463,7 +463,7 @@ return (
         />
       )}
 
-      {currentView === 'sofia_demo' && <DemoSofiaPage />}
+      {currentView === 'sofia_demo' && <DemoSofia />}
     </div>
     );
 
