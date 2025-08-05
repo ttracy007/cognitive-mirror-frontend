@@ -1,12 +1,9 @@
-// src/pages/DemoSofia.js 
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
-import dayjs from 'dayjs';
 import './DemoSofia.css';
 
-const sofiaUserId = '372d20c2-4c5b-4bfc-8a70-bd88a7e84190';
-
-export default function DemoSofia() {
+const DemoSofiaPage = () => {
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
@@ -14,35 +11,48 @@ export default function DemoSofia() {
       const { data, error } = await supabase
         .from('journals')
         .select('*')
-        .eq('user_id', sofiaUserId)
-        .order('timestamp', { ascending: true }); // ordered by time
+        .eq('user_id', '372d20c2-4c5b-4bfc-8a70-bd88a7e84190')
+        .order('timestamp', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching Sofia entries:', error.message);
-      } else {
-        setEntries(data);
-      }
+      if (!error && data) setEntries(data);
     };
-
     fetchEntries();
   }, []);
 
   return (
-    <div className="demo-sofia-container">
-      <h1 className="demo-heading">🧠 Sofia's Reflections: The Loyalty Trap</h1>
-      <p className="demo-subtext">This is a demo story. Each entry reveals how Cognitive Mirror tracks emotional loops over time.</p>
-
-      {entries.map((entry, index) => (
-        <div key={entry.id || index} className="demo-entry-card">
-          <div className="demo-entry-text">"{entry.entry_text}"</div>
-          <div className="demo-entry-meta">
-            <span>🌀 Loop: {entry.loop_name || '—'}</span>
-            <span>🎭 Theme: {entry.primary_theme}</span>
-            <span>🔥 Severity: {entry.severity_rating}</span>
+    <div className="sofia-container">
+      <div className="sofia-left-column">
+        <h2>📓 Sofia’s Reflections</h2>
+        {entries.map((entry) => (
+          <div key={entry.id} className="sofia-entry-card">
+            <p className="entry-text">"{entry.entry_text}"</p>
+            <p className="loop">🔁 {entry.loop_name}</p>
+            <p className="tags">🏷️ {entry.primary_theme}, {entry.secondary_theme}</p>
+            <p className="severity">🔥 Severity: {entry.severity_rating}</p>
+            <div className="mirror-reply">
+              <strong>Mirror:</strong> {entry.mirror_response}
+            </div>
           </div>
-          <div className="demo-entry-response">{entry.response_text}</div>
-        </div>
-      ))}
+        ))}
+      </div>
+      <div className="sofia-right-sidebar">
+        <h3>🧠 Therapist Summary</h3>
+        <p>Detected Loops:</p>
+        <ul>
+          {[...new Set(entries.map((e) => e.loop_name))].map((loop) => (
+            <li key={loop}>🔁 {loop}</li>
+          ))}
+        </ul>
+        <p>Dominant Themes:</p>
+        <ul>
+          {[...new Set(entries.map((e) => e.primary_theme))].map((theme) => (
+            <li key={theme}>🏷️ {theme}</li>
+          ))}
+        </ul>
+        <button className="summary-btn">Generate Handoff Summary</button>
+      </div>
     </div>
   );
-}
+};
+
+export default DemoSofiaPage;
