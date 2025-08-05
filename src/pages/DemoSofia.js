@@ -34,6 +34,7 @@ const DemoSofiaPage = () => {
         themeTags={['internal conflict', 'Vulnerability & Trust']}
         severity={3}
         mirrorResponse="Your gut’s got a point. You’re trying to sell yourself a story you don’t buy. Why do you think you’re pushing this forgiveness angle? What’s the real play here?"
+        voiceName="Tony"  
       />
   
       <SofiaReflectionCard
@@ -42,6 +43,7 @@ const DemoSofiaPage = () => {
         themeTags={['Fear of change', 'Change & Uncertainty']}
         severity={4}
         mirrorResponse="Dreams can be a hell of a mirror, can’t they? You know what’s up—you’re scared of change. But here’s the deal. What’s more important—staying safe in the mess or taking a shot at something better?"
+        voiceName="Tony"  
       />
     </div>
   );
