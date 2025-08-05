@@ -1,9 +1,8 @@
-// 🔼 Imports and Setup     
+// 🔼 Imports and Setup    
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
-import DemoSofia from './pages/DemoSofia';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
@@ -33,7 +32,6 @@ const App = () => {
   let transcriptBuffer = '';
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [styleVariant, setStyleVariant] = useState("D")
-  const [currentView, setCurrentView] = useState('main'); // 'main' is default view
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
@@ -414,58 +412,15 @@ return (
   </div>
 </div>
 
-  return (
-    <div className="App">
-      {/* 🔘 TEMP HEADER VIEW TOGGLE */}
-      <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 999, display: 'flex', alignItems: 'center' }}>
-        <p style={{ fontWeight: 'bold', marginRight: '8px' }}>Explore:</p>
-        <button onClick={() => setCurrentView('main')}>Main App</button>
-        <button onClick={() => setCurrentView('sofia_demo')}>View Sofia’s Story</button>
-      </div>
-
-      {/* 🌐 Conditional View Rendering */}
-      {currentView === 'main' && (
-        <JournalTimeline
-          entry={entry}
-          setEntry={setEntry}
-          history={history}
-          setHistory={setHistory}
-          forcedTone={forcedTone}
-          setForcedTone={setForcedTone}
-          latestEntryId={latestEntryId}
-          setLatestEntryId={setLatestEntryId}
-          showSummary={showSummary}
-          setShowSummary={setShowSummary}
-          loadingSummary={loadingSummary}
-          setLoadingSummary={setLoadingSummary}
-          summary={summary}
-          setSummary={setSummary}
-          parsedTags={parsedTags}
-          setParsedTags={setParsedTags}
-          severityLevel={severityLevel}
-          setSeverityLevel={setSeverityLevel}
-          isProcessing={isProcessing}
-          setIsProcessing={setIsProcessing}
-          username={username}
-          setUsername={setUsername}
-          recognition={recognition}
-          setRecognition={setRecognition}
-          isListening={isListening}
-          setIsListening={setIsListening}
-          setRefreshTrigger={setRefreshTrigger}
-          refreshTrigger={refreshTrigger}
-          placeholderPrompt={placeholderPrompt}
-          setPlaceholderPrompt={setPlaceholderPrompt}
-          tooltipVisible={tooltipVisible}
-          setTooltipVisible={setTooltipVisible}
-          styleVariant={styleVariant}
-          setStyleVariant={setStyleVariant}
-        />
-      )}
-
-    //   {currentView === 'sofia_demo' && <DemoSofia/>}
-    // </div>
-    // );
+{/* JournalTimeline Render Call */}
+<div style={{ flex: 1, overflowY: 'auto' }}>
+<JournalTimeline
+  userId={session?.user?.id}
+  refreshTrigger={refreshTrigger}
+  styleVariant={styleVariant}
+/>
+</div>
+   
 
    
     {/* Generate Handoff Summary Bottom Center
