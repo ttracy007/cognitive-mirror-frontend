@@ -463,9 +463,9 @@ return (
         />
       )}
 
-      {currentView === 'sofia_demo' && <DemoSofia/>}
-    </div>
-    );
+    //   {currentView === 'sofia_demo' && <DemoSofia/>}
+    // </div>
+    // );
 
    
     {/* Generate Handoff Summary Bottom Center
