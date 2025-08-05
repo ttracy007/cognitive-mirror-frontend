@@ -1,8 +1,8 @@
-// src/pages/DemoSofia.js
+// src/pages/DemoSofiaPage.js
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
-import './DemoSofia.css';
+import './DemoSofiaPage.css';
 
 const sofiaUserId = '372d20c2-4c5b-4bfc-8a70-bd88a7e84190';
 
