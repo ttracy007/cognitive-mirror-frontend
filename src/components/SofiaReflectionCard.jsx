@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import './SofiaReflectionCard.css';
 
 const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorResponse, voiceName = "Tony" }) => {
