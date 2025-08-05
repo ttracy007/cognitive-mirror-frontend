@@ -13,7 +13,7 @@
 }
 .demo-sofia-wrapper {
   padding: 2rem;
-  background: url('/textures/soft-wave-paper-texture.png'); /* Adjust path if needed */
+  background: url('/public/textures/soft-wave-paper-texture.png'); /* Adjust path if needed */
   background-color: #fdfbf7;
   background-size: cover;
   min-height: 100vh;
