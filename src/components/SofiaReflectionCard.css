@@ -1,0 +1,34 @@
+.sofia-card {
+  background-color: #1b1e24;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.entry-block {
+  margin-bottom: 1rem;
+}
+
+.entry-text {
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.metadata {
+  font-size: 0.95rem;
+  color: #bbb;
+  margin-top: 0.5rem;
+}
+
+.loop, .themes, .severity {
+  margin-top: 0.2rem;
+}
+
+.mirror-block {
+  border-top: 1px solid #444;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
