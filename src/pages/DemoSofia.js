@@ -21,7 +21,7 @@ const DemoSofiaPage = () => {
   }, []);
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#0f1116', color: '#f9f9f9' }}>
+    <div className="demo-sofia-wrapper">
       <h2 style={{ fontSize: '1.5rem' }}>🌸 Sofia — The Loyalty Trap</h2>
       <p style={{ maxWidth: '600px', marginBottom: '2rem' }}>
         Sofia just found out her husband cheated—again. They’ve got two kids, a shared home, and over a decade together.
