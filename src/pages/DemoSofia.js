@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import SofiaReflectionCard from '../components/SofiaReflectionCard';
 import './DemoSofia.css';
 
 const DemoSofiaPage = () => {
@@ -20,37 +21,28 @@ const DemoSofiaPage = () => {
   }, []);
 
   return (
-    <div className="sofia-container">
-      <div className="sofia-left-column">
-        <h2>📓 Sofia’s Reflections</h2>
-        {entries.map((entry) => (
-          <div key={entry.id} className="sofia-entry-card">
-            <p className="entry-text">"{entry.entry_text}"</p>
-            <p className="loop">🔁 {entry.loop_name}</p>
-            <p className="tags">🏷️ {entry.primary_theme}, {entry.secondary_theme}</p>
-            <p className="severity">🔥 Severity: {entry.severity_rating}</p>
-            <div className="mirror-reply">
-              <strong>Mirror:</strong> {entry.mirror_response}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="sofia-right-sidebar">
-        <h3>🧠 Therapist Summary</h3>
-        <p>Detected Loops:</p>
-        <ul>
-          {[...new Set(entries.map((e) => e.loop_name))].map((loop) => (
-            <li key={loop}>🔁 {loop}</li>
-          ))}
-        </ul>
-        <p>Dominant Themes:</p>
-        <ul>
-          {[...new Set(entries.map((e) => e.primary_theme))].map((theme) => (
-            <li key={theme}>🏷️ {theme}</li>
-          ))}
-        </ul>
-        <button className="summary-btn">Generate Handoff Summary</button>
-      </div>
+    <div style={{ padding: '2rem', backgroundColor: '#0f1116', color: '#f9f9f9' }}>
+      <h2 style={{ fontSize: '1.5rem' }}>🌸 Sofia — The Loyalty Trap</h2>
+      <p style={{ maxWidth: '600px', marginBottom: '2rem' }}>
+        Sofia just found out her husband cheated—again. They’ve got two kids, a shared home, and over a decade together.
+        She’s torn between reclaiming her dignity and preserving her children’s home. Each day feels like a battle between betrayal and guilt.
+      </p>
+  
+      <SofiaReflectionCard
+        entryText="I keep telling myself I can forgive him, but deep down, I don’t think I believe it. It’s like I’m trying to convince myself of something my gut already knows isn’t true."
+        loopName="Cycle of Self-Doubt"
+        themeTags={['internal conflict', 'Vulnerability & Trust']}
+        severity={3}
+        mirrorResponse="Your gut’s got a point. You’re trying to sell yourself a story you don’t buy. Why do you think you’re pushing this forgiveness angle? What’s the real play here?"
+      />
+  
+      <SofiaReflectionCard
+        entryText="Last night I had a dream where I was packing bags. Not even crying, just numb. Woke up and realized I’m more afraid of starting over than I am of staying in this mess."
+        loopName="Cycle of Avoidance"
+        themeTags={['Fear of change', 'Change & Uncertainty']}
+        severity={4}
+        mirrorResponse="Dreams can be a hell of a mirror, can’t they? You know what’s up—you’re scared of change. But here’s the deal. What’s more important—staying safe in the mess or taking a shot at something better?"
+      />
     </div>
   );
 };
