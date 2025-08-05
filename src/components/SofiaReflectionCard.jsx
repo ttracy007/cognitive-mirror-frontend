@@ -1,22 +1,24 @@
-// src/components/SofiaReflectionCard.jsx
-
 import React from 'react';
 import './SofiaReflectionCard.css';
 
-const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorResponse }) => {
+const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorResponse, voiceName = "Tony" }) => {
   return (
-    <div className="sofia-card">
-      <div className="entry-text">
-        <em>“{entryText}”</em>
+    <div className="sofia-chat-container">
+      {/* User entry bubble */}
+      <div className="bubble user">
+        <p><em>{entryText}</em></p>
+        <div className="metadata">
+          🔁 <strong>{loopName}</strong><br />
+          🏷️ {themeTags.join(', ')}<br />
+          🔥 Severity: {severity}
+        </div>
       </div>
 
-      <div className="mirror-response">
-        <strong>Mirror:</strong> {mirrorResponse}
+      {/* GPT voice response bubble */}
+      <div className="bubble ai">
+        <div className="voice-name">Mirror ({voiceName}):</div>
+        <p>{mirrorResponse}</p>
       </div>
-
-      <div className="loop-name">🔁 {loopName}</div>
-      <div className="tags">🏷️ {themeTags.join(', ')}</div>
-      <div className="severity">🔥 Severity: {severity}</div>
     </div>
   );
 };
