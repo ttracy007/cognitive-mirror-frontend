@@ -13,6 +13,10 @@
 }
 .demo-sofia-wrapper {
   padding: 2rem;
-  background-color: #fdfdfd;
-  color: #000;
+  background: url('/parchment-light.png'); /* Adjust path if needed */
+  background-color: #fdfbf7;
+  background-size: cover;
+  min-height: 100vh;
+  color: #111;
+  font-family: 'Georgia', serif;
 }
