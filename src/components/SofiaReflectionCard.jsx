@@ -1,7 +1,7 @@
 // src/components/SofiaReflectionCard.jsx
 
 import React from 'react';
-import './DemoSofia.css';
+import '../pages/DemoSofia.css';
 
 const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorResponse }) => {
   return (
