@@ -16,7 +16,7 @@ const SofiaReflectionCard = ({ entryText, loopName, themeTags, severity, mirrorR
 
       {/* GPT voice response bubble */}
       <div className="bubble ai">
-        <div className="voice-name">Mirror ({voiceName}):</div>
+        <div className="voice-name">Mirror (Tony):</div>
         <p>{mirrorResponse}</p>
       </div>
     </div>
