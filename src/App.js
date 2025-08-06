@@ -423,60 +423,6 @@ return (
 />
 </div>
 
-// Demo Mode Sofia Toggle// 
-// return (
-  //   <div className="App">
-  //     {/* 🔘 TEMP HEADER VIEW TOGGLE */}
-  //     <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 999, display: 'flex', alignItems: 'center' }}>
-  //       <p style={{ fontWeight: 'bold', marginRight: '8px' }}>Explore:</p>
-  //       <button onClick={() => setCurrentView('main')}>Main App</button>
-  //       <button onClick={() => setCurrentView('sofia_demo')}>View Sofia’s Story</button>
-  //     </div>
-
-  //     {/* 🌐 Conditional View Rendering */}
-  //     {currentView === 'main' && (
-  //       <JournalTimeline
-  //         entry={entry}
-  //         setEntry={setEntry}
- 
-  //         history={history}
-  //         setHistory={setHistory}
-  //         forcedTone={forcedTone}
-  //         setForcedTone={setForcedTone}
-  //         latestEntryId={latestEntryId}
-  //         setLatestEntryId={setLatestEntryId}
-  //         showSummary={showSummary}
-  //         setShowSummary={setShowSummary}
-  //         loadingSummary={loadingSummary}
-  //         setLoadingSummary={setLoadingSummary}
-  //         summary={summary}
-  //         setSummary={setSummary}
-  //         parsedTags={parsedTags}
-  //         setParsedTags={setParsedTags}
-  //         severityLevel={severityLevel}
-  //         setSeverityLevel={setSeverityLevel}
-  //         isProcessing={isProcessing}
-  //         setIsProcessing={setIsProcessing}
-  //         username={username}
-  //         setUsername={setUsername}
-  //         recognition={recognition}
-  //         setRecognition={setRecognition}
-  //         isListening={isListening}
-  //         setIsListening={setIsListening}
-  //         setRefreshTrigger={setRefreshTrigger}
-  //         refreshTrigger={refreshTrigger}
-  //         placeholderPrompt={placeholderPrompt}
-  //         setPlaceholderPrompt={setPlaceholderPrompt}
-  //         tooltipVisible={tooltipVisible}
-  //         setTooltipVisible={setTooltipVisible}
-  //         styleVariant={styleVariant}
-  //         setStyleVariant={setStyleVariant}
-  //       />
-  //     )}
-
-  //     {currentView === 'sofia_demo' && <DemoSofia/>}
-  //   </div>
-  //   );
 
 
     {/* Generate Handoff Summary Bottom Center
