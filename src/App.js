@@ -33,7 +33,7 @@ const App = () => {
   let transcriptBuffer = '';
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [styleVariant, setStyleVariant] = useState("D")
-  const [showWelcome, setShowWelcome] = useState(true);
+  // const [currentView, setCurrentView] = useState('main'); // 'main' is default view
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
@@ -304,45 +304,50 @@ const App = () => {
 return (
   <>
     {showWelcome && (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(255,255,255,0.96)',
-        zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-        padding: '2rem',
-        textAlign: 'center'
-      }}>
-        <h2 style={{ marginBottom: '1rem', fontSize: '1.8rem' }}>👋 Welcome to Cognitive Mirror</h2>
-        <p style={{ maxWidth: '500px', marginBottom: '2rem', fontSize: '1.1rem' }}>
-          Just start typing what’s on your mind. Mirror listens, remembers, and reflects back in different voices. 
-          You’ll spot patterns. You’ll get called out. You’ll get clarity.
-        </p>
-        <p style={{ fontStyle: 'italic', marginBottom: '1.5rem' }}>
-          Don’t be afraid to get a little sassy if the moment calls for it—Mirror can take it.
-        </p>
-        <button
-          onClick={() => setShowWelcome(false)}
-          style={{
-            padding: '0.8rem 1.5rem',
-            fontSize: '1rem',
-            borderRadius: '6px',
-            backgroundColor: '#374151',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          Start Reflecting →
-        </button>
-      </div>
-    )}
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    zIndex: 1000,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    padding: '2rem',
+    textAlign: 'center'
+  }}>
+    <h2 style={{ marginBottom: '1rem', fontSize: '2rem', fontWeight: '600' }}>👋 Welcome to Cognitive Mirror</h2>
+    
+    <p style={{ maxWidth: '600px', fontSize: '1.1rem', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+      Just start typing what’s on your mind. Mirror listens, remembers, and reflects back in different voices.
+      You’ll spot patterns. You’ll get called out. You’ll get clarity.
+    </p>
+
+    <p style={{ maxWidth: '600px', fontSize: '1rem', marginBottom: '1.5rem', fontStyle: 'italic', color: '#333' }}>
+      Don’t be afraid to get a little sassy if the moment calls for it—Mirror can take it.
+    </p>
+
+    <button
+      onClick={() => setShowWelcome(false)}
+      style={{
+        padding: '0.9rem 1.6rem',
+        fontSize: '1rem',
+        borderRadius: '6px',
+        backgroundColor: '#374151',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        letterSpacing: '0.3px'
+      }}
+    >
+      Start Reflecting →
+    </button>
+  </div>
+)}
 
     <div className="chat-container background-option-1">
       {/* Header with Logout + Summary */}
