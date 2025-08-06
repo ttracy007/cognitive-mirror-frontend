@@ -302,221 +302,201 @@ const App = () => {
   };
 // 🔽 UI Rendering
 return (
-  // <div style={{ padding: '2rem', fontFamily: 'sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-     <div className="chat-container background-option-1">
- {/* Header with Logout + Summary */}
-<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-  <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
-  <div style={{ display: 'flex', gap: '1rem' }}>
-    <button
-      onClick={() => setShowSummary(true)}
-      style={{
-        padding: '0.5rem 1rem',
-        backgroundColor: '#333',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer'
-      }}
-    >
-      Generate Handoff Summaries
-    </button>
-    <button
-      onClick={async () => {
-        await supabase.auth.signOut();
-        setSession(null);
-      }}
-      style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
-    >
-      Log Out
-    </button>
-  </div>
-</div>
-
-<div
-  className="reflection-input-container"
-  style={{
-    position: 'fixed',
-    bottom: '70px',
-    left: 0,
-    right: 0,
-    zIndex: 999
-  }}
->
-  <textarea
-    rows="3"
-    value={entry}
-    onChange={(e) => setEntry(e.target.value)}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (entry.trim() && !isProcessing) {
-          handleSubmit();
-        }
-      }
-    }}
-    placeholder={placeholderPrompt}
-    style={{
-      width: '100%',
-      maxWidth: '100%',
-      boxSizing: 'border-box',
-      padding: '1rem',
-      fontSize: '1rem',
-      backgroundColor: 'rgba(255, 255, 255, 0.85)',
-      border: '1px solid rgba(0, 0, 0, 0.1)',
-      borderRadius: '10px',
-      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-      backdropFilter: 'blur(2px)' // optional: gives a slight frosted glass effect
-    }}
-  />
-  <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-    <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
-    <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-    <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-    <button
-      onClick={handlePatternInsight}
-      onMouseEnter={() => setTooltipVisible(true)}
-      onMouseLeave={() => setTooltipVisible(false)}
-      style={{
-        backgroundColor: '#374151',
-        color: 'white',
-        padding: '0.5rem 1rem',
-        borderRadius: '0.375rem',
-        fontWeight: 'bold',
-        cursor: 'pointer'
-      }}
-    >
-      🧭 See Pattern Insight
-    </button>
-    {tooltipVisible && (
+  <>
+    {showWelcome && (
       <div style={{
-        position: 'absolute',
-        top: '-2.5rem',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        zIndex: 1000,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        padding: '2rem',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ marginBottom: '1rem', fontSize: '1.8rem' }}>👋 Welcome to Cognitive Mirror</h2>
+        <p style={{ maxWidth: '500px', marginBottom: '2rem', fontSize: '1.1rem' }}>
+          Just start typing what’s on your mind. Mirror listens, remembers, and reflects back in different voices. 
+          You’ll spot patterns. You’ll get called out. You’ll get clarity.
+        </p>
+        <p style={{ fontStyle: 'italic', marginBottom: '1.5rem' }}>
+          Don’t be afraid to get a little sassy if the moment calls for it—Mirror can take it.
+        </p>
+        <button
+          onClick={() => setShowWelcome(false)}
+          style={{
+            padding: '0.8rem 1.5rem',
+            fontSize: '1rem',
+            borderRadius: '6px',
+            backgroundColor: '#374151',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Start Reflecting →
+        </button>
+      </div>
+    )}
+
+    <div className="chat-container background-option-1">
+      {/* Header with Logout + Summary */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ marginBottom: '1rem' }}>Cognitive Mirror</h1>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button
+            onClick={() => setShowSummary(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#333',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Generate Handoff Summaries
+          </button>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setSession(null);
+            }}
+            style={{ padding: '0.5rem 1rem', background: '#eee', border: '1px solid #ccc', cursor: 'pointer' }}
+          >
+            Log Out
+          </button>
+        </div>
+      </div>
+
+      {/* Sticky Input Bar */}
+      <div className="reflection-input-container" style={{
+        position: 'fixed',
+        bottom: '70px',
+        left: 0,
+        right: 0,
+        zIndex: 999
+      }}>
+        <textarea
+          rows="3"
+          value={entry}
+          onChange={(e) => setEntry(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (entry.trim() && !isProcessing) {
+                handleSubmit();
+              }
+            }
+          }}
+          placeholder={placeholderPrompt}
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            padding: '1rem',
+            fontSize: '1rem',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: '10px',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(2px)'
+          }}
+        />
+        <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
+          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+          <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+          <button
+            onClick={handlePatternInsight}
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+            style={{
+              backgroundColor: '#374151',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            🧭 See Pattern Insight
+          </button>
+          {tooltipVisible && (
+            <div style={{
+              position: 'absolute',
+              top: '-2.5rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#333',
+              color: '#fff',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              whiteSpace: 'nowrap',
+              zIndex: 1000
+            }}>
+              Generates a unified insight based on your recent themes, topics, and emotional loops.
+            </div>
+          )}
+          {isListening && <span>🎧 Listening…</span>}
+          {isProcessing && (
+            <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
+              Mirror is thinking<span className="dots"></span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* JournalTimeline */}
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        <JournalTimeline
+          userId={session?.user?.id}
+          refreshTrigger={refreshTrigger}
+          styleVariant={styleVariant}
+        />
+      </div>
+
+      {/* Tone Picker */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
         left: '50%',
         transform: 'translateX(-50%)',
-        backgroundColor: '#333',
-        color: '#fff',
-        padding: '0.4rem 0.6rem',
-        borderRadius: '6px',
-        fontSize: '0.75rem',
-        whiteSpace: 'nowrap',
-        zIndex: 1000
+        backgroundColor: '#f4f4f4',
+        padding: '0.5rem 1rem',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        zIndex: 999
       }}>
-        Generates a unified insight based on your recent themes, topics, and emotional loops.
+        <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+        <select
+          value={forcedTone}
+          onChange={(e) => setForcedTone(e.target.value)}
+          style={{ padding: '0.4rem' }}
+        >
+          <option value="frank">Tony</option>
+          <option value="marcus">Marcus</option>
+          <option value="therapist">Clara</option>
+          <option value="movies">Movies</option>
+          <option value="verena">Verena</option>
+        </select>
       </div>
-    )}
-    {isListening && <span>🎧 Listening…</span>}
-    {isProcessing && (
-      <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
-        Mirror is thinking<span className="dots"></span>
-      </div>
-    )}
-  </div>
-</div>
 
-{/* JournalTimeline Render Call */}
-<div style={{ flex: 1, overflowY: 'auto' }}>
-<JournalTimeline
-  userId={session?.user?.id}
-  refreshTrigger={refreshTrigger}
-  styleVariant={styleVariant}
-/>
-</div>
-
-
-
-    {/* Generate Handoff Summary Bottom Center
-    // <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-    //   {history.length >= 5 ? (
-    //     <button
-    //       onClick={() => setShowSummary(true)}
-    //       style={{
-    //         padding: '1rem 2rem',
-    //         fontSize: '1rem',
-    //         backgroundColor: '#333',
-    //         color: 'white',
-    //         border: 'none',
-    //         borderRadius: '5px',
-    //         cursor: 'pointer'
-    //       }}
-    //     >
-    //       Generate Handoff Summaries
-    //     </button>
-    //   ) : (
-    //     <button
-    //       disabled
-    //       style={{
-    //         padding: '1rem 2rem',
-    //         fontSize: '1rem',
-    //         backgroundColor: '#ccc',
-    //         color: '#666',
-    //         border: 'none',
-    //         borderRadius: '5px',
-    //         cursor: 'not-allowed'
-    //       }}
-    //     >
-    //       Add at least 5 reflections to enable summaries
-    //     </button>
-    //   )}
-      </div>
-      */}   
-
+      {/* Summary Viewer */}
       {showSummary && (
         <div style={{ marginTop: '1rem' }}>
           <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
         </div>
       )}
-      {/* Bottom-center fixed tone picker */}
-<div style={{
-  position: 'fixed',
-  bottom: '20px',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  backgroundColor: '#f4f4f4',
-  padding: '0.5rem 1rem',
-  border: '1px solid #ccc',
-  borderRadius: '8px',
-  zIndex: 999
-}}>
-  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-  <select
-    value={forcedTone}
-    onChange={(e) => setForcedTone(e.target.value)}
-    style={{ padding: '0.4rem' }}
-  >
-    <option value="frank">Tony</option>
-    <option value="marcus">Marcus</option>
-    <option value="therapist">Clara</option>
-    <option value="movies">Movies</option>
-    <option value="verena">Verena</option>
-  </select>
-</div>
-    {/* 🔁 Pinned Bottom-Right: Generate Summary Button */}
-{/*{history.length >= 5 && (
-  <div style={{
-    position: 'fixed',
-    bottom: '20px',
-    right: '20px',
-    backgroundColor: '#333',
-    borderRadius: '6px',
-    padding: '0.5rem 0.75rem',
-    zIndex: 9999
-  }}>
-    <button
-      onClick={() => setShowSummary(true)}
-      style={{
-        fontSize: '0.9rem',
-        color: 'white',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer'
-      }}
-    >
-      🧠 Summary
-    </button>
-  </div>
-)}*/}
-  </div>
-  );
-};
+    </div>
+  </>
+);
+}
+
 export default App;
