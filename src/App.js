@@ -33,7 +33,7 @@ const App = () => {
   let transcriptBuffer = '';
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [styleVariant, setStyleVariant] = useState("D")
-  // const [currentView, setCurrentView] = useState('main'); // 'main' is default view
+  const [showWelcome, setShowWelcome] = useState(true);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
