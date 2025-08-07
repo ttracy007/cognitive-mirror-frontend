@@ -430,21 +430,32 @@ return (
 
         {/* Tone Picker */}
         <div style={{
-          position: 'fixed', bottom: '20px', left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: '#f4f4f4', padding: '0.5rem 1rem',
-          borderRadius: '8px', zIndex: 999
-        }}>
-          <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-          <select value={forcedTone} onChange={(e) => setForcedTone(e.target.value)}>
-            <option value="frank">Tony</option>
-            <option value="marcus">Marcus</option>
-            <option value="therapist">Clara</option>
-            <option value="movies">Movies</option>
-            <option value="verena">Verena</option>
-          </select>
-        </div>
-
+  position: 'fixed',
+  bottom: '20px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  backgroundColor: '#f4f4f4',
+  padding: '0.5rem 1rem',
+  borderRadius: '8px',
+  zIndex: 999
+}}>
+  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+  <div style={{ position: 'relative', display: 'inline-block' }}>
+    <select
+      value={forcedTone}
+      onChange={(e) => setForcedTone(e.target.value)}
+      style={{ padding: '0.3rem' }}
+      onMouseOver={(e) => setTooltip(e.target.value)}
+      onMouseOut={() => setTooltip(null)}
+    >
+      <option value="frank" title="💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.">Tony</option>
+      <option value="marcus" title="🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.">Marcus</option>
+      <option value="therapist" title="🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.">Clara</option>
+      <option value="movies" title="🎬 Movies – A movie buff who only speaks through movie metaphors.">Movies</option>
+      <option value="verena" title="🌸 Verena – A clarity-driven life coach unphased by self-pity.">Verena</option>
+    </select>
+  </div>
+</div>
         {/* Summary Viewer */}
         {showSummary && (
           <div style={{ marginTop: '1rem' }}>
