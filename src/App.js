@@ -1,4 +1,4 @@
-// 🔼 Imports and Setup      
+// 🔼 Imports and Setup     
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
@@ -417,7 +417,8 @@ return (
             placeholder={placeholderPrompt}
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
-          {/* Buttons below input */}
+          
+        {/* Buttons below input */}
         <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
           <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
           <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
@@ -425,17 +426,28 @@ return (
 
           <button
             onClick={handlePatternInsight}
-            onMouseEnter={() => setTooltipVisible(true)}
-            onMouseLeave={() => setTooltipVisible(false)}
+            onMouseEnter={() => setTooltipVisible('pattern')}
+            onMouseLeave={() => setTooltipVisible(null)}
           >
             🧭 See Pattern Insight
           </button>
 
-          <button onClick={() => setShowSummary(true)}>
+          <button
+            onClick={() => setShowSummary(true)}
+            onMouseEnter={() => setTooltipVisible('therapist')}
+            onMouseLeave={() => setTooltipVisible(null)}
+          >
             🩺 Therapist Summary
           </button>
 
-          {tooltipVisible && (
+          <button
+            onMouseEnter={() => setTooltipVisible('mood')}
+            onMouseLeave={() => setTooltipVisible(null)}
+          >
+            📊 Mood Tracker
+          </button>
+
+          {tooltipVisible === 'pattern' && (
             <div style={{
               position: 'absolute',
               top: '-2.5rem',
@@ -449,6 +461,40 @@ return (
               whiteSpace: 'nowrap'
             }}>
               Generates a unified insight based on your recent themes, topics, and emotional loops.
+            </div>
+          )}
+
+          {tooltipVisible === 'therapist' && (
+            <div style={{
+              position: 'absolute',
+              top: '-2.5rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#333',
+              color: '#fff',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              whiteSpace: 'nowrap'
+            }}>
+              A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.
+            </div>
+          )}
+
+          {tooltipVisible === 'mood' && (
+            <div style={{
+              position: 'absolute',
+              top: '-2.5rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#333',
+              color: '#fff',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              whiteSpace: 'nowrap'
+            }}>
+              Visualizes your emotional trends over time. Coming soon.
             </div>
           )}
 
