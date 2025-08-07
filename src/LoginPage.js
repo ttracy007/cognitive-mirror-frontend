@@ -9,6 +9,11 @@ const LoginPage = ({ onAuthSuccess }) => {
   const [session, setSession] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
 
   const handleLoginOrSignup = async () => {
     setErrorMsg('');
