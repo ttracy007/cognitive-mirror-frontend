@@ -377,7 +377,7 @@ return (
         fontFamily: 'Georgia, serif',
         textShadow: '0 1px 1px rgba(0,0,0,0.1)'
       }}>
-        🪞 Cognitive Mirror
+        <span className="mirror-emoji">🪞</span> Cognitive Mirror
       </h1>
 
       <div style={{
