@@ -32,7 +32,7 @@ const App = () => {
   let transcriptBuffer = '';
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [styleVariant, setStyleVariant] = useState("D")
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
 
