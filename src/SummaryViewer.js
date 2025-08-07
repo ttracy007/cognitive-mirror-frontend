@@ -6,7 +6,6 @@ const SummaryViewer = ({ history, onClose }) => {
   const [summaries, setSummaries] = useState({
     insight: null,
     clinical: null,
-    narrative: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +20,7 @@ const SummaryViewer = ({ history, onClose }) => {
   setIsModalOpen(true);
 
   try {
-    const types = ['insight', 'clinical', 'narrative'];
+    const types = ['insight', 'clinical'];
     const recentHistory = history.slice(0, 10); // Only last 10
 
     const fetchSummary = (type) => {
@@ -41,7 +40,6 @@ const SummaryViewer = ({ history, onClose }) => {
     setSummaries({
       insight: results[0].summary,
       clinical: results[1].summary,
-      narrative: results[2].summary,
     });
   } catch (err) {
     console.error("❌ Failed to generate summaries:", err);
@@ -98,16 +96,7 @@ const SummaryViewer = ({ history, onClose }) => {
             onCopy={() => copyToClipboard(summaries.clinical?.summary)}
           />
 
-          {/* Narrative Voice Summary */}
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>✍️ Narrative Voice Summary</h3>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
-            A first-person reflection written in the client’s voice. Captures their emotional experience, recurring struggles, and hopes for therapy—offering therapists a direct connection to the client’s inner world.
-          </p>
-          <SummaryBlock
-            label="Narrative Voice Summary"
-            content={summaries.narrative || 'Summary not available.'}
-            onCopy={() => copyToClipboard(summaries.narrative?.summary)}
-          />
+          
         </>
       )}
 
