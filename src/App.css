@@ -79,16 +79,11 @@
   opacity: 0;
   transform: translateY(10px);
   animation: mirrorPopIn 1.2s ease-out forwards;
-}
-
-.mirror-emoji {
   font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji' !important;
   font-size: 1.6rem;
   line-height: 1;
   margin-right: 0.5rem;
-  display: inline-block;
   vertical-align: middle;
-}
 }
 
 @keyframes mirrorPopIn {
