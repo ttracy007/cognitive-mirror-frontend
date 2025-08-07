@@ -4,12 +4,12 @@ import SummaryViewer from './SummaryViewer';
 import { supabase } from './supabaseClient';
 import './App.css';
 // import DemoSofia from './pages/DemoSofia';
-import LandingPage from './LandingPage';
-import LoginPage from './LoginPage';
+// import LandingPage from './LandingPage';
+// import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
+  // const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -38,10 +38,11 @@ const App = () => {
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
-      const savedUsername = localStorage.getItem("username");
-      if (savedUsername) {
-        setUsername(savedUsername);
-      }
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      setUsername(savedUsername);
+      setShowWelcome(false); // auto-skip welcome on reload
+    }
   }, []);
 
   // 🔽 Function 2: Set Up Voice Recognition
@@ -234,21 +235,21 @@ const App = () => {
     if (session) fetchHistory();
   }, [session]);
 
-  // 🔽 UI State Routing
-  if (!session && !showLogin) {
-    return <LandingPage onStart={() => setShowLogin(true)} />;
-  }
+  // // 🔽 UI State Routing
+  // if (!session && !showLogin) {
+  //   return <LandingPage onStart={() => setShowLogin(true)} />;
+  // }
 
-  if (!session) {
-    return (
-      <LoginPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
-  }
+  // if (!session) {
+  //   return (
+  //     <LoginPage
+  //       onAuthSuccess={(session, username) => {
+  //         setSession(session);
+  //         setUsername(username);
+  //       }}
+  //     />
+  //   );
+  // }
 
 // 🔽 Function 7: Generate Handoff Summaries  
 
