@@ -368,7 +368,7 @@ return (
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-        <h1 style={{
+      <h1 style={{
         marginBottom: '0.3rem',
         fontSize: '1.8rem',
         fontWeight: 600,
@@ -377,7 +377,7 @@ return (
         fontFamily: 'Georgia, serif',
         textShadow: '0 1px 1px rgba(0,0,0,0.1)'
       }}>
-        <span className="mirror-emoji" role="img" aria-label="mirror">🪞</span>Cognitive Mirror
+        <span className="mirror-emoji" role="img" aria-label="mirror">🪞</span> Cognitive Mirror
       </h1>
 
       <div style={{
