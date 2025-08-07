@@ -3,13 +3,9 @@ import React, { useEffect, useState } from 'react';
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
-// import DemoSofia from './pages/DemoSofia';
-import LandingPage from './LandingPage';
-import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -23,7 +19,7 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const prompts = ["What’s shakkng sugar?"];
+  const prompts = ["What’s shaking sugar?"];
   const [showGroupedView, setShowGroupedView] = useState(false);
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)] 
@@ -36,13 +32,22 @@ const App = () => {
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
 
-  // 🔽 Function 1: Load Saved Username
-  useEffect(() => {
-      const savedUsername = localStorage.getItem("username");
-      if (savedUsername) {
-        setUsername(savedUsername);
-      }
-  }, []);
+  // 🔽 Function 1: Load Saved Username and Check Session
+useEffect(() => {
+  const savedUsername = localStorage.getItem("username");
+  if (savedUsername) {
+    setUsername(savedUsername);
+  }
+
+  // 🔁 Restore session check (used to be in LoginPage)
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      console.error("❌ Error fetching session:", error.message);
+    } else if (data?.session) {
+      setSession(data.session);
+    }
+  });
+}, []);
 
   // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
@@ -234,22 +239,6 @@ const App = () => {
     if (session) fetchHistory();
   }, [session]);
 
-  // 🔽 UI State Routing
-  if (!session && !showLogin) {
-    return <LandingPage onStart={() => setShowLogin(true)} />;
-  }
-
-  if (!session) {
-    return (
-      <LoginPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
-  }
-
 // 🔽 Function 7: Generate Handoff Summaries  
 
   // 🔽 Tone Display Utility
@@ -324,7 +313,17 @@ return (
         overflowY: 'auto'
       }}>
         <div style={{ maxWidth: '600px', width: '90%' }}>
-          <h2 style={{ marginBottom: '0.8rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
+        <div style={{ marginBottom: '1rem' }}>
+        <h2 style={{ marginBottom: '0.2rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
+        <p style={{
+          fontSize: '0.85rem',
+          color: '#888',
+          fontStyle: 'italic',
+          margin: 0
+        }}>
+          beta testing version — feedback welcome
+        </p>
+      </div>
           <p style={{ fontSize: '1rem', marginBottom: '0.8rem' }}>
             <strong>This isn’t a chatbot.</strong><br />
             It’s a place to hear yourself — and be challenged.
@@ -432,7 +431,17 @@ return (
       <div className="chat-container background-option-1">
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>Cognitive Mirror</h1>
+        <div>
+      <h1 style={{ marginBottom: '0.2rem' }}>Cognitive Mirror</h1>
+      <p style={{
+        fontSize: '0.85rem',
+        color: '#888',
+        fontStyle: 'italic',
+        margin: 0
+      }}>
+        beta testing version — feedback welcome
+      </p>
+    </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
             <button onClick={async () => {
