@@ -32,23 +32,21 @@ const App = () => {
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
 
-  🔽 Function 1: Load Saved Username
+  // 🔽 Function 1: Load Saved Username and Check Session
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
+  
     if (savedUsername) {
       setUsername(savedUsername);
-      // setShowWelcome(false); // auto-skip welcome on reload
+  
+      supabase.auth.getSession().then(({ data }) => {
+        if (data?.session) {
+          setSession(data.session);
+          setShowWelcome(false);  // Only skip welcome if a valid session exists
+        }
+      });
     }
   }, []);
-      // useEffect(() => {
-      //   const savedUsername = localStorage.getItem("username");
-      //   if (savedUsername) {
-      //     setUsername(savedUsername);
-      //     if (session) {
-      //       setShowWelcome(false);
-      //     }
-      //   }
-      // }, [session]);
 
   // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
