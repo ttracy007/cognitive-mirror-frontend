@@ -417,68 +417,62 @@ return (
             placeholder={placeholderPrompt}
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
-          {/* Buttons below input */}
-        <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
-          <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
-          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-          <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Button Row */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
+        <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+        <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+        <button
+          onClick={handlePatternInsight}
+          onMouseEnter={() => setTooltipVisible('pattern')}
+          onMouseLeave={() => setTooltipVisible(null)}
+        >
+          🧭 See Pattern Insight
+        </button>
+        <button
+          onClick={() => setShowSummary(true)}
+          onMouseEnter={() => setTooltipVisible('therapist')}
+          onMouseLeave={() => setTooltipVisible(null)}
+        >
+          🩺 Therapist Summary
+        </button>
+        <button
+          onMouseEnter={() => setTooltipVisible('mood')}
+          onMouseLeave={() => setTooltipVisible(null)}
+        >
+          📊 Mood Tracker
+        </button>
+      </div>
 
-          <button
-            onClick={handlePatternInsight}
-            onMouseEnter={() => setTooltipVisible(true)}
-            onMouseLeave={() => setTooltipVisible(false)}
-          >
-            🧭 See Pattern Insight
-          </button>
-
-          <button onClick={() => setShowSummary(true)}>
-            🩺 Therapist Summary
-          </button>
-
-          {tooltipVisible && (
-            <div style={{
-              position: 'absolute',
-              top: '-2.5rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#333',
-              color: '#fff',
-              padding: '0.4rem 0.6rem',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              whiteSpace: 'nowrap'
-            }}>
-              Generates a unified insight based on your recent themes, topics, and emotional loops.
+      {/* Status Row */}
+      <div style={{ minHeight: '1.5rem', marginTop: '0.25rem' }}>
+        {isListening && <span>🎧 Listening…</span>}
+        {isProcessing && <span>Mirror is thinking<span className="dots"></span></span>}
+      </div>
+    </div>
+            
             </div>
-          )}
 
-        <div style={{ minHeight: '1.5rem' }}>
-          {isListening && <span>🎧 Listening…</span>}
-          {isProcessing && <span>Mirror is thinking<span className="dots"></span></span>}
-        </div>
-        </div>
-        
-        </div>
+            {/* Timeline */}
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              <JournalTimeline
+                userId={session?.user?.id}
+                refreshTrigger={refreshTrigger}
+                styleVariant={styleVariant}
+              />
+            </div>
 
-        {/* Timeline */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <JournalTimeline
-            userId={session?.user?.id}
-            refreshTrigger={refreshTrigger}
-            styleVariant={styleVariant}
-          />
-        </div>
-
-        {/* Tone Picker */}
-        <div style={{
-  position: 'fixed',
-  bottom: '20px',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  backgroundColor: '#f4f4f4',
-  padding: '0.5rem 1rem',
-  borderRadius: '8px',
-  zIndex: 999
+            {/* Tone Picker */}
+            <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      backgroundColor: '#f4f4f4',
+      padding: '0.5rem 1rem',
+      borderRadius: '8px',
+      zIndex: 999
 }}>
   <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
   <div style={{ position: 'relative', display: 'inline-block' }}>
