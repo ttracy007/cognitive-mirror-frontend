@@ -33,13 +33,22 @@ const App = () => {
   const [username, setUsername] = useState('');
 
   // 🔽 Function 1: Load Saved Username
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    if (savedUsername) {
-      setUsername(savedUsername);
-      // setShowWelcome(false); // auto-skip welcome on reload
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedUsername = localStorage.getItem("username");
+  //   if (savedUsername) {
+  //     setUsername(savedUsername);
+  //     // setShowWelcome(false); // auto-skip welcome on reload
+  //   }
+  // }, []);
+      useEffect(() => {
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) {
+          setUsername(savedUsername);
+          if (session) {
+            setShowWelcome(false);
+          }
+        }
+      }, [session]);
 
   // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
@@ -305,7 +314,17 @@ return (
         overflowY: 'auto'
       }}>
         <div style={{ maxWidth: '600px', width: '90%' }}>
-          <h2 style={{ marginBottom: '0.8rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
+        <div style={{ marginBottom: '1rem' }}>
+        <h2 style={{ marginBottom: '0.2rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
+        <p style={{
+          fontSize: '0.85rem',
+          color: '#888',
+          fontStyle: 'italic',
+          margin: 0
+        }}>
+          beta testing version — feedback welcome
+        </p>
+      </div>
           <p style={{ fontSize: '1rem', marginBottom: '0.8rem' }}>
             <strong>This isn’t a chatbot.</strong><br />
             It’s a place to hear yourself — and be challenged.
@@ -413,7 +432,17 @@ return (
       <div className="chat-container background-option-1">
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>Cognitive Mirror</h1>
+        <div>
+      <h1 style={{ marginBottom: '0.2rem' }}>Cognitive Mirror</h1>
+      <p style={{
+        fontSize: '0.85rem',
+        color: '#888',
+        fontStyle: 'italic',
+        margin: 0
+      }}>
+        beta testing version — feedback welcome
+      </p>
+    </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
             <button onClick={async () => {
