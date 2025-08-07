@@ -127,7 +127,7 @@ useEffect(() => {
     setLoading(false);
   };
 
-  fetchJournals(userId); // ✅ PASS userId here
+  fetchJournals(); // 
 }, [userId, refreshTrigger]);
 
   useEffect(() => {
