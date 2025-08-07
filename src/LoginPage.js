@@ -138,7 +138,7 @@ const LoginPage = ({ onAuthSuccess }) => {
       />
 
       <button
-        onClick={handleLogin}
+        onClick={handleLoginOrSignup}
         disabled={!username.trim() || !email.trim() || !password.trim() || loading}
         style={{
           padding: '0.8rem 1.5rem',
