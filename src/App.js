@@ -32,23 +32,23 @@ const App = () => {
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
 
-  // 🔽 Function 1: Load Saved Username
-  // useEffect(() => {
-  //   const savedUsername = localStorage.getItem("username");
-  //   if (savedUsername) {
-  //     setUsername(savedUsername);
-  //     // setShowWelcome(false); // auto-skip welcome on reload
-  //   }
-  // }, []);
-      useEffect(() => {
-        const savedUsername = localStorage.getItem("username");
-        if (savedUsername) {
-          setUsername(savedUsername);
-          if (session) {
-            setShowWelcome(false);
-          }
-        }
-      }, [session]);
+  🔽 Function 1: Load Saved Username
+  useEffect(() => {
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      setUsername(savedUsername);
+      // setShowWelcome(false); // auto-skip welcome on reload
+    }
+  }, []);
+      // useEffect(() => {
+      //   const savedUsername = localStorage.getItem("username");
+      //   if (savedUsername) {
+      //     setUsername(savedUsername);
+      //     if (session) {
+      //       setShowWelcome(false);
+      //     }
+      //   }
+      // }, [session]);
 
   // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
