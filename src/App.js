@@ -113,14 +113,47 @@ useEffect(() => {
       });
   }, []);
   
-  // 🔽 Function 4: Auth Setup
+  // 🔄 Fetch Journal Entries
+  const fetchHistory = async (userId) => {
+    if (!userId) {
+      console.warn("No userId found—aborting journal fetch.");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("journals")
+      .select("*")
+      .eq("user_id", userId)
+      .order("timestamp", { ascending: false });
+
+    if (error) {
+      console.error("❌ Error fetching journals:", error.message);
+    } else {
+      setHistory(data);
+    }
+  };
+
+  // ✅ Function 4: Auth Setup + Journal Fetch
   useEffect(() => {
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      if (session?.user) {
+        setSession(session);
+        fetchHistory(session.user.id);
+      }
     });
+
+    // Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      if (session?.user) {
+        setSession(session);
+        fetchHistory(session.user.id);
+      } else {
+        setSession(null);
+        setHistory([]);
+      }
     });
+
     return () => {
       listener?.subscription.unsubscribe();
     };
