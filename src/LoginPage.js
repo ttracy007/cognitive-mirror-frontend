@@ -1,29 +1,66 @@
-// LoginPage.js
+// login page
+
 import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
 
 const LoginPage = ({ onAuthSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const [session, setSession] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError('');
+  const handleLoginOrSignup = async () => {
+    setErrorMsg('');
+
+    if (!username || !password) {
+      setErrorMsg('Username and password are required.');
+      return;
+    }
+
+    // Build a fake email to satisfy Supabase but make email irrelevant to the user
+    const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '')}@cognitivemirror.ai`;
+    const authData = {
+      email: fakeEmail,
+      password,
+    };
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      localStorage.setItem("username", username);
-      onAuthSuccess(data.session, username);
+      // Try logging in first
+      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
+
+      if (loginError) {
+        // If login fails, try sign-up
+        let { error: signupError } = await supabase.auth.signUp(authData);
+
+        if (signupError) {
+          setErrorMsg(signupError.message);
+          return;
+        }
+
+        // If sign-up succeeds, log them in
+        let { error: retryLoginError } = await supabase.auth.signInWithPassword(authData);
+        if (retryLoginError) {
+          setErrorMsg(retryLoginError.message);
+          return;
+        }
+      }
+
+      // Fetch session after successful login
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        setErrorMsg('Authentication failed.');
+        return;
+      }
+
+      // Pass username manually to App
+      onAuthSuccess(sessionData.session, username);
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      console.error(err);
+      setErrorMsg('Unexpected error. Please try again.');
     }
   };
+
 
   return (
     <div style={{
