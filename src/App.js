@@ -417,38 +417,25 @@ return (
             placeholder={placeholderPrompt}
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
-
-        {/* Buttons below input */}
-        
-        <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'nowrap'}}>
+          {/* Buttons below input */}
+        <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
           <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
           <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
           <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
 
           <button
             onClick={handlePatternInsight}
-            onMouseEnter={() => setTooltipVisible('pattern')}
-            onMouseLeave={() => setTooltipVisible(null)}
-                  >
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+          >
             🧭 See Pattern Insight
-            </button>
+          </button>
 
-              <button
-                onClick={() => setShowSummary(true)}
-                onMouseEnter={() => setTooltipVisible('therapist')}
-                onMouseLeave={() => setTooltipVisible(null)}
-              >
+          <button onClick={() => setShowSummary(true)}>
             🩺 Therapist Summary
           </button>
 
-          <button
-            onMouseEnter={() => setTooltipVisible('mood')}
-            onMouseLeave={() => setTooltipVisible(null)}
-          >
-            📊 Mood Tracker
-          </button>
-
-          {tooltipVisible === 'pattern' && (
+          {tooltipVisible && (
             <div style={{
               position: 'absolute',
               top: '-2.5rem',
@@ -465,42 +452,10 @@ return (
             </div>
           )}
 
-          {tooltipVisible === 'therapist' && (
-            <div style={{
-              position: 'absolute',
-              top: '-2.5rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#333',
-              color: '#fff',
-              padding: '0.4rem 0.6rem',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              whiteSpace: 'nowrap'
-            }}>
-              A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.
-            </div>
-          )}
-
-          {tooltipVisible === 'mood' && (
-            <div style={{
-              position: 'absolute',
-              top: '-2.5rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#333',
-              color: '#fff',
-              padding: '0.4rem 0.6rem',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              whiteSpace: 'nowrap'
-            }}>
-              Visualizes your emotional trends over time. Coming soon.
-            </div>
-          )}
-
+        <div style={{ minHeight: '1.5rem' }}>
           {isListening && <span>🎧 Listening…</span>}
-          {isProcessing && <div>Mirror is thinking<span className="dots"></span></div>}
+          {isProcessing && <span>Mirror is thinking<span className="dots"></span></span>}
+        </div>
         </div>
         
         </div>
