@@ -102,12 +102,9 @@ useEffect(() => {
 }, [insightTheme, userId]);
   
 useEffect(() => {
-  const fetchJournals = async () => {
-    if (!userId) {
-      console.warn('⚠️ No userId provided to fetchJournals');
-      return;
-    }
+  if (!userId) return; // Wait until userId is available
 
+  const fetchJournals = async () => {
     setLoading(true);
 
     const { data, error } = await supabase
@@ -127,9 +124,8 @@ useEffect(() => {
     setLoading(false);
   };
 
-  fetchJournals(); // 
+  fetchJournals();
 }, [userId, refreshTrigger]);
-
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
