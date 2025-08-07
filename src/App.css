@@ -74,3 +74,23 @@
   background-repeat: repeat;
 }
 
+.mirror-emoji {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: mirrorPopIn 1.2s ease-out forwards;
+}
+
+@keyframes mirrorPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
