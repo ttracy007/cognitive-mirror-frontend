@@ -234,21 +234,21 @@ const App = () => {
     if (session) fetchHistory();
   }, [session]);
 
-  // 🔽 UI State Routing
-  if (!session && !showLogin) {
-    return <LandingPage onStart={() => setShowLogin(true)} />;
-  }
+  // // 🔽 UI State Routing
+  // if (!session && !showLogin) {
+  //   return <LandingPage onStart={() => setShowLogin(true)} />;
+  // }
 
-  if (!session) {
-    return (
-      <LoginPage
-        onAuthSuccess={(session, username) => {
-          setSession(session);
-          setUsername(username);
-        }}
-      />
-    );
-  }
+  // if (!session) {
+  //   return (
+  //     <LoginPage
+  //       onAuthSuccess={(session, username) => {
+  //         setSession(session);
+  //         setUsername(username);
+  //       }}
+  //     />
+  //   );
+  // }
 
 // 🔽 Function 7: Generate Handoff Summaries  
 
