@@ -368,15 +368,30 @@ return (
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-      <h1 style={{ marginBottom: '0.2rem' }}>Cognitive Mirror</h1>
-      <p style={{
-        fontSize: '0.85rem',
-        color: '#888',
-        fontStyle: 'italic',
-        margin: 0
+      <h1 style={{
+        marginBottom: '0.3rem',
+        fontSize: '1.8rem',
+        fontWeight: 600,
+        letterSpacing: '0.5px',
+        color: '#1a1a1a',
+        fontFamily: 'Georgia, serif',
+        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
       }}>
-        beta testing version — feedback welcome
-      </p>
+        🪞 Cognitive Mirror
+      </h1>
+
+      <div style={{
+        display: 'inline-block',
+        padding: '0.2rem 0.6rem',
+        fontSize: '0.75rem',
+        color: '#555',
+        backgroundColor: '#f5f5f5',
+        border: '1px solid #ddd',
+        borderRadius: '6px',
+        fontStyle: 'italic'
+      }}>
+        beta testing — feedback welcome
+      </div>
     </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
