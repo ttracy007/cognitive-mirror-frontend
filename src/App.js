@@ -112,26 +112,7 @@ useEffect(() => {
          // console.log(`🧱 Frontend build version: ${text}`);
       });
   }, []);
-  
-  // 🔄 Fetch Journal Entries
-  const fetchHistory = async (userId) => {
-    if (!userId) {
-      console.warn("No userId found—aborting journal fetch.");
-      return;
-    }
 
-    const { data, error } = await supabase
-      .from("journals")
-      .select("*")
-      .eq("user_id", userId)
-      .order("timestamp", { ascending: false });
-
-    if (error) {
-      console.error("❌ Error fetching journals:", error.message);
-    } else {
-      setHistory(data);
-    }
-  };
 
   // ✅ Function 4: Auth Setup + Journal Fetch
   useEffect(() => {
