@@ -64,6 +64,7 @@ const SummaryViewer = ({ history, onClose }) => {
         maxHeight: '90vh',
         overflowY: 'auto',
         fontFamily: 'sans-serif',
+        paddingBottom: '6rem'
       }}
     >
       <h2>🧾 Handoff Summaries</h2>
