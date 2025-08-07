@@ -377,17 +377,6 @@ return (
           </div>
         </div>
 
-        {/* Beta Feedback Welcome Message */}
-      <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fff8dc', borderRadius: '8px', fontSize: '0.95rem', lineHeight: '1.4' }}>
-        <p><strong>✨ You’re early.</strong><br />
-        You’re among the first to test Cognitive Mirror. Expect some bumps—and help us smooth them out.</p>
-      </div>
-
-      <div style={{ marginTop: '0.5rem', padding: '1rem', backgroundColor: '#e0f7fa', borderRadius: '8px', fontSize: '0.95rem', lineHeight: '1.4' }}>
-        <p><strong>📬 Spot a bug or have an idea?</strong><br />
-        Just type <code>feedback:</code> followed by your note. We read every one.</p>
-      </div>
-
         {/* Sticky Input Bar */}
         <div className="reflection-input-container" style={{ position: 'fixed', bottom: '70px', left: 0, right: 0, zIndex: 999 }}>
           <textarea
