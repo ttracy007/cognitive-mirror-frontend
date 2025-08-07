@@ -3,13 +3,9 @@ import React, { useEffect, useState } from 'react';
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
-// import DemoSofia from './pages/DemoSofia';
-// import LandingPage from './LandingPage';
-// import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
-  // const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -41,7 +37,7 @@ const App = () => {
     const savedUsername = localStorage.getItem("username");
     if (savedUsername) {
       setUsername(savedUsername);
-      setShowWelcome(false); // auto-skip welcome on reload
+      // setShowWelcome(false); // auto-skip welcome on reload
     }
   }, []);
 
@@ -234,22 +230,6 @@ const App = () => {
   useEffect(() => {
     if (session) fetchHistory();
   }, [session]);
-
-  // // 🔽 UI State Routing
-  // if (!session && !showLogin) {
-  //   return <LandingPage onStart={() => setShowLogin(true)} />;
-  // }
-
-  // if (!session) {
-  //   return (
-  //     <LoginPage
-  //       onAuthSuccess={(session, username) => {
-  //         setSession(session);
-  //         setUsername(username);
-  //       }}
-  //     />
-  //   );
-  // }
 
 // 🔽 Function 7: Generate Handoff Summaries  
 
