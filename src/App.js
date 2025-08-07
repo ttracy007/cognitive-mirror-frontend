@@ -35,16 +35,9 @@ const App = () => {
   // 🔽 Function 1: Load Saved Username and Check Session
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
-  
     if (savedUsername) {
       setUsername(savedUsername);
-  
-      supabase.auth.getSession().then(({ data }) => {
-        if (data?.session) {
-          setSession(data.session);
-          setShowWelcome(false);  // Only skip welcome if a valid session exists
-        }
-      });
+      // setShowWelcome(false); // auto-skip welcome on reload
     }
   }, []);
 
