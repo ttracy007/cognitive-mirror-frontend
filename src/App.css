@@ -74,22 +74,19 @@
   background-repeat: repeat;
 }
 
-.mirror-emoji {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(10px);
-  animation: mirrorPopIn 1.2s ease-out forwards;
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji' !important;
-  font-size: 1.6rem;
-  line-height: 1;
-  margin-right: 0.5rem;
-  vertical-align: middle;
+.mirror-title {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
 .mirror-emoji {
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", sans-serif;
   font-size: 1.7rem;
   line-height: 1;
+  vertical-align: middle;
 }
 
 @keyframes mirrorPopIn {
