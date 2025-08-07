@@ -114,7 +114,7 @@ useEffect(() => {
       });
   }, []);
   
-  // 🔄 Fetch Journal Entries
+ // 🔽 Function 4: Fetch Past Journals 
   const fetchHistory = async (userId) => {
     if (!userId) {
       console.warn("No userId found—aborting journal fetch.");
@@ -123,18 +123,27 @@ useEffect(() => {
 
     const { data, error } = await supabase
       .from("journals")
-      .select("*")
+      .select("id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker")
       .eq("user_id", userId)
       .order("timestamp", { ascending: false });
 
     if (error) {
       console.error("❌ Error fetching journals:", error.message);
-    } else {
-      setHistory(data);
+      return;
     }
+
+    const showAll = true; // Toggle to false if you want to filter entries later
+    const filtered = showAll
+      ? (data || [])
+      : (data || []).filter(entry =>
+          entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
+          entry.debug_marker?.trim() !== ''
+        );
+
+    setHistory(filtered);
   };
 
-  // ✅ Function 4: Auth Setup + Journal Fetch
+  // ✅ Function 4a: Auth Setup + Journal Fetch
   useEffect(() => {
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -241,37 +250,6 @@ useEffect(() => {
       setIsProcessing(false);
     }
   };
-   // 🔽 Function 6: Fetch Past Journals
-  const fetchHistory = async () => {
-    const user = session?.user;
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('journals')
-      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false });
-      
-    if (error) {
-    console.error("❌ Error fetching history:", error.message);
-    return;
-  }
-
-  // 🔽 Function 6a: Filter Out No Respose, No debug markers 
-
-  const showAll = true; // <== True all entries, False filtered 
-  const filtered = showAll
-    ? (data || [])
-    : (data || []).filter(entry =>
-    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
-    entry.debug_marker?.trim() !== ''
-  );
-  // console.log("📜 Filtered journal history:", filtered);  // <== Enable if False 
-  setHistory(filtered);
-};
-
-  useEffect(() => {
-    if (session) fetchHistory();
-  }, [session]);
 
 // 🔽 Function 7: Generate Handoff Summaries  
 
