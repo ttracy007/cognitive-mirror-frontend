@@ -3,9 +3,13 @@ import React, { useEffect, useState } from 'react';
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
 import './App.css';
+// import DemoSofia from './pages/DemoSofia';
+import LandingPage from './LandingPage';
+import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
+  const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -19,7 +23,7 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const prompts = ["What’s shaking sugar?"];
+  const prompts = ["What’s shakkng sugar?"];
   const [showGroupedView, setShowGroupedView] = useState(false);
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)] 
@@ -32,23 +36,13 @@ const App = () => {
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
 
-  // 🔽 Function 1: Load Saved Username and Check Session
-useEffect(() => {
-  const savedUsername = localStorage.getItem("username");
-  if (savedUsername) {
-    setUsername(savedUsername);
-  }
-
-  // 🔁 Restore session check (used to be in LoginPage)
-  supabase.auth.getSession().then(({ data, error }) => {
-    if (error) {
-      console.error("❌ Error fetching session:", error.message);
-    } else if (data?.session) {
-      setSession(data.session);
-      fetchHistory(data.session.user.id); // ✅ Trigger fetch AFTER session is valid
-    }
-  });
-}, []);
+  // 🔽 Function 1: Load Saved Username
+  useEffect(() => {
+      const savedUsername = localStorage.getItem("username");
+      if (savedUsername) {
+        setUsername(savedUsername);
+      }
+  }, []);
 
   // 🔽 Function 2: Set Up Voice Recognition
   useEffect(() => {
@@ -114,56 +108,14 @@ useEffect(() => {
       });
   }, []);
   
- // 🔽 Function 4: Fetch Past Journals 
-  const fetchHistory = async (userId) => {
-    if (!userId) {
-      console.warn("No userId found—aborting journal fetch.");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("journals")
-      .select("id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker")
-      .eq("user_id", userId)
-      .order("timestamp", { ascending: false });
-
-    if (error) {
-      console.error("❌ Error fetching journals:", error.message);
-      return;
-    }
-
-    const showAll = true; // Toggle to false if you want to filter entries later
-    const filtered = showAll
-      ? (data || [])
-      : (data || []).filter(entry =>
-          entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
-          entry.debug_marker?.trim() !== ''
-        );
-
-    setHistory(filtered);
-  };
-
-  // ✅ Function 4a: Auth Setup + Journal Fetch
+  // 🔽 Function 4: Auth Setup
   useEffect(() => {
-    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setSession(session);
-        fetchHistory(session.user.id);
-      }
+      setSession(session);
     });
-
-    // Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setSession(session);
-        fetchHistory(session.user.id);
-      } else {
-        setSession(null);
-        setHistory([]);
-      }
+      setSession(session);
     });
-
     return () => {
       listener?.subscription.unsubscribe();
     };
@@ -250,6 +202,53 @@ useEffect(() => {
       setIsProcessing(false);
     }
   };
+   // 🔽 Function 6: Fetch Past Journals
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+      
+    if (error) {
+    console.error("❌ Error fetching history:", error.message);
+    return;
+  }
+
+  // 🔽 Function 6a: Filter Out No Respose, No debug markers 
+
+  const showAll = true; // <== True all entries, False filtered 
+  const filtered = showAll
+    ? (data || [])
+    : (data || []).filter(entry =>
+    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
+    entry.debug_marker?.trim() !== ''
+  );
+  // console.log("📜 Filtered journal history:", filtered);  // <== Enable if False 
+  setHistory(filtered);
+};
+
+  useEffect(() => {
+    if (session) fetchHistory();
+  }, [session]);
+
+  // 🔽 UI State Routing
+  if (!session && !showLogin) {
+    return <LandingPage onStart={() => setShowLogin(true)} />;
+  }
+
+  if (!session) {
+    return (
+      <LoginPage
+        onAuthSuccess={(session, username) => {
+          setSession(session);
+          setUsername(username);
+        }}
+      />
+    );
+  }
 
 // 🔽 Function 7: Generate Handoff Summaries  
 
@@ -325,17 +324,7 @@ return (
         overflowY: 'auto'
       }}>
         <div style={{ maxWidth: '600px', width: '90%' }}>
-        <div style={{ marginBottom: '1rem' }}>
-        <h2 style={{ marginBottom: '0.2rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
-        <p style={{
-          fontSize: '0.85rem',
-          color: '#888',
-          fontStyle: 'italic',
-          margin: 0
-        }}>
-          beta testing version — feedback welcome
-        </p>
-      </div>
+          <h2 style={{ marginBottom: '0.8rem', fontSize: '1.6rem' }}>🪞 Welcome to Cognitive Mirror</h2>
           <p style={{ fontSize: '1rem', marginBottom: '0.8rem' }}>
             <strong>This isn’t a chatbot.</strong><br />
             It’s a place to hear yourself — and be challenged.
@@ -443,17 +432,7 @@ return (
       <div className="chat-container background-option-1">
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-      <h1 style={{ marginBottom: '0.2rem' }}>Cognitive Mirror</h1>
-      <p style={{
-        fontSize: '0.85rem',
-        color: '#888',
-        fontStyle: 'italic',
-        margin: 0
-      }}>
-        beta testing version — feedback welcome
-      </p>
-    </div>
+          <h1>Cognitive Mirror</h1>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
             <button onClick={async () => {
@@ -506,15 +485,13 @@ return (
         </div>
 
         {/* Timeline */}
-        {session?.user?.id && (
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            <JournalTimeline
-              userId={session.user.id}
-              refreshTrigger={refreshTrigger}
-              styleVariant={styleVariant}
-            />
-          </div>
-        )}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <JournalTimeline
+            userId={session?.user?.id}
+            refreshTrigger={refreshTrigger}
+            styleVariant={styleVariant}
+          />
+        </div>
 
         {/* Tone Picker */}
         <div style={{
