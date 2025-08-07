@@ -82,12 +82,13 @@
 }
 
 .mirror-emoji {
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
-  font-size: 1.4rem;
-  margin-right: 0.4rem;
-  vertical-align: middle;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji' !important;
+  font-size: 1.6rem;
   line-height: 1;
+  margin-right: 0.5rem;
   display: inline-block;
+  vertical-align: middle;
+}
 }
 
 @keyframes mirrorPopIn {
