@@ -367,7 +367,17 @@ return (
       <div className="chat-container background-option-1">
         {/* Header with Logout + Summary */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>Cognitive Mirror</h1>
+        <div>
+      <h1 style={{ marginBottom: '0.2rem' }}>Cognitive Mirror</h1>
+      <p style={{
+        fontSize: '0.85rem',
+        color: '#888',
+        fontStyle: 'italic',
+        margin: 0
+      }}>
+        beta testing version — feedback welcome
+      </p>
+    </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
             <button onClick={async () => {
@@ -376,7 +386,6 @@ return (
             }}>Log Out</button>
           </div>
         </div>
-
         {/* Sticky Input Bar */}
         <div className="reflection-input-container" style={{ position: 'fixed', bottom: '70px', left: 0, right: 0, zIndex: 999 }}>
           <textarea
