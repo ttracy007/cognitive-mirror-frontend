@@ -102,14 +102,12 @@ useEffect(() => {
 }, [insightTheme, userId]);
   
 useEffect(() => {
-  if (!userId) return; // Wait until userId is available
-
   const fetchJournals = async () => {
     setLoading(true);
 
     const { data, error } = await supabase
       .from('journals')
-      .select('*')
+      .select('*')  // ✅ Include all fields for flexibility
       .eq('user_id', userId)
       .order('timestamp', { ascending: false });
 
@@ -120,12 +118,13 @@ useEffect(() => {
     }
 
     setJournalEntries(data || []);
-    console.log('✅ journalEntries populated:', data);
+    console.log('✅ journalEntries populated:', data); // Add this
     setLoading(false);
   };
 
   fetchJournals();
 }, [userId, refreshTrigger]);
+
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
