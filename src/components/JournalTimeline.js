@@ -102,12 +102,17 @@ useEffect(() => {
 }, [insightTheme, userId]);
   
 useEffect(() => {
-  const fetchJournals = async () => {
+  const fetchJournals = async (userId) => {
+    if (!userId) {
+      console.warn('⚠️ No userId provided to fetchJournals');
+      return;
+    }
+
     setLoading(true);
 
     const { data, error } = await supabase
       .from('journals')
-      .select('*')  // ✅ Include all fields for flexibility
+      .select('*')
       .eq('user_id', userId)
       .order('timestamp', { ascending: false });
 
@@ -118,11 +123,11 @@ useEffect(() => {
     }
 
     setJournalEntries(data || []);
-    console.log('✅ journalEntries populated:', data); // Add this
+    console.log('✅ journalEntries populated:', data);
     setLoading(false);
   };
 
-  fetchJournals();
+  fetchJournals(userId); // ✅ PASS userId here
 }, [userId, refreshTrigger]);
 
   useEffect(() => {
