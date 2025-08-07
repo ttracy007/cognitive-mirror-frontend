@@ -23,7 +23,7 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const prompts = ["What’s shakkng sugar?"];
+  const prompts = ["What’s shaking sugar?"];
   const [showGroupedView, setShowGroupedView] = useState(false);
   const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
     prompts[Math.floor(Math.random() * prompts.length)] 
