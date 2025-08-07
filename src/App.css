@@ -86,6 +86,12 @@
   vertical-align: middle;
 }
 
+.mirror-emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", sans-serif;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
 @keyframes mirrorPopIn {
   0% {
     opacity: 0;
