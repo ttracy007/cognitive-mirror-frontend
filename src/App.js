@@ -4,8 +4,8 @@ import SummaryViewer from './SummaryViewer';
 import { supabase } from './supabaseClient';
 import './App.css';
 // import DemoSofia from './pages/DemoSofia';
-import LandingPage from './LandingPage';
-import LoginPage from './LoginPage';
+// import LandingPage from './LandingPage';
+// import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
