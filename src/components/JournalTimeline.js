@@ -102,7 +102,7 @@ useEffect(() => {
 }, [insightTheme, userId]);
   
 useEffect(() => {
-  const fetchJournals = async (userId) => {
+  const fetchJournals = async () => {
     if (!userId) {
       console.warn('⚠️ No userId provided to fetchJournals');
       return;
