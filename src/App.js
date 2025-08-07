@@ -506,13 +506,15 @@ return (
         </div>
 
         {/* Timeline */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <JournalTimeline
-            userId={session?.user?.id}
-            refreshTrigger={refreshTrigger}
-            styleVariant={styleVariant}
-          />
-        </div>
+        {session?.user?.id && (
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <JournalTimeline
+              userId={session.user.id}
+              refreshTrigger={refreshTrigger}
+              styleVariant={styleVariant}
+            />
+          </div>
+        )}
 
         {/* Tone Picker */}
         <div style={{
