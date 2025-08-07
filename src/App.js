@@ -417,8 +417,9 @@ return (
             placeholder={placeholderPrompt}
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
-          
+
         {/* Buttons below input */}
+        
         <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
           <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
           <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
@@ -428,15 +429,15 @@ return (
             onClick={handlePatternInsight}
             onMouseEnter={() => setTooltipVisible('pattern')}
             onMouseLeave={() => setTooltipVisible(null)}
-          >
+                  >
             🧭 See Pattern Insight
-          </button>
+            </button>
 
-          <button
-            onClick={() => setShowSummary(true)}
-            onMouseEnter={() => setTooltipVisible('therapist')}
-            onMouseLeave={() => setTooltipVisible(null)}
-          >
+              <button
+                onClick={() => setShowSummary(true)}
+                onMouseEnter={() => setTooltipVisible('therapist')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
             🩺 Therapist Summary
           </button>
 
