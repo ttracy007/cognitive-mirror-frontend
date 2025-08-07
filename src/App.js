@@ -394,7 +394,6 @@ return (
       </div>
     </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => setShowSummary(true)}>Generate Handoff Summaries</button>
             <button onClick={async () => {
               await supabase.auth.signOut();
               setSession(null);
@@ -419,28 +418,44 @@ return (
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
           {/* Buttons below input */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
-            <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
-            <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
-            <button
-              onClick={handlePatternInsight}
-              onMouseEnter={() => setTooltipVisible(true)}
-              onMouseLeave={() => setTooltipVisible(false)}
-            >
-              🧭 See Pattern Insight
-            </button>
-            {tooltipVisible && (
-              <div style={{
-                position: 'absolute', top: '-2.5rem', left: '50%', transform: 'translateX(-50%)',
-                backgroundColor: '#333', color: '#fff', padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem'
-              }}>
-                Generates a unified insight based on your recent themes, topics, and emotional loops.
-              </div>
-            )}
-            {isListening && <span>🎧 Listening…</span>}
-            {isProcessing && <div>Mirror is thinking<span className="dots"></span></div>}
-          </div>
+        <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
+          <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
+          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+          <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
+
+          <button
+            onClick={handlePatternInsight}
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+          >
+            🧭 See Pattern Insight
+          </button>
+
+          <button onClick={() => setShowSummary(true)}>
+            🩺 Therapist Summary
+          </button>
+
+          {tooltipVisible && (
+            <div style={{
+              position: 'absolute',
+              top: '-2.5rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#333',
+              color: '#fff',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              whiteSpace: 'nowrap'
+            }}>
+              Generates a unified insight based on your recent themes, topics, and emotional loops.
+            </div>
+          )}
+
+          {isListening && <span>🎧 Listening…</span>}
+          {isProcessing && <div>Mirror is thinking<span className="dots"></span></div>}
+        </div>
+        
         </div>
 
         {/* Timeline */}
