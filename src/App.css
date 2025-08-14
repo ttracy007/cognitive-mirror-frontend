@@ -102,3 +102,45 @@
     transform: translateY(0);
   }
 }
+
+/* === Voice & toolbar spacing + mood button (Aug-14) === */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap; /* prevents crowding on small screens */
+}
+
+.voice-group {
+  display: inline-block;
+  min-width: 260px;
+  max-width: 320px;
+}
+
+.voice-select {
+  width: 100%;
+  padding: 0.3rem;          /* smaller, less “tall” */
+}
+
+.tone-description {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.35;
+}
+
+.btn-mood {
+  margin-left: 6px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.btn-mood:hover { background: #f6f6f6; }
+
+@media (max-width: 560px) {
+  .voice-group { min-width: 220px; max-width: 260px; }
+  .tone-description { font-size: 0.85rem; }
+}
