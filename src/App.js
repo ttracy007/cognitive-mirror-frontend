@@ -474,6 +474,29 @@ return (
             </div>
           )}
 
+          {/* NEW: Mood Tracker right next to Therapist Summary */}
+            <button className="btn-mood" onClick={handleOpenMoodTracker}>📊 Mood Tracker</button>
+
+          {tooltipVisible && (
+            <div className="cmTooltip"
+              style={{
+                position: 'absolute',
+                top: '-2.5rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: '#333',
+                color: '#fff',
+                padding: '0.4rem 0.6rem',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Generates a unified insight based on your recent themes, topics, and emotional loops.
+            </div>
+          )}
+
+
           {isListening && <span>🎧 Listening…</span>}
           {isProcessing && <div>Mirror is thinking<span className="dots"></span></div>}
         </div>
