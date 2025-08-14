@@ -21,6 +21,18 @@
   padding: 1rem;
 }
 
+/* ✅ Override texture for reflection input area */
+.reflection-input-container {
+  max-width: 640px;
+  /* margin: 1.5rem auto; */
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.6); /* soft transparent white */
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(6px);
+}
+
 /* === Toolbar layout & cosmetics (App.css) === */
 
 /* Container for the button row + voice cluster */
@@ -79,19 +91,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-
-/* ✅ Override texture for reflection input area */
-.reflection-input-container {
-  max-width: 640px;
-  /* margin: 1.5rem auto; */
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.6); /* soft transparent white */
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(6px);
 }
 
 /* Scrollable history area */
@@ -163,43 +162,6 @@
     transform: translateY(0);
   }
 }
-
-/* === Voice & toolbar spacing + mood button (Aug-14) === */
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap; /* prevents crowding on small screens */
-}
-
-.voice-group {
-  display: inline-block;
-  min-width: 260px;
-  max-width: 320px;
-}
-
-.voice-select {
-  width: 100%;
-  padding: 0.3rem;          /* smaller, less “tall” */
-}
-
-.tone-description {
-  margin-top: 0.35rem;
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.35;
-}
-
-.btn-mood {
-  margin-left: 6px;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.9rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-.btn-mood:hover { background: #f6f6f6; }
 
 @media (max-width: 560px) {
   .voice-group { min-width: 220px; max-width: 260px; }
