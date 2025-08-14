@@ -95,6 +95,21 @@
   line-height: 1.35;
 }
 
+/* Make the description drop under the select when space is tight */
+.cm-voice {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+  border-left: 1px solid #e6e6e6;
+  padding-left: 12px;
+}
+
+.cm-tone-desc {
+  flex-basis: 100%;   /* forces it to a new line under the select */
+  margin-top: 2px;
+}
+
 /* Scrollable history area */
 .chat-thread {
   flex: 1;
