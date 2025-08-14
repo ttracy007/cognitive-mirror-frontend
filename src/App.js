@@ -560,14 +560,13 @@ return (
               )}
             </div>
 
-            {/* Voice cluster with subtle separation and a narrower select */}
+          {/* Voice cluster with subtle separation and a wider select to fit text */}
             <div
               className="cm-voice"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px 10px',
-                flexWrap: 'wrap',
                 borderLeft: '1px solid #e6e6e6',
                 paddingLeft: 12
               }}
@@ -577,7 +576,7 @@ return (
                 value={forcedTone}
                 onChange={handleToneChange}
                 aria-label="Select voice"
-                style={{ minWidth: 120, maxWidth: 160, padding: '6px 8px' }}
+                style={{ minWidth: 140, maxWidth: 200, padding: '6px 8px' }} // widened
               >
                 <option value="therapist">Clara</option>
                 <option value="marcus">Marcus</option>
@@ -585,9 +584,20 @@ return (
                 <option value="movies">Movies</option>
                 <option value="verena">Verena</option>
               </select>
+            
+              {/* Description now inline and untruncated */}
               <div
                 className="cm-tone-desc"
                 aria-live="polite"
+                style={{
+                  fontSize: '0.85rem',
+                  color: '#555',
+                  lineHeight: 1.35,
+                  whiteSpace: 'nowrap',         // stay on same line
+                  overflow: 'visible',
+                  textOverflow: 'unset',
+                  maxWidth: 'none'              // removes truncation cap
+                }}
               >
                 {toneDescription}
               </div>
