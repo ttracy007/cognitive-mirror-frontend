@@ -14,7 +14,7 @@ const App = () => {
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
   const [forcedTone, setForcedTone] = useState("therapist");
-  const [tooltip, setTooltip] = useState('therapist');
+  const [tooltip, setTooltip] = useState("🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.");
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
@@ -487,10 +487,10 @@ return (
       style={{ padding: '0.3rem' }}
       onMouseOver={(e) => setTooltip(e.target.value)}
       onMouseOut={() => setTooltip(null)}
-    >
-      <option value="frank" title="💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.">Tony</option>
-      <option value="marcus" title="🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.">Marcus</option>
+    >  
       <option value="therapist" title="🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.">Clara</option>
+      <option value="marcus" title="🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.">Marcus</option>
+      <option value="frank" title="💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.">Tony</option>
       <option value="movies" title="🎬 Movies – A movie buff who only speaks through movie metaphors.">Movies</option>
       <option value="verena" title="🌸 Verena – A clarity-driven life coach unphased by self-pity.">Verena</option>
     </select>
