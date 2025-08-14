@@ -450,25 +450,22 @@ return (
         {/* Sticky Input Bar (fixed) */}
         <div
           className="reflection-input-container"
-          
-  
         >
           <textarea
-            rows="3"
-            value={entry}
-            onChange={(e) => setEntry(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (entry.trim() && !isProcessing) {
-                  handleSubmit();
-                }
+          className="reflection-textarea"
+          rows="3"
+          value={entry}
+          onChange={(e) => setEntry(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (entry.trim() && !isProcessing) {
+                handleSubmit();
               }
-            }}
-            placeholder={placeholderPrompt}
-            style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-          />
-
+            }
+          }}
+          placeholder={placeholderPrompt}
+        />
           {/* Toolbar row: all action buttons on one line */}
           <div
             className="cm-toolbar"
