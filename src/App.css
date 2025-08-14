@@ -46,7 +46,8 @@
 }
 
 .reflection-textarea {
-  width: 100%;
+  width: calc(100% - 2rem);
+  margin: 0 auto 0.75rem auto;
   height: 90px; /* fixed height to match button box size */
   padding: 1rem;
   font-size: 1rem;
@@ -55,6 +56,7 @@
   background-color: #fff;
   resize: none; /* disable manual resizing */
   box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* match shadow */
+  display: block; 
 }
 
 /* === Toolbar layout & cosmetics (App.css) === */
