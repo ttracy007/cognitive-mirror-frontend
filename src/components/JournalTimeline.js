@@ -188,7 +188,7 @@ return (
     ref={timelineRef}
     style={{
       padding: '1rem',
-      paddingBottom: '8rem', // More padding to prevent input overlap
+      paddingBottom: '16rem', // More padding to prevent input overlap
       overflowY: 'auto',
       maxHeight: 'calc(100vh - 12rem)' // Adjust depending on header/footer height
     }}
