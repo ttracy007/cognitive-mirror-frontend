@@ -9,11 +9,32 @@ import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
 const App = () => {
+
+  // --- Tone descriptions map ---
+  const toneDescriptions = {
+    therapist: "🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.",
+    marcus: "🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.",
+    frank: "💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.",
+    movies: "🎬 Movies – A movie buff who only speaks through movie metaphors.",
+    verena: "🌸 Verena – A clarity-driven life coach unphased by self-pity."
+  };
+
+  // Default to Clara
+  const [forcedTone, setForcedTone] = useState("therapist");
+  // Keep a visible description bound to the current selection
+  const [toneDescription, setToneDescription] = useState(toneDescriptions["therapist"]);
+
+  const handleToneChange = (e) => {
+    const val = e.target.value;
+    setForcedTone(val);
+    setToneDescription(toneDescriptions[val] || "");
+  };
+
+  // 🔽 Existing states (no change to their order beyond moving forcedTone here)
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
-  const [forcedTone, setForcedTone] = useState("therapist");
   const [tooltip, setTooltip] = useState("🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.");
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -479,22 +500,36 @@ return (
   borderRadius: '8px',
   zIndex: 999
 }}>
-  <label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-  <div style={{ position: 'relative', display: 'inline-block' }}>
-    <select
-      value={forcedTone}
-      onChange={(e) => setForcedTone(e.target.value)}
-      style={{ padding: '0.3rem' }}
-      onMouseOver={(e) => setTooltip(e.target.value)}
-      onMouseOut={() => setTooltip(null)}
-    >  
-      <option value="therapist" title="🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.">Clara</option>
-      <option value="marcus" title="🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.">Marcus</option>
-      <option value="frank" title="💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.">Tony</option>
-      <option value="movies" title="🎬 Movies – A movie buff who only speaks through movie metaphors.">Movies</option>
-      <option value="verena" title="🌸 Verena – A clarity-driven life coach unphased by self-pity.">Verena</option>
-    </select>
+ {/* --- in your JSX where the Voice control lives --- */}
+<label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
+
+<div style={{ display: 'inline-block', minWidth: 260 }}>
+  <select
+    value={forcedTone}
+    onChange={handleToneChange}
+    style={{ padding: '0.3rem', width: '100%' }}
+    aria-label="Select voice"
+  >
+    <option value="therapist">Clara</option>
+    <option value="marcus">Marcus</option>
+    <option value="frank">Tony</option>
+    <option value="movies">Movies</option>
+    <option value="verena">Verena</option>
+  </select>
+
+  {/* Always-visible, auto-updating description */}
+  <div
+    style={{
+      marginTop: '0.35rem',
+      fontSize: '0.9rem',
+      color: '#555',
+      lineHeight: 1.35
+    }}
+    aria-live="polite"
+  >
+    {toneDescription}
   </div>
+</div>
 </div>
         {/* Summary Viewer */}
         {showSummary && (
