@@ -21,6 +21,67 @@
   padding: 1rem;
 }
 
+/* === Toolbar layout & cosmetics (App.css) === */
+
+/* Container for the button row + voice cluster */
+.cm-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;            /* row-gap column-gap */
+  padding: 6px 10px;
+  background: #f2f2f2;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+}
+
+/* Action buttons row */
+.cm-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  position: relative;       /* anchors the shared tooltip */
+}
+
+/* Consistent button look */
+.cm-btn {
+  background: #ececec;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.cm-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* Voice block with gentle separation */
+.cm-voice {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+  border-left: 1px solid #e6e6e6;  /* visual separator from actions */
+  padding-left: 12px;
+}
+
+/* Narrower select for Clara */
+.cm-voice select {
+  min-width: 120px;
+  max-width: 160px;
+  padding: 6px 8px;
+}
+
+/* Tone description stays subtle and doesn’t shove layout */
+.cm-tone-desc {
+  font-size: 0.85rem;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 /* ✅ Override texture for reflection input area */
 .reflection-input-container {
   max-width: 640px;
