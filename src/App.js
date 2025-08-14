@@ -52,7 +52,7 @@ const App = () => {
   );
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   let transcriptBuffer = '';
-  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(null); // 'pattern' | 'therapist' | 'mood' | null
   const [styleVariant, setStyleVariant] = useState("D")
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeStep, setWelcomeStep] =useState(1);
@@ -326,107 +326,132 @@ const App = () => {
         };
     }
   };
+
+    // Centralize tooltip copy in one place
+    const TOOLTIP_TEXT = {
+      pattern: "Generates a unified insight based on your recent themes, topics, and emotional loops.",
+      therapist: "A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.",
+      mood: "Visualizes your emotional trends over time. Coming soon."
+    };
+
 // 🔽 UI Rendering
 return (
   <>
     {/* Step 1: Voice Introduction + Begin */}
-{showWelcome && welcomeStep === 1 && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    zIndex: 1000,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    padding: '2rem',
-    textAlign: 'center',
-    fontFamily: 'sans-serif',
-    overflowY: 'auto'
-  }}>
-    <div style={{ maxWidth: '700px', width: '90%' }}>
-      <h2 style={{ marginBottom: '1rem', fontSize: '1.6rem' }}>✨ Choose Your Companion</h2>
-      <ul style={{ textAlign: 'left', fontSize: '1rem', marginBottom: '2rem' }}>
-        <li style={{ marginBottom: '1rem' }}>
-          <b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.
-        </li>
-        <li style={{ marginBottom: '1rem' }}>
-          <b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. If inspired he may quote from his own journal, <i>Meditations</i>.
-        </li>
-        <li style={{ marginBottom: '1rem' }}>
-          <b>🩺 Clara</b> – A warm, grounded therapist who sees the pattern beneath the panic.
-        </li>
-        <li style={{ marginBottom: '1rem' }}>
-          <b>🎬 Movie Metaphor Man</b> – Only thinks in movie metaphors—no matter what you say. Your problems are part of the hero's journey.
-        </li>
-        <li style={{ marginBottom: '1.5rem' }}>
-          <b>🌸 Verena</b> – Verena is a clarity-driven career coach who helps you stop spinning your wheels and start building something real.
-        </li>
-      </ul>
+    {showWelcome && welcomeStep === 1 && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(255,255,255,0.96)',
+          zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          padding: '2rem',
+          textAlign: 'center',
+          fontFamily: 'sans-serif',
+          overflowY: 'auto'
+        }}
+      >
+        <div style={{ maxWidth: '700px', width: '90%' }}>
+          <h2 style={{ marginBottom: '1rem', fontSize: '1.6rem' }}>✨ Choose Your Companion</h2>
+          <ul style={{ textAlign: 'left', fontSize: '1rem', marginBottom: '2rem' }}>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. If inspired he may quote from his own journal, <i>Meditations</i>.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🩺 Clara</b> – A warm, grounded therapist who sees the pattern beneath the panic.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🎬 Movie Metaphor Man</b> – Only thinks in movie metaphors—no matter what you say. Your problems are part of the hero's journey.
+            </li>
+            <li style={{ marginBottom: '1.5rem' }}>
+              <b>🌸 Verena</b> – Verena is a clarity-driven career coach who helps you stop spinning your wheels and start building something real.
+            </li>
+          </ul>
 
           <button
-      onClick={() => setShowWelcome(false)}
-      style={{
-        padding: '0.8rem 1.5rem',
-        fontSize: '1rem',
-        borderRadius: '6px',
-        backgroundColor: '#374151',
-        color: '#fff',
-        border: 'none',
-        cursor: 'pointer'
-      }}
-    >
-      Let’s begin →
-    </button>
-    </div>
-  </div>
-)}
+            onClick={() => setShowWelcome(false)}
+            style={{
+              padding: '0.8rem 1.5rem',
+              fontSize: '1rem',
+              borderRadius: '6px',
+              backgroundColor: '#374151',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Let’s begin →
+          </button>
+        </div>
+      </div>
+    )}
 
-  
     {/* MAIN APP INTERFACE — Only render when welcome is dismissed */}
     {!showWelcome && (
       <div className="chat-container background-option-1">
-        {/* Header with Logout + Summary */}
+        {/* Header with Logout */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-      <h1 style={{
-        marginBottom: '0.3rem',
-        fontSize: '1.8rem',
-        fontWeight: 600,
-        letterSpacing: '0.5px',
-        color: '#1a1a1a',
-        fontFamily: 'Georgia, serif',
-        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-      }}>
-        <span className="mirror-emoji" role="img" aria-label="mirror">🪞</span> Cognitive Mirror
-      </h1>
+          <div>
+            <h1
+              style={{
+                marginBottom: '0.3rem',
+                fontSize: '1.8rem',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                color: '#1a1a1a',
+                fontFamily: 'Georgia, serif',
+                textShadow: '0 1px 1px rgba(0,0,0,0.1)'
+              }}
+            >
+              <span className="mirror-emoji" role="img" aria-label="mirror">
+                🪞
+              </span>{' '}
+              Cognitive Mirror
+            </h1>
 
-      <div style={{
-        display: 'inline-block',
-        padding: '0.2rem 0.6rem',
-        fontSize: '0.75rem',
-        color: '#555',
-        backgroundColor: '#f5f5f5',
-        border: '1px solid #ddd',
-        borderRadius: '6px',
-        fontStyle: 'italic'
-      }}>
-        beta testing — feedback welcome
-      </div>
-    </div>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '0.2rem 0.6rem',
+                fontSize: '0.75rem',
+                color: '#555',
+                backgroundColor: '#f5f5f5',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontStyle: 'italic'
+              }}
+            >
+              beta testing — feedback welcome
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={async () => {
-              await supabase.auth.signOut();
-              setSession(null);
-            }}>Log Out</button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                setSession(null);
+              }}
+            >
+              Log Out
+            </button>
           </div>
         </div>
-        {/* Sticky Input Bar */}
-        <div className="reflection-input-container" style={{ position: 'fixed', bottom: '70px', left: 0, right: 0, zIndex: 999 }}>
+
+        {/* Sticky Input Bar (fixed) */}
+        <div
+          className="reflection-input-container"
+          style={{ position: 'fixed', bottom: '70px', left: 0, right: 0, zIndex: 999 }}
+        >
           <textarea
             rows="3"
             value={entry}
@@ -442,122 +467,148 @@ return (
             placeholder={placeholderPrompt}
             style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
           />
-          {/* Buttons below input */}
-        <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
-          {/* <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
-          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button> */}
-          
-          <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
 
-          <button
-            onClick={handlePatternInsight}
-            onMouseEnter={() => setTooltipVisible(true)}
-            onMouseLeave={() => setTooltipVisible(false)}
+          {/* Toolbar row: all action buttons on one line */}
+          <div
+            className="cm-toolbar"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '8px 12px',
+              padding: '6px 10px',
+              background: '#f2f2f2',
+              border: '1px solid #e6e6e6',
+              borderRadius: '6px'
+            }}
           >
-            🧭 See Pattern Insight
-          </button>
+            {/* Action buttons (one row) */}
+            <div
+              className="cm-actions"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', position: 'relative' }}
+            >
+              {/* <button className="cm-btn" onClick={startListening} disabled={isListening}>
+                🎙️ Start
+              </button>
+              <button className="cm-btn" onClick={stopListening} disabled={!isListening}>
+                🛑 Stop
+          </button> */}
+          
+              <button className="cm-btn" onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>
+                🧠 Reflect
+              </button>
 
-          <button onClick={() => setShowSummary(true)}>
-            🩺 Therapist Summary
-          </button>
+              <button
+                className="cm-btn"
+                onClick={handlePatternInsight}
+                onMouseEnter={() => setTooltipVisible('pattern')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                🧭 See Pattern Insight
+              </button>
 
-          {tooltipVisible && (
-            <div style={{
-              position: 'absolute',
-              top: '-2.5rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#333',
-              color: '#fff',
-              padding: '0.4rem 0.6rem',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              whiteSpace: 'nowrap'
-            }}>
-              Generates a unified insight based on your recent themes, topics, and emotional loops.
+              <button
+                className="cm-btn"
+                onClick={() => setShowSummary(true)}
+                onMouseEnter={() => setTooltipVisible('therapist')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                🩺 Therapist Summary
+              </button>
+
+              <button
+                className="cm-btn"
+                onClick={handleOpenMoodTracker /* your existing handler */}
+                onMouseEnter={() => setTooltipVisible('mood')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                📊 Mood Tracker
+              </button>
+
+              {/* Shared tooltip renderer for the three buttons */}
+              {tooltipVisible && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-2.4rem',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#333',
+                    color: '#fff',
+                    padding: '0.4rem 0.6rem',
+                    borderRadius: 6,
+                    fontSize: '0.75rem',
+                    whiteSpace: 'nowrap',
+                    zIndex: 20,
+                    pointerEvents: 'none'
+                  }}
+                >
+                  {tooltipVisible === 'pattern' &&
+                    'Generates a unified insight based on your recent themes, topics, and emotional loops.'}
+                  {tooltipVisible === 'therapist' &&
+                    'A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.'}
+                  {tooltipVisible === 'mood' && 'Visualizes your emotional trends over time. Coming soon.'}
+                </div>
+              )}
+
+              {isListening && <span>🎧 Listening…</span>}
+              {isProcessing && (
+                <div>
+                  Mirror is thinking<span className="dots"></span>
+                </div>
+              )}
             </div>
-          )}
 
-          {/* NEW: Mood Tracker right next to Therapist Summary */}
-            <button className="btn-mood" onClick={handleOpenMoodTracker}>📊 Mood Tracker</button>
-
-          {tooltipVisible && (
-            <div className="cmTooltip"
+            {/* Voice cluster with subtle separation and a narrower select */}
+            <div
+              className="cm-voice"
               style={{
-                position: 'absolute',
-                top: '-2.5rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: '#333',
-                color: '#fff',
-                padding: '0.4rem 0.6rem',
-                borderRadius: '6px',
-                fontSize: '0.75rem',
-                whiteSpace: 'nowrap'
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px 10px',
+                flexWrap: 'wrap',
+                borderLeft: '1px solid #e6e6e6',
+                paddingLeft: 12
               }}
             >
-              Generates a unified insight based on your recent themes, topics, and emotional loops.
+              <label style={{ marginRight: '0.35rem' }}>🗣️ Voice:</label>
+              <select
+                value={forcedTone}
+                onChange={handleToneChange}
+                aria-label="Select voice"
+                style={{ minWidth: 120, maxWidth: 160, padding: '6px 8px' }}
+              >
+                <option value="therapist">Clara</option>
+                <option value="marcus">Marcus</option>
+                <option value="frank">Tony</option>
+                <option value="movies">Movies</option>
+                <option value="verena">Verena</option>
+              </select>
+              <div
+                className="cm-tone-desc"
+                aria-live="polite"
+                style={{
+                  fontSize: '0.85rem',
+                  color: '#555',
+                  maxWidth: 300,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {toneDescription}
+              </div>
             </div>
-          )}
-
-
-          {isListening && <span>🎧 Listening…</span>}
-          {isProcessing && <div>Mirror is thinking<span className="dots"></span></div>}
+          </div>
+          {/* END toolbar */}
         </div>
-        
-        </div>
+        {/* END fixed input container */}
 
-        {/* Timeline */}
+        {/* Timeline (outside the fixed container) */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          <JournalTimeline
-            userId={session?.user?.id}
-            refreshTrigger={refreshTrigger}
-            styleVariant={styleVariant}
-          />
+          <JournalTimeline userId={session?.user?.id} refreshTrigger={refreshTrigger} styleVariant={styleVariant} />
         </div>
 
-        {/* Tone Picker */}
-        <div style={{
-  position: 'fixed',
-  bottom: '20px',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  backgroundColor: '#f4f4f4',
-  padding: '0.5rem 1rem',
-  borderRadius: '8px',
-  zIndex: 999
-}}>
- {/* --- in your JSX where the Voice control lives --- */}
-<label style={{ marginRight: '0.5rem' }}>🗣️ Voice:</label>
-
-<div style={{ display: 'inline-block', minWidth: 260 }}>
-  <select
-    value={forcedTone}
-    onChange={handleToneChange}
-    style={{ padding: '0.3rem', width: '100%' }}
-    aria-label="Select voice"
-  >
-    <option value="therapist">Clara</option>
-    <option value="marcus">Marcus</option>
-    <option value="frank">Tony</option>
-    <option value="movies">Movies</option>
-    <option value="verena">Verena</option>
-  </select>
-
-  {/* Always-visible, auto-updating description */}
-  <div
-    style={{
-      marginTop: '0.35rem',
-      fontSize: '0.9rem',
-      color: '#555',
-      lineHeight: 1.35
-    }}
-    aria-live="polite"
-  >
-    {toneDescription}
-  </div>
-</div>
-</div>
         {/* Summary Viewer */}
         {showSummary && (
           <div style={{ marginTop: '1rem' }}>
@@ -569,5 +620,4 @@ return (
   </>
 );
 }
-
 export default App;
