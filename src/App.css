@@ -25,7 +25,6 @@
 .reflection-input-container {
   /* positioning */
   position: fixed;
-  height: 90px;  
   left: 0;
   right: 0;
   bottom: 35px;          /* how to control bottom cushion */
