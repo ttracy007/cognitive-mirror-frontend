@@ -27,7 +27,8 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 20px;          /* was 70px; ~1 inch higher */
+  bottom: 35px;          /* how to control bottom cushion */
+  padding-top: 20px      /* how to control top cushion */
   z-index: 999;
 
   /* layout & look */
