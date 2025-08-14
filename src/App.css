@@ -21,16 +21,28 @@
   padding: 1rem;
 }
 
-/* ✅ Override texture for reflection input area */
+/* Sticky input + toolbar container */
 .reflection-input-container {
-  max-width: 640px;
-  /* margin: 1.5rem auto; */
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.6); /* soft transparent white */
+  /* positioning */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 130px;          /* was 70px; ~1 inch higher */
+  z-index: 999;
+
+  /* layout & look */
+  max-width: 640px;       /* keeps the block compact */
+  margin: 0 auto;         /* centers it on the page */
+  padding: 1rem;          /* same interior padding you had */
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(6px);
+}
+
+/* (optional) small screens: nudge a bit closer to the bottom */
+@media (max-width: 560px) {
+  .reflection-input-container { bottom: 100px; }
 }
 
 /* === Toolbar layout & cosmetics (App.css) === */
@@ -91,7 +103,6 @@
   white-space: normal;
   overflow: visible;
   text-overflow: initial;
-  max-width: 100%;
   line-height: 1.35;
 }
 
