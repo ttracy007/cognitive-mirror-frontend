@@ -587,14 +587,6 @@ return (
               <div
                 className="cm-tone-desc"
                 aria-live="polite"
-                style={{
-                  fontSize: '0.85rem',
-                  color: '#555',
-                  maxWidth: 300,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}
               >
                 {toneDescription}
               </div>
