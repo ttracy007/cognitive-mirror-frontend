@@ -57,6 +57,9 @@ const App = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
+  const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const handleOpenMoodTracker = () => setShowMoodTracker(true);
+  const handleCloseMoodTracker = () => setShowMoodTracker(flase);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
