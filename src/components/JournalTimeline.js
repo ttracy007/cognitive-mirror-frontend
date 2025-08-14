@@ -188,7 +188,7 @@ return (
     ref={timelineRef}
     style={{
       padding: '1rem',
-      paddingBottom: '16rem', // More padding to prevent input overlap
+      paddingBottom: '12rem', // HOW TO INCREASE SPACE BETWEEN TOOLBAR AND TIMELINE
       overflowY: 'auto',
       maxHeight: 'calc(100vh - 12rem)' // Adjust depending on header/footer height
     }}
