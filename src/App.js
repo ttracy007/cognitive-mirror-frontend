@@ -444,8 +444,8 @@ return (
           />
           {/* Buttons below input */}
         <div style={{ display: 'flex', gap: '0.5rem', position: 'relative', flexWrap: 'wrap' }}>
-          <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
-          <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
+          // <button onClick={startListening} disabled={isListening}>🎙️ Start</button>
+          // <button onClick={stopListening} disabled={!isListening}>🛑 Stop</button>
           <button onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>🧠 Reflect</button>
 
           <button
