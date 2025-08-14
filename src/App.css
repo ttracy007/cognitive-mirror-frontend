@@ -28,7 +28,7 @@
   left: 0;
   right: 0;
   bottom: 35px;          /* how to control bottom cushion */
-  padding-top: 20px      /* how to control top cushion */
+  padding-top: 20px;      /* how to control top cushion */
   z-index: 999;
 
   /* layout & look */
