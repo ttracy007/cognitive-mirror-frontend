@@ -33,6 +33,66 @@
   backdrop-filter: blur(6px);
 }
 
+/* === Toolbar layout & cosmetics (App.css) === */
+
+/* Container for the button row + voice cluster */
+.cm-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;            /* row-gap column-gap */
+  padding: 6px 10px;
+  background: #f2f2f2;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+}
+
+/* Action buttons row */
+.cm-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  position: relative;       /* anchors the shared tooltip */
+}
+
+/* Consistent button look */
+.cm-btn {
+  background: #ececec;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.cm-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* Voice block with gentle separation */
+.cm-voice {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+  border-left: 1px solid #e6e6e6;  /* visual separator from actions */
+  padding-left: 12px;
+}
+
+/* Narrower select for Clara */
+.cm-voice select {
+  min-width: 120px;
+  max-width: 160px;
+  padding: 6px 8px;
+}
+
+/* Tone description stays subtle and doesn’t shove layout */
+.cm-tone-desc {
+  font-size: 0.85rem;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Scrollable history area */
 .chat-thread {
   flex: 1;
@@ -102,43 +162,6 @@
     transform: translateY(0);
   }
 }
-
-/* === Voice & toolbar spacing + mood button (Aug-14) === */
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap; /* prevents crowding on small screens */
-}
-
-.voice-group {
-  display: inline-block;
-  min-width: 260px;
-  max-width: 320px;
-}
-
-.voice-select {
-  width: 100%;
-  padding: 0.3rem;          /* smaller, less “tall” */
-}
-
-.tone-description {
-  margin-top: 0.35rem;
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.35;
-}
-
-.btn-mood {
-  margin-left: 6px;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.9rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-.btn-mood:hover { background: #f6f6f6; }
 
 @media (max-width: 560px) {
   .voice-group { min-width: 220px; max-width: 260px; }
