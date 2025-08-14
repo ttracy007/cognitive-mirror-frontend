@@ -27,7 +27,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 130px;          /* was 70px; ~1 inch higher */
+  bottom: 35px;          /* was 70px; ~1 inch higher */
   z-index: 999;
 
   /* layout & look */
