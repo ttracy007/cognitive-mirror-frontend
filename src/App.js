@@ -595,7 +595,7 @@ return (
         {/* END fixed input container */}
 
         {/* Timeline (outside the fixed container) */}
-        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 80px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '1rem' }}>
           <JournalTimeline userId={session?.user?.id} refreshTrigger={refreshTrigger} styleVariant={styleVariant} />
         </div>
 
