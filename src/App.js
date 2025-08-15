@@ -556,7 +556,11 @@ return (
               )}
 
               {isListening && <span>🎧 Listening…</span>}
-              {isProcessing && <div className="processing-message">{processingMessage}</div>}
+              {isProcessing && (
+                <div className="processing-message">
+                  ⏳ {toneName(forcedTone)} is thinking<span className="dots"></span>
+                </div>
+              )}
             </div>
 
             {/* Voice cluster with subtle separation and a narrower select */}
