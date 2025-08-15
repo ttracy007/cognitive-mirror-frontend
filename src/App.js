@@ -197,8 +197,11 @@ const App = () => {
   };
 
   // 🔽 Function 5b: Generate Pattern Insight
+  const [processingMessage, setProcessingMessage] = useState("");
+  
   const handlePatternInsight = async () => {
-    setIsProcessing(true); // ⏳ Mirror is thinking...
+    setProcessingMessage(`⏳ ${forcedTone || 'Mirror'} is thinking...`);
+    setIsProcessing(true);
   
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -550,11 +553,7 @@ return (
               )}
 
               {isListening && <span>🎧 Listening…</span>}
-              {isProcessing && (
-                <div>
-                  Mirror is thinking<span className="dots"></span>
-                </div>
-              )}
+              {isProcessing && <div className="processing-message">{processingMessage}</div>}
             </div>
 
             {/* Voice cluster with subtle separation and a narrower select */}
