@@ -30,6 +30,9 @@ const App = () => {
     setToneDescription(toneDescriptions[val] || "");
   };
 
+  const toneName = (t) =>
+  ({ therapist: 'Clara', marcus: 'Marcus', frank: 'Tony', movies: 'Movies', verena: 'Verena' }[t] || 'Mirror');
+
   // 🔽 Existing states (no change to their order beyond moving forcedTone here)
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState(null);
@@ -147,14 +150,15 @@ const App = () => {
   }, []);
 
   // 🔽 Function 5: Submit New Journal Entry
-  const handleSubmit = async () => {
-        console.warn("🧪 handleSubmit called!");
+   const handleSubmit = async () => {
+    console.warn("🧪 handleSubmit called!");
     const user = session?.user;
     if (!user || !entry.trim()) return;
-    
-    
-    
+  
+    setProcessingMessage(`⏳ ${getToneName(forcedTone)} is thinking...`); // ← add this
     setIsProcessing(true);
+    ...
+  }
 
     if (!username || username.trim() === "") {
       console.warn("Username is missing-aborting submission.");
@@ -200,7 +204,7 @@ const App = () => {
   const [processingMessage, setProcessingMessage] = useState("");
   
   const handlePatternInsight = async () => {
-    setProcessingMessage(`⏳ ${forcedTone || 'Mirror'} is thinking...`);
+    setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
     setIsProcessing(true);
   
     try {
