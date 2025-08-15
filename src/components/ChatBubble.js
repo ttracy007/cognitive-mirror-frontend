@@ -95,9 +95,13 @@ return (
         <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>
         )}
       {entry.response_text && (
-        entry.response_text.split('\n').map((para, idx) => (
-          <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
-        ))
+        <>
+          {entry.response_text.split('\n').map((para, idx) => (
+            <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
+          ))}
+          {/* Feedback (AI replies only) */}
+          <FeedbackBar journalId={entry.id} />
+        </>
       )}
 
       {/* Timestamp */}
