@@ -210,3 +210,24 @@
   .voice-group { min-width: 220px; max-width: 260px; }
   .tone-description { font-size: 0.85rem; }
 }
+
+.cm-feedbackBlock {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px dashed #c8d1e0;
+  background: #f9fbff;
+  border-radius: 8px;
+}
+
+.cm-feedbackLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: #5b6b92;
+  margin-bottom: 6px;
+}
+
+/* optional: slightly smaller controls inside the block */
+.cm-feedbackBlock .cm-btn { font-size: 0.9rem; }
+.cm-feedbackBlock input { font-size: 0.9rem; }
