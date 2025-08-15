@@ -149,63 +149,56 @@ const App = () => {
     };
   }, []);
 
- // 🔽 Function 5: Submit New Journal Entry
-const handleSubmit = async () => {
-  console.warn("🧪 handleSubmit called!");
+  // 🔽 Function 5: Submit New Journal Entry
+  const handleSubmit = async () => {
+        console.warn("🧪 handleSubmit called!");
+    const user = session?.user;
+    if (!user || !entry.trim()) return;
+    
+    setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
+    setIsProcessing(true);
 
-  const user = session?.user;
-  if (!user || !entry.trim()) return;
+    if (!username || username.trim() === "") {
+      console.warn("Username is missing-aborting submission.");
+      alert("Username is missing-please refresh or log in again.");
+      setIsProcessing(false);
+      return;
+    }
 
-  setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
-  setIsProcessing(true);
-
-  if (!username || username.trim() === "") {
-    console.warn("Username is missing—aborting submission.");
-    alert("Username is missing — please refresh or log in again.");
-    setIsProcessing(false);
-    return;
-  }
-
-  try {
     const debug_marker = Math.random().toString(36).substring(2, 8);
-
+    
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
 
     console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
 
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/journal-entry`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          entry_text: entry,
-          tone_mode: forcedTone,
-          username,
-          user_id: userId,
-          debug_marker,
-        }),
-      }
-    );
-
+    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        entry_text: entry,
+        tone_mode: forcedTone,
+        username,
+        user_id: userId,
+        debug_marker,
+      }),
+    });
+    
     const data = await res.json();
     const responseText = data.response || 'No response received.';
-    console.log('✅ Submitting journal for user:', username);
-    // do whatever you need with responseText if desired
 
+    console.log('✅ Submitting journal for user:', username);
+    // console.log("💡 Fresh deploy trigger");
+    // console.log("🚨 App.js version: [insert build label or timestamp]");
+    
     setEntry('');
     setParsedTags([]);
     setSeverityLevel('');
-    setTimeout(fetchHistory, 300);
-    setRefreshTrigger(prev => prev + 1);
-  } catch (err) {
-    console.error('❌ handleSubmit failed:', err);
-    alert('Sorry — something went wrong submitting your entry.');
-  } finally {
     setIsProcessing(false);
-  }
-};
+    setTimeout(fetchHistory, 300);
+    setRefreshTrigger(prev => prev +1);
+  };
+  
   // 🔽 Function 5b: Generate Pattern Insight
   const [processingMessage, setProcessingMessage] = useState("");
   
