@@ -30,6 +30,15 @@ export default function FeedbackBar({ journalId }) {
     }
   };
 
+    const key = 'fb_' + journalId;
+      useEffect(() => { if (localStorage.getItem(key)) setSent(true); }, [key]);
+
+    const send = async (rating) => {
+      // ...after success:
+      localStorage.setItem(key, '1');
+      setSent(true);
+    };
+
   return (
     <div style={{display:'flex',gap:8,alignItems:'center',marginTop:6,flexWrap:'wrap'}}>
       <span style={{opacity:.75}}>Was this helpful?</span>
