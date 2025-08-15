@@ -157,7 +157,6 @@ const App = () => {
   
     setProcessingMessage(`⏳ ${getToneName(forcedTone)} is thinking...`); // ← add this
     setIsProcessing(true);
-    ...
   }
 
     if (!username || username.trim() === "") {
