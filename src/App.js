@@ -63,6 +63,7 @@ const App = () => {
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
   const handleCloseMoodTracker = () => setShowMoodTracker(flase);
+  const [showFeedbackAdmin, setShowFeedbackAdmin] = useState(false);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
@@ -546,6 +547,7 @@ return (
                     zIndex: 20,
                     pointerEvents: 'none'
                   }}
+                  
                 >
                   {tooltipVisible === 'pattern' &&
                     'Generates a unified insight based on your recent themes, topics, and emotional loops.'}
@@ -554,6 +556,10 @@ return (
                   {tooltipVisible === 'mood' && 'Visualizes your emotional trends over time. Coming soon.'}
                 </div>
               )}
+
+              <button onClick={() => setShowFeedbackAdmin(v => !v)}>
+                {showFeedbackAdmin ? 'Hide Feedback' : 'Feedback Admin'}
+              </button>
 
               {isListening && <span>🎧 Listening…</span>}
               {isProcessing && (
@@ -609,6 +615,13 @@ return (
         {showSummary && (
           <div style={{ marginTop: '1rem' }}>
             <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+          </div>
+        )}
+
+        {/* Feedback Admin */}
+        {showFeedbackAdmin && (
+          <div style={{marginTop: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: 8}}>
+            <FeedbackReview />
           </div>
         )}
       </div>
