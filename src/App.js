@@ -14,9 +14,12 @@ function FeedbackReview() {
 
   const load = async () => {
     try {
-      const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
+      const url = new URL(${process.env.REACT_APP_BACKEND_URL}/journal-feedback);
       if (rating) url.searchParams.set('rating', rating);
-      const res = await fetch(url.pathname + url.search, { credentials: 'include' });
+      const res = await fetch(url.toString(), {
+        headers: { 'x-service-role-key': process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY || '' },
+        cache: 'no-store'
+      });
       const json = await res.json();
       setItems(json.items || []);
     } catch (e) {
