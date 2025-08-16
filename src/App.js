@@ -12,18 +12,18 @@ function FeedbackReview() {
   const [items, setItems] = useState([]);
   const [rating, setRating] = useState('');
 
-  const load = async () => {
-    try {
-      const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
-      if (rating) url.searchParams.set('rating', rating);
-      const res = await fetch(url.pathname + url.search, { credentials: 'include' });
-      const json = await res.json();
-      setItems(json.items || []);
-    } catch (e) {
-      console.error('Load feedback failed:', e);
-      setItems([]);
-    }
-  };
+  // const load = async () => {
+  //   try {
+  //     const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
+  //     if (rating) url.searchParams.set('rating', rating);
+  //     const res = await fetch(url.pathname + url.search, { credentials: 'include' });
+  //     const json = await res.json();
+  //     setItems(json.items || []);
+  //   } catch (e) {
+  //     console.error('Load feedback failed:', e);
+  //     setItems([]);
+  //   }
+  // };
 
   useEffect(() => { load(); }, [rating]);
 
