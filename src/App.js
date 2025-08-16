@@ -7,37 +7,10 @@ import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
+import FeedbackReviewPanel from './FeedbackReview;
 
-function FeedbackReview() {
-  const [items, setItems] = useState([]);
-  const [rating, setRating] = useState('');
-
-  const load = async () => {
-    try {
-      const url = new URL(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`);
-      if (rating) url.searchParams.set('rating', rating);
-      const res = await fetch(url.toString(), {
-          headers: { 'x-service-role-key': process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY || '' },
-          cache: 'no-store',
-        });
-
-      if (!res.ok) {
-        console.error('Feedback admin fetch failed:', res.status);
-        setItems([]);
-        return;
-      }
-      
-      const json = await res.json();
-      setItems(json.items || []);
-
-    } catch (e) {
-      console.error('Load feedback failed:', e);
-      setItems([]);
-    }
-  };
-
-  useEffect(() => { load(); }, [rating]);
-
+function FeedbackReview() { return <FeedbackReviewPanel />; }
+  
   return (
     <div style={{ padding: 8 }}>
       <h3 style={{ marginTop: 0 }}>Feedback (latest)</h3>
