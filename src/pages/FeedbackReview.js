@@ -4,7 +4,7 @@ export default function FeedbackReview() {
   const [items, setItems] = useState([]);
   const [rating, setRating] = useState('');
   const load = async () => {
-    const url = new URL(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`);
+    const url = new URL(`${process.env.REACT_APP_BACKEND_URL}/admin/feedback`);
     if (rating) url.searchParams.set('rating', rating);
     const res = await fetch(url, {
       headers: { 'x-service-role-key': process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY || ''}
