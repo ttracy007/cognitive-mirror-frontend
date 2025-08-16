@@ -6,7 +6,9 @@ export default function FeedbackReview() {
   const load = async () => {
     const url = new URL(`${process.env.REACT_APP_BACKEND_URL}/admin/feedback`);
     if (rating) url.searchParams.set('rating', rating);
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { 'x-service-role-key': process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY || ''}
+    });
     const json = await res.json();
     setItems(json.items || []);
   };
