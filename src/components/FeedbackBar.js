@@ -7,37 +7,40 @@ export default function FeedbackBar({ journalId }) {
 
   if (sent) return <div style={{opacity:.7, fontSize:'.9rem'}}>Thanks — logged.</div>;
 
-  const send = async (rating) => {
-    try {
-      setBusy(true);
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          journal_id: journalId,
-          rating,                              // 1..5
-          feedback_text: note?.trim() || null  // optional
-        })
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || 'Failed');
-      setSent(true);
-    } catch (e) {
-      console.error('Feedback submit failed:', e);
-      setSent(true); // soft-ack for demo UX
-    } finally {
-      setBusy(false);
-    }
-  };
-
     const key = 'fb_' + journalId;
       useEffect(() => { if (localStorage.getItem(key)) setSent(true); }, [key]);
 
     const send = async (rating) => {
-      // ...after success:
-      localStorage.setItem(key, '1');
-      setSent(true);
+      try {
+        setBusy(true);
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            journal_id: journalId,
+            rating,                              // 1..5
+            feedback_text: note?.trim() || null  // optional
+          })
+        });
+
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error || 'Failed');
+
+        // ✅ Mark as sent locally so it doesn’t reappear
+        localStorage.setItem(key, '1');
+        setSent(true);
+      } catch (e) {
+        console.error('Feedback submit failed:', e);
+        setSent(true); // soft-ack for demo UX
+      } finally {
+        setBusy(false);
+      }
     };
+
+useEffect(() => {
+  if (localStorage.getItem(key)) setSent(true);
+}, [key]);
+
 
   return (
     <div style={{display:'flex',gap:8,alignItems:'center',marginTop:6,flexWrap:'wrap'}}>
