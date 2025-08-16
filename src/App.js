@@ -20,8 +20,16 @@ function FeedbackReview() {
           headers: { 'x-service-role-key': process.env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY || '' },
           cache: 'no-store',
         });
+
+      if (!res.ok) {
+        console.error('Feedback admin fetch failed:', res.status);
+        setItems([]);
+        return;
+      }
+      
       const json = await res.json();
       setItems(json.items || []);
+
     } catch (e) {
       console.error('Load feedback failed:', e);
       setItems([]);
