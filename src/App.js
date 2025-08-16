@@ -1,4 +1,4 @@
-// 🔼 Imports and Setup       
+// 🔼 Imports and Setup      
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
@@ -7,10 +7,26 @@ import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
-import FeedbackReviewPanel from './FeedbackReview';
 
-function FeedbackReview() { return <FeedbackReviewPanel />; }
-  
+function FeedbackReview() {
+  const [items, setItems] = useState([]);
+  const [rating, setRating] = useState('');
+
+  const load = async () => {
+    try {
+      const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
+      if (rating) url.searchParams.set('rating', rating);
+      const res = await fetch(url.pathname + url.search, { credentials: 'include' });
+      const json = await res.json();
+      setItems(json.items || []);
+    } catch (e) {
+      console.error('Load feedback failed:', e);
+      setItems([]);
+    }
+  };
+
+  useEffect(() => { load(); }, [rating]);
+
   return (
     <div style={{ padding: 8 }}>
       <h3 style={{ marginTop: 0 }}>Feedback (latest)</h3>
