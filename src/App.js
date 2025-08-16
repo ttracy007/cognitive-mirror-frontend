@@ -7,7 +7,7 @@ import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
-import FeedbackReviewPanel from './FeedbackReview;
+import FeedbackReviewPanel from './FeedbackReview';
 
 function FeedbackReview() { return <FeedbackReviewPanel />; }
   
