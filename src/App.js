@@ -62,8 +62,8 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
-  const handleCloseMoodTracker = () => setShowMoodTracker(flase);
-  const [showFeedbackAdmin, setShowFeedbackAdmin] = useState(false);
+  const handleCloseMoodTracker = () => setShowMoodTracker(false);
+  const [showFeedbackAdmin, setShowFeedbackAdmin] = useState(true);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
