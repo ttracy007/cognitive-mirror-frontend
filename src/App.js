@@ -25,7 +25,7 @@ function FeedbackReview() {
     }
   };
 
-  useEffect(() => { load(); }, [rating]);
+  // useEffect(() => { load(); }, [rating]);
 
   return (
     <div style={{ padding: 8 }}>
