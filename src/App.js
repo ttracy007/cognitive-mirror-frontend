@@ -668,12 +668,12 @@ return (
           </div>
         )}
 
-        {/* Feedback Admin */}
-        {showFeedbackAdmin && (
+        {/* // Feedback Admin
+        // {showFeedbackAdmin && (
           <div style={{marginTop: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: 8}}>
             <FeedbackReview />
           </div>
-        )}
+        )} */}
       </div>
     )}
   </>
