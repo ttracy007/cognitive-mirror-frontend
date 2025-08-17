@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';  
+import React, { useState, useEffect } from 'react'; 
 
 export default function FeedbackBar({ journalId }) {
   const [sent, setSent] = useState(false);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (sent) return <div style={{opacity:.7, fontSize:'.9rem'}}>Thanks — logged.</div>;
-
     const key = 'fb_' + journalId;
       useEffect(() => { if (localStorage.getItem(key)) setSent(true); }, [key]);
+
+    if (sent) return <div style={{opacity:.7, fontSize:'.9rem'}}>Thanks — logged.</div>;
 
     const send = async (rating) => {
       try {
