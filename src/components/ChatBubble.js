@@ -1,4 +1,4 @@
-// ChatBubble.js   
+// ChatBubble.js    
 import dayjs from 'dayjs';
 // import FeedbackBar from './FeedbackBar';
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
