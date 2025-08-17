@@ -1,6 +1,6 @@
 // ChatBubble.js   
 import dayjs from 'dayjs';
-import FeedbackBar from './FeedbackBar';
+// import FeedbackBar from './FeedbackBar';
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
