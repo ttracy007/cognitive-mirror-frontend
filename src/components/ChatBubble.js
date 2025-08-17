@@ -1,6 +1,5 @@
 // ChatBubble.js   
 import dayjs from 'dayjs';
-import FeedbackBar from './FeedbackBar';
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
   const isInsight = entry.entry_type === 'insight';
@@ -95,20 +94,11 @@ return (
         <p style={{ marginBottom: '0.5rem' }}>{entry.entry_text}</p>
         )}
       {entry.response_text && (
-        <>
-          {entry.response_text.split('\n').map((para, idx) => (
-            <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
-          ))}
-      
-          {/* Phase 6 — Feedback block (distinct look, still interactive) */}
-          {entry.id && (
-            <div className="cm-feedbackBlock">
-              <div className="cm-feedbackLabel">Feedback on this reply</div>
-              <FeedbackBar journalId={entry.id} />
-            </div>
-          )}
-        </>
+        entry.response_text.split('\n').map((para, idx) => (
+          <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
+        ))
       )}
+
       {/* Timestamp */}
       <div style={{
         fontSize: '0.75rem',
