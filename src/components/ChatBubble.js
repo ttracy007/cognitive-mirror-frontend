@@ -1,7 +1,10 @@
 // ChatBubble.js    
 import dayjs from 'dayjs';
+import FeedbackBar from './FeedbackBar';
+
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
+  const showFeedback = !isUser && !!entry.response_text;
   const isInsight = entry.entry_type === 'insight';
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isUserEntry = !entry.response_text && !isInsight;
@@ -108,6 +111,13 @@ return (
       }}>
         {dayjs(entry.timestamp).format('h:mm A')}
       </div>
+
+        {/* FeedbackBar */}
+        {showFeedback && (
+        <div style={{ marginTop: '6px' }}>
+          <FeedbackBar journalId={entry.id || entry.journal_id} />
+        </div>
+      )}
 
     </div>
   </div>
