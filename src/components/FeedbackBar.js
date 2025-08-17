@@ -36,19 +36,23 @@ export default function FeedbackBar({ journalId }) {
     try {
       setBusy(true);
       const rating = stage === 'up' ? 5 : 1;
+  
+      // ⬇️ REPLACE your current `body` with this:
       const body = {
         journal_id: journalId,
+        user_id: userId || null,                    // pass if available; ok to be null
         rating,
         feedback_text: note?.trim() || null,
+        choice_group: stage === 'up' ? 'pos' : 'neg',// match follow-up set
         choice_key: choice || null
       };
-
+  
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
+  
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
 
