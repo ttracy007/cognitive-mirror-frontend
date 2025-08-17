@@ -1,4 +1,4 @@
-// 🔼 Imports and Setup      
+// 🔼 Imports and Setup       
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import { supabase } from './supabaseClient';
@@ -8,55 +8,55 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 
-// function FeedbackReview() {
-//   const [items, setItems] = useState([]);
-//   const [rating, setRating] = useState('');
+function FeedbackReview() {
+  const [items, setItems] = useState([]);
+  const [rating, setRating] = useState('');
 
-//   const load = async () => {
-//     try {
-//       const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
-//       if (rating) url.searchParams.set('rating', rating);
-//       const res = await fetch(url.pathname + url.search, { credentials: 'include' });
-//       const json = await res.json();
-//       setItems(json.items || []);
-//     } catch (e) {
-//       console.error('Load feedback failed:', e);
-//       setItems([]);
-//     }
-//   };
+  const load = async () => {
+    try {
+      const url = new URL(`${process.env.REACT_APP_BACKEND_URL || ''}/journal-feedback`, window.location.origin);
+      if (rating) url.searchParams.set('rating', rating);
+      const res = await fetch(url.pathname + url.search, { credentials: 'include' });
+      const json = await res.json();
+      setItems(json.items || []);
+    } catch (e) {
+      console.error('Load feedback failed:', e);
+      setItems([]);
+    }
+  };
 
-//   useEffect(() => { load(); }, [rating]);
+  useEffect(() => { load(); }, [rating]);
 
-//   return (
-//     <div style={{ padding: 8 }}>
-//       <h3 style={{ marginTop: 0 }}>Feedback (latest)</h3>
-//       <label style={{ marginRight: 6 }}>Filter rating:</label>
-//       <select value={rating} onChange={e => setRating(e.target.value)}>
-//         <option value="">All</option>
-//         <option value="5">👍 (5)</option>
-//         <option value="1">👎 (1)</option>
-//       </select>
-//       <table style={{ width:'100%', marginTop:12, borderCollapse:'collapse' }}>
-//         <thead><tr>
-//           <th style={{textAlign:'left'}}>When (UTC)</th>
-//           <th>Rating</th>
-//           <th style={{textAlign:'left'}}>Note</th>
-//           <th>Journal</th>
-//         </tr></thead>
-//         <tbody>
-//           {items.map(r => (
-//             <tr key={r.id}>
-//               <td>{new Date(r.created_at).toLocaleString()}</td>
-//               <td style={{textAlign:'center'}}>{r.rating}</td>
-//               <td style={{textAlign:'left'}}>{r.feedback_text || '—'}</td>
-//               <td style={{textAlign:'center'}}>{(r.journal_id || '').slice(0,8)}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
+  return (
+    <div style={{ padding: 8 }}>
+      <h3 style={{ marginTop: 0 }}>Feedback (latest)</h3>
+      <label style={{ marginRight: 6 }}>Filter rating:</label>
+      <select value={rating} onChange={e => setRating(e.target.value)}>
+        <option value="">All</option>
+        <option value="5">👍 (5)</option>
+        <option value="1">👎 (1)</option>
+      </select>
+      <table style={{ width:'100%', marginTop:12, borderCollapse:'collapse' }}>
+        <thead><tr>
+          <th style={{textAlign:'left'}}>When (UTC)</th>
+          <th>Rating</th>
+          <th style={{textAlign:'left'}}>Note</th>
+          <th>Journal</th>
+        </tr></thead>
+        <tbody>
+          {items.map(r => (
+            <tr key={r.id}>
+              <td>{new Date(r.created_at).toLocaleString()}</td>
+              <td style={{textAlign:'center'}}>{r.rating}</td>
+              <td style={{textAlign:'left'}}>{r.feedback_text || '—'}</td>
+              <td style={{textAlign:'center'}}>{(r.journal_id || '').slice(0,8)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 const App = () => {
 
@@ -668,12 +668,12 @@ return (
           </div>
         )}
 
-        {/* // Feedback Admin
-        // {showFeedbackAdmin && (
+        {/* Feedback Admin */}
+        {showFeedbackAdmin && (
           <div style={{marginTop: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: 8}}>
             <FeedbackReview />
           </div>
-        )} */}
+        )}
       </div>
     )}
   </>
