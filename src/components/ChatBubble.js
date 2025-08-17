@@ -100,13 +100,13 @@ return (
             <p key={idx} style={{ marginBottom: '0.5rem' }}>{para}</p>
           ))}
       
-          {/* Phase 6 — Feedback block (distinct look, still interactive) */}
-          {entry.id && (
+    {/* // Phase 6 — Feedback block (distinct look, still interactive) */}
+          {/* // {entry.id && (
             <div className="cm-feedbackBlock">
               <div className="cm-feedbackLabel">Feedback on this reply</div>
               <FeedbackBar journalId={entry.id} />
             </div>
-          )}
+          )} */}
         </>
       )}
       {/* Timestamp */}
