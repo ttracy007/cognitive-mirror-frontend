@@ -115,7 +115,7 @@ return (
         {/* FeedbackBar */}
         {showFeedback && (
         <div style={{ marginTop: '6px' }}>
-          <FeedbackBar journalId={entry.id || entry.journal_id} />
+          <FeedbackBar journalId={entry.id} userId={userId} />
         </div>
       )}
 
