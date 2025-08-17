@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function FeedbackBar({ journalId }) {
+export default function FeedbackBar({ journalId, userID }) {
   const [stage, setStage] = useState('idle'); // 'idle' | 'up' | 'down' | 'sent'
   const [choice, setChoice] = useState('');
   const [note, setNote] = useState('');
