@@ -5,7 +5,8 @@ export default function LandingPage({ onStart }) {
   return (
     <div style={wrap}>
       <div style={card}>
-        <h1 style={h1}>🪞 Cognitive Mirror</h1>
+        <h1 style={h1}>🔎 Cognitive Mirror</h1>
+
 
         {/* What this is */}
         <p style={p}>
