@@ -1,82 +1,73 @@
-// src/pages/LandingPage.js  (replace the main content area)
+// LandingPage.js
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-export default function LandingPage() {
+export default function LandingPage({ onStart }) {
   return (
-    <div className="landing wrap">
-      <header className="landing-hero">
-        <h1 className="brand"><span className="mirror-emoji" aria-hidden> </span> Cognitive Mirror</h1>
-        <p className="beta-chip">🚧 Rough Beta: responses can take up to a minute.</p>
-        <p className="sub">Thanks for helping us test—your reflections and feedback are what make this useful.</p>
-        <div className="cta">
-          <Link to="/login" className="btn btn-primary">Start the Beta</Link>
-        </div>
-      </header>
+    <div style={wrap}>
+      <div style={card}>
+        <h1 style={h1}>🪞 Cognitive Mirror</h1>
 
-      {/* What this is */}
-      <section className="block">
-        <h2>What is this?</h2>
-        <p>
-          Cognitive Mirror is a journaling companion. You paste a thought or situation and it reflects back
-          patterns, questions, or re-frames (not advice). It’s designed to help you see your own mind more clearly.
+        {/* What this is */}
+        <p style={p}>
+          <strong>This isn’t a chatbot.</strong> It’s a fast way to hear yourself—and get a
+          nudge that breaks the loop you’re stuck in.
         </p>
-      </section>
 
-      {/* How to get the most useful entries */}
-      <section className="block">
-        <h2>How to get the most from the beta</h2>
-        <ul className="bullets">
-          <li><strong>Keep entries concrete.</strong> “My manager changed the deadline at 4pm and I froze,” beats “work is stressful.”</li>
-          <li><strong>1–3 sentences is plenty.</strong> You can send more, but short + specific works best.</li>
-          <li><strong>Say what felt at stake.</strong> e.g., “I worried I’d look incompetent.”</li>
-          <li><strong>When a response lands (or misses), rate it.</strong> Use 👍 / ↔ / 👎 and add a short note.</li>
+        {/* How to start */}
+        <h3 style={h3}>How to try it (takes ~30s)</h3>
+        <ol style={ol}>
+          <li>Type one honest thought or problem (1–2 sentences is perfect).</li>
+          <li>Pick a <em>Voice</em> (therapist, stoic, blunt friend, etc.).</li>
+          <li>Click 🧠 <strong>Reflect</strong>. Replies may take up to a minute.</li>
+        </ol>
+
+        {/* What to expect */}
+        <h3 style={h3}>What to expect</h3>
+        <ul style={ul}>
+          <li>It mirrors what you said, names the pattern, and asks a pointed question.</li>
+          <li>Your entries are saved so you can generate a summary later.</li>
+          <li>Use the thumbs to rate the reply—this helps us tune the system.</li>
         </ul>
-      </section>
 
-      {/* Voices preview (read-only on landing; choose inside the app) */}
-      <section className="block">
-        <h2>Choose a voice that fits you</h2>
-        <div className="voices-grid">
-          <div className="voice-card">
-            <div className="title">Clara</div>
-            <div className="desc">Warm, grounded therapist—gentle questions and nervous-system aware.</div>
-          </div>
-          <div className="voice-card">
-            <div className="title">Marcus</div>
-            <div className="desc">Stoic mentor—short, direct, values clarity and action.</div>
-          </div>
-          <div className="voice-card">
-            <div className="title">Movie Metaphor™</div>
-            <div className="desc">Reflects with quick story beats to reframe stakes and momentum.</div>
-          </div>
-        </div>
-        <p className="muted">You’ll be able to switch voices any time inside the app.</p>
-      </section>
-
-      {/* Feedback ask */}
-      <section className="block">
-        <h2>What we’re testing</h2>
-        <ul className="bullets">
-          <li>Did the reflection feel <em>helpful</em> for your specific entry?</li>
-          <li>What part helped: <em>saw a pattern</em>, <em>reframed</em>, <em>actionable next step</em>, or <em>felt seen</em>?</li>
-          <li>If it missed, was it <em>too generic</em>, <em>missed context</em>, <em>patronizing</em>, or <em>too long</em>?</li>
+        {/* Voices */}
+        <h3 style={h3}>Voices you can choose</h3>
+        <ul style={ul}>
+          <li><b>Clara</b> — warm, grounded therapist who spots the loop.</li>
+          <li><b>Marcus</b> — concise Stoic reflection (may quote Meditations).</li>
+          <li><b>Tony</b> — frank, no-BS friend who cuts through noise.</li>
+          <li><b>Movie Metaphor</b> — frames your situation as a scene/arc.</li>
+          <li><b>Verena</b> — clarity-driven career coach for momentum.</li>
         </ul>
-        <p className="muted">Your quick note in the feedback bar is gold for us.</p>
-      </section>
 
-      {/* Privacy + safety */}
-      <section className="block">
-        <h2>Privacy & boundaries</h2>
-        <p className="muted">
-          Please avoid sharing sensitive personal data. Cognitive Mirror is not a crisis service or medical advice.
-          If you’re in immediate danger, contact local emergency services.
-        </p>
-      </section>
+        {/* Best-use tips */}
+        <h3 style={h3}>Tips for best results</h3>
+        <ul style={ul}>
+          <li>Be specific: “I’m dreading Monday because ____.”</li>
+          <li>Name the fear or stake if you can.</li>
+          <li>If a reply misses, rate it and add a short note—tell us why.</li>
+        </ul>
 
-      <footer className="footer">
-        <Link to="/login" className="btn btn-primary">Log in to start</Link>
-      </footer>
+        <button style={cta} onClick={onStart}>Start reflecting →</button>
+        <div style={finePrint}>Rough Beta: responses can take up to a minute.</div>
+      </div>
     </div>
   );
 }
+
+const wrap = {
+  position: 'fixed', inset: 0, zIndex: 1000,
+  background: 'rgba(255,255,255,0.96)',
+  display: 'flex', justifyContent: 'center', alignItems: 'center',
+  padding: '1.25rem', overflowY: 'auto'
+};
+const card = { width: 'min(760px, 92%)', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', color: '#111' };
+const h1 = { margin: '0 0 .6rem', fontSize: '2rem', fontWeight: 700, letterSpacing: '.3px' };
+const h3 = { margin: '1.1rem 0 .5rem', fontSize: '1.05rem' };
+const p  = { margin: '.5rem 0', fontSize: '1rem' };
+const ul = { margin: '.2rem 0 .6rem 1rem', padding: 0, fontSize: '.96rem', lineHeight: 1.45 };
+const ol = { ...ul };
+const cta = {
+  marginTop: '1rem', padding: '.65rem 1rem', fontSize: '.95rem',
+  background: '#1f2937', color: '#fff', border: 0, borderRadius: 8, cursor: 'pointer'
+};
+const finePrint = { marginTop: '.5rem', fontSize: '.85rem', color: '#6b7280', fontStyle: 'italic' };
