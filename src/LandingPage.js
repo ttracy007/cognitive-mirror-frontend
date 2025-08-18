@@ -33,9 +33,9 @@ export default function LandingPage({ onStart }) {
         <h3 style={h3}>Voices you can choose</h3>
         <ul style={ul}>
           <li><b>Clara</b> — warm, grounded therapist who spots the loop.</li>
-          <li><b>Marcus</b> — concise Stoic reflection (may quote Meditations).</li>
-          <li><b>Tony</b> — frank, no-BS friend who cuts through noise.</li>
-          <li><b>Movie Metaphor</b> — frames your situation as a scene/arc.</li>
+          <li><b>Marcus</b> — stoic, Marcus Aurelius (may quote Meditations).</li>
+          <li><b>Tony</b> — frank, no-bullshit friend who always shoots straight.</li>
+          <li><b>Movie Metaphor</b> — sees your situation as a movie metaphor that's been solved before.</li>
           <li><b>Verena</b> — clarity-driven career coach for momentum.</li>
         </ul>
 
