@@ -20,9 +20,10 @@ export default function FeedbackBar({ journalId, userId }) {
 
   const POSITIVE_CHOICES = [
     ['learned_new','Helped me learn something new about myself'],
-    ['reframed_known','Said something I knew, but in a helpful way'],
-    ['saw_pattern','Helped me see a pattern'],
+    ['reframed_known','Said something I already knew, but in an interesting way'],
+    ['great_insight','Revealed a powerful insight'],
     ['decided_next_step','Helped me decide a next step'],
+    ['other', 'Other'],
   ];
   const NEGATIVE_CHOICES = [
     ['missed_point','Missed the point'],
@@ -30,12 +31,24 @@ export default function FeedbackBar({ journalId, userId }) {
     ['tone_off','Tone felt off'],
     ['too_long','Too long / over-explained'],
     ['unsolicited_advice','Gave advice I didn’t ask for'],
+    ['other', 'Other'],
+  ];
+
+  const MIXED_CHOICES = [
+    ['useful_but_generic','Helpful overall, but too generic or broad'],
+    ['right_dir_missed_context','Right direction, missed key context'],
+    ['insight_but_too_long','Insightful, but too long'],
+    ['good_not_timed','Good reflection, but not for this moment'],
+    ['other', 'Other'],
   ];
 
   const submit = async () => {
     try {
       setBusy(true);
-      const rating = stage === 'up' ? 5 : 1;
+      const rating = 
+        stage === 'up' ? 5 :
+        stage === 'down' ? 1:
+        /*mixed */         3;
   
       // ⬇️ REPLACE your current `body` with this:
       const body = {
@@ -43,7 +56,11 @@ export default function FeedbackBar({ journalId, userId }) {
         user_id: userId,
         rating,
         feedback_text: note?.trim() || null,
-        choice_group: stage === 'up' ? 'pos' : 'neg',// match follow-up set
+        choice_group: 
+          stage === 'up'   ? 'pos' :
+          stage === 'down' ? 'neg' :
+                             'mix' ,
+    
         choice_key: choice || null
       };
   
@@ -141,6 +158,12 @@ export default function FeedbackBar({ journalId, userId }) {
             aria-label="Thumbs up"
           >👍</button>
           <button
+            title="Mixed"
+            onClick={() => setStage('mixed')}
+            disabled={busy}
+            aria-label="Half and half"
+          >↔️</button>
+          <button
             title="No"
             onClick={() => setStage('down')}
             disabled={busy}
@@ -150,6 +173,7 @@ export default function FeedbackBar({ journalId, userId }) {
       )}
 
       {stage === 'up'   && renderChoices(POSITIVE_CHOICES)}
+      {stage === 'mixed' && renderChoices(MIXED_CHOICES)}
       {stage === 'down' && renderChoices(NEGATIVE_CHOICES)}
     </div>
   );
