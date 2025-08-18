@@ -441,16 +441,45 @@ return (
             </div>
           </div>
   
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                setSession(null);
-              }}
-            >
-              Log Out
-            </button>
+        {/* Username and Logout Button Placement Top Right */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div
+            title={session?.user?.id || ''}
+            style={{
+              fontSize: '.85rem',
+              color: '#374151',
+              background: '#eef2ff',
+              border: '1px solid #c7d2fe',
+              padding: '4px 8px',
+              borderRadius: '6px',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Signed in as <strong>{username || '—'}</strong>
+            {session?.user?.id ? (
+              <span style={{ color: '#6b7280', marginLeft: 6 }}>
+                ({(session.user.id).slice(0, 8)})
+              </span>
+            ) : null}
           </div>
+
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setSession(null);
+            }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: 6,
+              border: '1px solid #d1d5db',
+              background: '#fff',
+              cursor: 'pointer'
+            }}
+          >
+            Log Out
+          </button>
+        </div>
         </div>
 
         {/* Sticky Input Bar (fixed) */}
