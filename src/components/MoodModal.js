@@ -9,11 +9,12 @@ export default function MoodModal({ userId, onClose }) {
   async function load(d) {
     setLoading(true); setErr(''); setData(null);
     try {
-      const url = `${process.env.REACT_APP_BACKEND_URL}/mood-summary?user_id=${encodeURIComponent(userId)}&days=${d}`;
+      // ✅ match backend route name & query params
+      const url = `${process.env.REACT_APP_BACKEND_URL}/mood-stats?user_id=${encodeURIComponent(userId)}&days=${d}`;
       const res = await fetch(url);
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
-      setData(json);
+      setData(json); // ✅ keep backend field names as-is
     } catch (e) {
       setErr(e.message || 'Failed to load');
     } finally {
@@ -37,10 +38,7 @@ export default function MoodModal({ userId, onClose }) {
               key={d}
               onClick={() => setDays(d)}
               disabled={loading}
-              style={{
-                ...chip,
-                ...(days===d ? chipOn : {})
-              }}
+              style={{ ...chip, ...(days===d ? chipOn : {}) }}
             >
               Last {d} days
             </button>
@@ -55,20 +53,25 @@ export default function MoodModal({ userId, onClose }) {
             <div style={kpiRow}>
               <div style={kpi}>
                 <div style={kpiLabel}>Entries</div>
-                <div style={kpiValue}>{data.count}</div>
+                {/* ✅ backend: total_entries */}
+                <div style={kpiValue}>{data.total_entries}</div>
               </div>
               <div style={kpi}>
                 <div style={kpiLabel}>Avg severity</div>
-                <div style={kpiValue}>{data.avgSeverity}</div>
+                {/* ✅ backend: avg_severity */}
+                <div style={kpiValue}>{data.avg_severity}</div>
               </div>
             </div>
 
             <div style={{marginTop:12}}>
               <div style={kpiLabel}>Top emotions</div>
-              {data.topEmotions?.length ? (
+              {/* ✅ backend: top_emotions */}
+              {data.top_emotions?.length ? (
                 <ul style={{margin:'6px 0 0 16px', padding:0}}>
-                  {data.topEmotions.map(e => (
-                    <li key={e.emotion} style={{margin:'2px 0'}}>{e.emotion} — {e.count}</li>
+                  {data.top_emotions.map(e => (
+                    <li key={e.emotion} style={{margin:'2px 0'}}>
+                      {e.emotion} — {e.count}
+                    </li>
                   ))}
                 </ul>
               ) : (
