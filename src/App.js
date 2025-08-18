@@ -420,7 +420,6 @@ return (
               }}
             >
               <span className="mirror-emoji" role="img" aria-label="mirror">
-                🪞
               </span>{' '}
               Cognitive Mirror
             </h1>
