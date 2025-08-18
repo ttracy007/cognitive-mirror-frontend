@@ -47,18 +47,36 @@ export default function FeedbackBar({ journalId, userID }) {
         choice_key: choice || null
       };
   
+      console.log('[FE] /journal-feedback -> sending:', body);
+
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/journal-feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
   
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
+      // read as text first so we can always log it
+      const raw = await res.text();
+      console.log('[FE] /journal-feedback <- status:', res.status, 'raw:', raw);
+
+      // parse once (stream already consumed)
+      let json = null;
+      try { json = raw ? JSON.parse(raw) : null; }
+      catch (e) { console.warn('[FE] response not JSON:', e); }
+
+      // error branch uses parsed JSON if present
+      if (!res.ok) {
+        throw new Error((json && json.error) ? json.error : `HTTP ${res.status}`);
+      }
+
+      // success -> optional id + mark complete
+      const feedbackId = json?.feedback_id ?? null;
+      if (feedbackId) console.log('[FE] feedback saved id=', feedbackId);
 
       // mark complete on this device
       localStorage.setItem(`fb_${journalId}`, '1');
       setStage('sent');
+      
     } catch (e) {
       console.error('Feedback submit failed:', e);
       // still close to avoid UX stall in demos
