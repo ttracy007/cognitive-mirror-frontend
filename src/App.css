@@ -250,8 +250,8 @@
   padding: 1.25rem;
   overflow-y: auto;
 
-  /* background styling */
-  background: linear-gradient(135deg, #e6f0fa, #f7fbff);
+  /* lighter, airy gradient */
+  background: linear-gradient(135deg, #f3f9ff, #fcfdff);
   background-attachment: fixed;
 
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
