@@ -34,8 +34,8 @@ export default function LandingPage({ onStart }) {
         <ul style={ul}>
           <li><b>Clara</b> — warm, grounded therapist who spots the loop.</li>
           <li><b>Marcus</b> — stoic, Marcus Aurelius (may quote Meditations).</li>
-          <li><b>Tony</b> — frank, no-bullshit friend who always shoots straight.</li>
-          <li><b>Movie Metaphor</b> — sees your situation as a movie metaphor that's been solved before.</li>
+          <li><b>Tony</b> — frank, no-bullshit friend who shoots you straight even when it hurts.</li>
+          <li><b>Movie Metaphor</b> — sees your problem as a movie metaphor that's been solved before.</li>
           <li><b>Verena</b> — clarity-driven career coach for momentum.</li>
         </ul>
 
