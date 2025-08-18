@@ -1,6 +1,14 @@
 // LandingPage.js
 import React from 'react';
 
+export default function LandingPage() {
+  return (
+    <div className="page-soft">
+      {/* your existing landing markup */}
+    </div>
+  );
+}
+
 export default function LandingPage({ onStart }) {
   return (
     <div style={wrap}>
