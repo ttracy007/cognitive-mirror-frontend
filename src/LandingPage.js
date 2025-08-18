@@ -1,6 +1,6 @@
 // LandingPage.js
 import React from 'react';
-import './App.css'; 
+import './App.css'; // needed for .page-soft
 
 export default function LandingPage({ onStart }) {
   return (
@@ -37,7 +37,7 @@ export default function LandingPage({ onStart }) {
             <li><b>Clara</b> — warm, grounded therapist who spots the loop.</li>
             <li><b>Marcus</b> — stoic, Marcus Aurelius (may quote Meditations).</li>
             <li><b>Tony</b> — frank, no-bullshit friend who shoots you straight even when it hurts.</li>
-            <li><b>Movie Metaphor</b> — sees your problem as a movie metaphor that's been solved before.</li>
+            <li><b>Movie Metaphor</b> — sees your problem as a movie metaphor that’s been solved before.</li>
             <li><b>Verena</b> — clarity-driven career coach for momentum.</li>
           </ul>
 
@@ -56,3 +56,21 @@ export default function LandingPage({ onStart }) {
     </div>
   );
 }
+
+const wrap = {
+  position: 'fixed', inset: 0, zIndex: 1000,
+  background: 'rgba(255,255,255,0.96)',
+  display: 'flex', justifyContent: 'center', alignItems: 'center',
+  padding: '1.25rem', overflowY: 'auto'
+};
+const card = { width: 'min(760px, 92%)', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', color: '#111' };
+const h1 = { margin: '0 0 .6rem', fontSize: '2rem', fontWeight: 700, letterSpacing: '.3px' };
+const h3 = { margin: '1.1rem 0 .5rem', fontSize: '1.05rem' };
+const p  = { margin: '.5rem 0', fontSize: '1rem' };
+const ul = { margin: '.2rem 0 .6rem 1rem', padding: 0, fontSize: '.96rem', lineHeight: 1.45 };
+const ol = { ...ul };
+const cta = {
+  marginTop: '1rem', padding: '.65rem 1rem', fontSize: '.95rem',
+  background: '#1f2937', color: '#fff', border: 0, borderRadius: 8, cursor: 'pointer'
+};
+const finePrint = { marginTop: '.5rem', fontSize: '.85rem', color: '#6b7280', fontStyle: 'italic' };
