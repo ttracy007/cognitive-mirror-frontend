@@ -1,6 +1,5 @@
 // LandingPage.js
 import React from 'react';
-import './App.css'; // needed for .page-soft
 
 export default function LandingPage({ onStart }) {
   return (
@@ -35,9 +34,9 @@ export default function LandingPage({ onStart }) {
           <h3 style={h3}>Voices you can choose</h3>
           <ul style={ul}>
             <li><b>Clara</b> — warm, grounded therapist who spots the loop.</li>
-            <li><b>Marcus</b> — stoic, Marcus Aurelius (may quote Meditations).</li>
-            <li><b>Tony</b> — frank, no-bullshit friend who shoots you straight even when it hurts.</li>
-            <li><b>Movie Metaphor</b> — sees your problem as a movie metaphor that’s been solved before.</li>
+            <li><b>Marcus</b> — stoic; short, steady reflections.</li>
+            <li><b>Tony</b> — blunt, no-nonsense straight shooter.</li>
+            <li><b>Movie Metaphor</b> — frames your situation like a film arc.</li>
             <li><b>Verena</b> — clarity-driven career coach for momentum.</li>
           </ul>
 
@@ -58,10 +57,11 @@ export default function LandingPage({ onStart }) {
 }
 
 const wrap = {
-  position: 'fixed', inset: 0, zIndex: 1000,
-  background: 'rgba(255,255,255,0.96)',
-  display: 'flex', justifyContent: 'center', alignItems: 'center',
-  padding: '1.25rem', overflowY: 'auto'
+  minHeight: '100vh',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '1.25rem'
 };
 const card = { width: 'min(760px, 92%)', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', color: '#111' };
 const h1 = { margin: '0 0 .6rem', fontSize: '2rem', fontWeight: 700, letterSpacing: '.3px' };
