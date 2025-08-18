@@ -7,6 +7,7 @@ import './App.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
+import MoodModal from './components/MoodModal'; 
 
 const App = () => {
 
@@ -61,8 +62,8 @@ const App = () => {
   const [welcomeStep, setWelcomeStep] =useState(1);
   const [username, setUsername] = useState('');
   const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const handleCloseMoodTracker = () => setShowMoodTracker(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
-  const handleCloseMoodTracker = () => setShowMoodTracker(flase);
 
   // 🔽 Function 1: Load Saved Username
   useEffect(() => {
@@ -550,7 +551,7 @@ return (
                     'Generates a unified insight based on your recent themes, topics, and emotional loops.'}
                   {tooltipVisible === 'therapist' &&
                     'A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.'}
-                  {tooltipVisible === 'mood' && 'Visualizes your emotional trends over time. Coming soon.'}
+                  {tooltipVisible === 'mood' && 'Visualizes your emotional trends over time.'}
                 </div>
               )}
 
@@ -609,6 +610,13 @@ return (
           <div style={{ marginTop: '1rem' }}>
             <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
           </div>
+        )}
+        {/* Mood Tracker Model */}
+        {showMoodTracker && (
+          <MoodModal
+            userId={session?.user?.id}
+            onClose={handleCloseMoodTracker}
+          />
         )}
       </div>
     )}
