@@ -4,6 +4,7 @@ import FeedbackBar from './FeedbackBar';
 
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
+  const userId = entry.user_id; 
   const showFeedback = !isUser && !!entry.response_text;
   const isInsight = entry.entry_type === 'insight';
   const style = getToneStyle(entry.tone_mode || 'frank');
