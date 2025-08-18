@@ -239,3 +239,21 @@
 /* optional: slightly smaller controls inside the block */
 .cm-feedbackBlock .cm-btn { font-size: 0.9rem; }
 .cm-feedbackBlock input { font-size: 0.9rem; }
+
+/* soft, soothing background for landing/login */
+.page-soft {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+
+  /* background styling */
+  background: linear-gradient(135deg, #e6f0fa, #f7fbff);
+  background-attachment: fixed;
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111;
+}
