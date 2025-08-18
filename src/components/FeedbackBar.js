@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function FeedbackBar({ journalId, userID }) {
+export default function FeedbackBar({ journalId, userId }) {
   const [stage, setStage] = useState('idle'); // 'idle' | 'up' | 'down' | 'sent'
   const [choice, setChoice] = useState('');
   const [note, setNote] = useState('');
@@ -40,7 +40,7 @@ export default function FeedbackBar({ journalId, userID }) {
       // ⬇️ REPLACE your current `body` with this:
       const body = {
         journal_id: journalId,
-        user_id: userId || null,                    // pass if available; ok to be null
+        user_id: userId,
         rating,
         feedback_text: note?.trim() || null,
         choice_group: stage === 'up' ? 'pos' : 'neg',// match follow-up set
