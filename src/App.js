@@ -437,10 +437,10 @@ return (
                 fontStyle: 'italic'
               }}
             >
-              beta testing — feedback welcome
+               🚧 Rough Beta: Responses can take up to a minute. Thanks for your patience.
             </div>
           </div>
-
+  
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button
               onClick={async () => {
