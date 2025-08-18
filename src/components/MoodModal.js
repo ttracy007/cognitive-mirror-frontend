@@ -32,7 +32,7 @@ export default function MoodModal({ userId, onClose }) {
         </div>
 
         <div style={toggleRow}>
-          {[7,30,90].map(d => (
+          {[7,30,60].map(d => (
             <button
               key={d}
               onClick={() => setDays(d)}
