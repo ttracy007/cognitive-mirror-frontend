@@ -1,5 +1,6 @@
 // LandingPage.js
 import React from 'react'; 
+import './App.css'; // needed for .page-soft
 
 export default function LandingPage({ onStart }) {
   return (
