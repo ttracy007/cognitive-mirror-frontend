@@ -136,6 +136,11 @@ const App = () => {
          // console.log(`🧱 Frontend build version: ${text}`);
       });
   }, []);
+
+    // Log environment on startup
+  useEffect(() => {
+    console.log(`🚀 Running in ${process.env.NEXT_PUBLIC_ENV || 'unknown'} mode`);
+  }, []);
   
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
