@@ -75,9 +75,9 @@ const App = () => {
 
     // Log environment on startup
   useEffect(() => {
-    console.log(🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode);
-    console.log(🛰️ Backend: ${process.env.REACT_APP_BACKEND_URL || 'unset'});
-    console.log(🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'});
+    console.log(`🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode`);
+    console.log(`🛰️ Backend: ${process.env.REACT_APP_BACKEND_URL || 'unset'}`);
+    console.log(`🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'}`);
   }, []);
   
   // 🔽 Function 3: Show Summary Trigger
