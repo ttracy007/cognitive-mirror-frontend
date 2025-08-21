@@ -139,7 +139,7 @@ const App = () => {
 
     // Log environment on startup
   useEffect(() => {
-    console.log(`🚀 Running in ${process.env.NEXT_PUBLIC_ENV || 'unknown'} mode`);
+    console.log(`🚀 Running in ${process.env.REACT_PUBLIC_ENV || 'unknown'} mode`);
   }, []);
   
   // 🔽 Function 4: Auth Setup
