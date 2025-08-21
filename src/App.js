@@ -73,51 +73,12 @@ const App = () => {
       }
   }, []);
 
-  // 🔽 Function 2: Set Up Voice Recognition
+    // Log environment on startup
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recog = new SpeechRecognition();
-      recog.continuous = true;
-      recog.interimResults = true;
-      recog.lang = 'en-US';
-
-      recog.onresult = (event) => {
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
-        }
-        const cleaned = finalTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
-        if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
-          transcriptBuffer += (cleaned + ' ');
-          setEntry(transcriptBuffer.trim());
-        }
-      };
-
-      recog.onend = () => {
-        setIsListening(false);
-      };
-
-      setRecognition(recog);
-    }
+    console.log(`🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode`);
   }, []);
-
-  const startListening = () => {
-    if (recognition && !isListening) {
-      recognition.start();
-      setIsListening(true);
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition && isListening) {
-      recognition.stop();
-      setIsListening(false);
-    }
-  };
-
+  
+  
   // 🔽 Function 3: Show Summary Trigger
   useEffect(() => {
     const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
@@ -137,11 +98,6 @@ const App = () => {
       });
   }, []);
 
-    // Log environment on startup
-  useEffect(() => {
-    console.log(`🚀 Running in ${process.env.REACT_PUBLIC_ENV || 'unknown'} mode`);
-  }, []);
-  
   // 🔽 Function 4: Auth Setup
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
