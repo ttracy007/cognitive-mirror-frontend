@@ -24,34 +24,54 @@ const LoginPage = ({ onAuthSuccess }) => {
     };
 
     try {
-      let { error: loginError } = await supabase.auth.signInWithPassword(authData);
-
+      const { error: loginError } = await supabase.auth.signInWithPassword(authData);
+    
       if (loginError) {
-        let { error: signupError } = await supabase.auth.signUp(authData);
-
-        if (signupError) {
-          setErrorMsg(signupError.message);
-          return;
-        }
-
-        let { error: retryLoginError } = await supabase.auth.signInWithPassword(authData);
-        if (retryLoginError) {
-          setErrorMsg(retryLoginError.message);
+        const msg = (loginError.message || '').toLowerCase();
+    
+        // Typical message is "Invalid login credentials"
+        if (msg.includes('invalid')) {
+          // Try to create the account
+          const { error: signupError } = await supabase.auth.signUp(authData);
+    
+          if (signupError) {
+            const s = (signupError.message || '').toLowerCase();
+            if (s.includes('already registered') || s.includes('already exists')) {
+              setErrorMsg('That username is already taken with a different password. Please enter the same password you used before.');
+              return;
+            }
+            setErrorMsg(signupError.message);
+            return;
+          }
+    
+          // sign-up ok → sign in
+          const { error: retryLoginError } = await supabase.auth.signInWithPassword(authData);
+          if (retryLoginError) { setErrorMsg(retryLoginError.message); return; }
+        } else {
+          // Some other sign-in error (network etc.)
+          setErrorMsg(loginError.message);
           return;
         }
       }
-
+    
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
-        setErrorMsg('Authentication failed.');
-        return;
-      }
-
-      onAuthSuccess(sessionData.session, username);
+      if (sessionError || !sessionData.session) { setErrorMsg('Authentication failed.'); return; }
+    
+      const cleanName = username.trim();
+      localStorage.setItem('cm_username', cleanName);
+      await supabase.auth.updateUser({ data: { username: cleanName } }).catch(() => {});
+      onAuthSuccess(sessionData.session, cleanName);
     } catch (err) {
       console.error(err);
       setErrorMsg('Unexpected error. Please try again.');
     }
+    // after you confirm sessionData.session exists
+      const cleanName = username.trim();
+      localStorage.setItem('cm_username', cleanName);
+      
+      // optional but recommended: keep it in Supabase profile
+      await supabase.auth.updateUser({ data: { username: cleanName } }).catch(() => {});
+      onAuthSuccess(sessionData.session, cleanName);
   };
 
   return (
