@@ -487,7 +487,13 @@ return (
                 🛑 Stop
           </button> */}
           
-              <button className="cm-btn" onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>
+              <button 
+                  className="cm-btn" 
+                  onClick={handleSubmit}
+                  id="reflect-btn"
+                  aria-label="Reflect"
+                  type="button" 
+                  disabled={isProcessing || !entry.trim()}>
                 🧠 Reflect
               </button>
 
