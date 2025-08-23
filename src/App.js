@@ -236,7 +236,7 @@ const App = () => {
         onAuthSuccess={(session, username) => {
           setSession(session);
           setUsername(username);
-          UsernameStore.set(name); // <--persist
+          UsernameStore.set(username); // <--persist
         }}
       />
     );
