@@ -1,7 +1,7 @@
 // 🔼 Imports and Setup      
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
-import { supabase } from './supabaseClient';
+import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
 import './App.css';
 // import DemoSofia from './pages/DemoSofia';
 import LandingPage from './LandingPage';
@@ -65,59 +65,19 @@ const App = () => {
   const handleCloseMoodTracker = () => setShowMoodTracker(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
 
-  // 🔽 Function 1: Load Saved Username
+  // 🔽 Function 1: Load Saved Username (rehydrate)
   useEffect(() => {
-      const savedUsername = localStorage.getItem("username");
-      if (savedUsername) {
-        setUsername(savedUsername);
-      }
+    const saved = UsernameStore.get();
+    if (saved) setUsername(saved);
   }, []);
 
-  // 🔽 Function 2: Set Up Voice Recognition
+    // Log environment on startup
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recog = new SpeechRecognition();
-      recog.continuous = true;
-      recog.interimResults = true;
-      recog.lang = 'en-US';
-
-      recog.onresult = (event) => {
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
-        }
-        const cleaned = finalTranscript.trim().replace(/\s+/g, ' ').replace(/[.!?]{2,}/g, match => match[0]);
-        if (cleaned && !transcriptBuffer.endsWith(cleaned)) {
-          transcriptBuffer += (cleaned + ' ');
-          setEntry(transcriptBuffer.trim());
-        }
-      };
-
-      recog.onend = () => {
-        setIsListening(false);
-      };
-
-      setRecognition(recog);
-    }
+    console.log(`🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode`);
+    console.log(`🛰️ Backend: ${process.env.REACT_APP_BACKEND_URL || 'unset'}`);
+    console.log(`🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'}`);
   }, []);
-
-  const startListening = () => {
-    if (recognition && !isListening) {
-      recognition.start();
-      setIsListening(true);
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition && isListening) {
-      recognition.stop();
-      setIsListening(false);
-    }
-  };
-
+  
   // 🔽 Function 3: Show Summary Trigger
   useEffect(() => {
     const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
@@ -137,74 +97,67 @@ const App = () => {
       });
   }, []);
 
-    // Log environment on startup
-  useEffect(() => {
-    console.log(`🚀 Running in ${process.env.NEXT_PUBLIC_ENV || 'unknown'} mode`);
-  }, []);
-  
-  // 🔽 Function 4: Auth Setup
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
+  // 🔽 Function 4: Auth Setup (boot + subscribe once)
+    useEffect(() => {
+      let stop = () => {};
+      (async () => {
+        setSession(await getBootSession());
+        stop = subscribeAuth(setSession);
+      })();
+      return () => stop();
+    }, []);
 
-  // 🔽 Function 5: Submit New Journal Entry
+ // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
   const handleSubmit = async () => {
-        console.warn("🧪 handleSubmit called!");
-    const user = session?.user;
-    if (!user || !entry.trim()) return;
-    
+    console.warn("🧪 handleSubmit called!");
+
+    // Always read a stable username
+    const u = (username || UsernameStore.get() || '').trim();
+
+    // Make sure we have a session
+    let s = session;
+    if (!s) {
+      s = await getBootSession();
+      if (s) setSession(s);
+    }
+
+    // Guard rails: must have session + entry + username
+    if (!s?.user || !entry.trim() || !u) return;
+
     setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
     setIsProcessing(true);
 
-    if (!username || username.trim() === "") {
-      console.warn("Username is missing-aborting submission.");
-      alert("Username is missing-please refresh or log in again.");
-      setIsProcessing(false);
-      return;
-    }
-
     const debug_marker = Math.random().toString(36).substring(2, 8);
-    
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
+    const userId = s.user.id;
 
-    console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/journal-entry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          entry_text: entry,
+          tone_mode: forcedTone,
+          username: u,            // <-- use stable value
+          user_id: userId,
+          debug_marker,
+        }),
+      });
 
-    const res = await fetch(process.env.REACT_APP_BACKEND_URL + '/journal-entry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        entry_text: entry,
-        tone_mode: forcedTone,
-        username,
-        user_id: userId,
-        debug_marker,
-      }),
-    });
-    
-    const data = await res.json();
-    const responseText = data.response || 'No response received.';
-
-    console.log('✅ Submitting journal for user:', username);
-    // console.log("💡 Fresh deploy trigger");
-    // console.log("🚨 App.js version: [insert build label or timestamp]");
-    
-    setEntry('');
-    setParsedTags([]);
-    setSeverityLevel('');
-    setIsProcessing(false);
-    setTimeout(fetchHistory, 300);
-    setRefreshTrigger(prev => prev +1);
+      const data = await res.json();
+      const responseText = data.response || 'No response received.';
+      console.log('✅ Submitting journal for user:', u);
+    } catch (err) {
+      console.error('❌ Submit failed:', err);
+    } finally {
+      setEntry('');
+      setParsedTags([]);
+      setSeverityLevel('');
+      setIsProcessing(false);
+      setTimeout(fetchHistory, 300);
+      setRefreshTrigger(prev => prev + 1);
+    }
   };
-  
+
   // 🔽 Function 5b: Generate Pattern Insight
   const [processingMessage, setProcessingMessage] = useState("");
   
@@ -239,6 +192,7 @@ const App = () => {
       setIsProcessing(false);
     }
   };
+  
    // 🔽 Function 6: Fetch Past Journals
   const fetchHistory = async () => {
     const user = session?.user;
@@ -282,6 +236,7 @@ const App = () => {
         onAuthSuccess={(session, username) => {
           setSession(session);
           setUsername(username);
+          UsernameStore.set(username); // <--persist
         }}
       />
     );
@@ -532,7 +487,13 @@ return (
                 🛑 Stop
           </button> */}
           
-              <button className="cm-btn" onClick={handleSubmit} disabled={isProcessing || !entry.trim()}>
+              <button 
+                  className="cm-btn" 
+                  onClick={handleSubmit}
+                  id="reflect-btn"
+                  aria-label="Reflect"
+                  type="button" 
+                  disabled={isProcessing || !entry.trim()}>
                 🧠 Reflect
               </button>
 
