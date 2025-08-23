@@ -1,4 +1,4 @@
-// 🔼 Imports and Setup      
+// 🔼 Imports and Setup       
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
