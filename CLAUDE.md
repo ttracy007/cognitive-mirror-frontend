@@ -49,6 +49,41 @@ This includes:
 - Mobile optimization patterns
 - Error handling strategies
 
+### 🚨 Integration Change Detection System
+
+**AUTOMATIC TRIGGERS** - When modifying these files, always check for backend integration impacts:
+
+**API Integration Files:**
+- `src/App.js` - Main API calls, authentication, journal submission
+- `src/supabaseClient.js` - Database client and auth configuration  
+- `src/components/JournalTimeline.js` - Data fetching and display
+- `src/SummaryViewer.js` - Summary generation API calls
+- `src/components/MoodModal.js` - Analytics API integration
+- `src/components/FeedbackBar.js` - Feedback collection API
+- `src/LoginPage.js` - Authentication flow
+
+**Environment Configuration:**
+- `.env` - Backend URLs, API keys, Supabase configuration
+- `public/index.html` - Mobile viewport and CORS-related meta tags
+- `package.json` - Development server configuration
+
+**Integration Change Process:**
+1. **Before committing** - Check if your changes affect backend integration
+2. **If yes** - Document in `INTEGRATION-CHANGES.md` using the provided template
+3. **Coordinate** - Notify backend team of pending changes
+4. **Verify** - Test integration after backend updates are deployed
+5. **Archive** - Move completed changes to archive section
+
+**Integration Impact Checklist:**
+- [ ] Does this change API request/response formats?
+- [ ] Does this modify authentication flow?
+- [ ] Does this add/remove API endpoints?
+- [ ] Does this change environment variables?
+- [ ] Does this affect CORS requirements?
+- [ ] Does this impact mobile-specific backend needs?
+
+If **any** checkbox is checked, document the change in `INTEGRATION-CHANGES.md` immediately.
+
 ## Mobile Optimizations
 
 - Pinch-zoom detection to prevent scroll conflicts
