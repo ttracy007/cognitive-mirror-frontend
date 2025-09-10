@@ -30,11 +30,6 @@ export default function JournalTimeline({userId, refreshTrigger, styleVariant })
   const bottomRef = useRef(null);
   const timelineRef = useRef(null);
 
-  useEffect(() => {
-    if (timelineRef.current) {
-      timelineRef.current.scrollTop = timelineRef.current.scrollHeight;
-    }
-  }, [journalEntries]);
 
 
 // ✅ Canonical theme list for dropdown
@@ -127,7 +122,12 @@ useEffect(() => {
 
   useEffect(() => {
     if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Debounce scroll to prevent competing scroll behaviors on mobile
+      const timeoutId = setTimeout(() => {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [journalEntries]);
 
@@ -190,7 +190,10 @@ return (
       padding: '1rem',
       paddingBottom: '12rem', // HOW TO INCREASE SPACE BETWEEN TOOLBAR AND TIMELINE
       overflowY: 'auto',
-      maxHeight: 'calc(100vh - 12rem)' // Adjust depending on header/footer height
+      maxHeight: 'calc(100svh - 12rem)', // Adjust depending on header/footer height
+      WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+      scrollBehavior: 'smooth', // Smooth scrolling behavior
+      willChange: 'scroll-position' // Optimize for scroll performance
     }}
 >
     {Object.entries(

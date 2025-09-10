@@ -59,7 +59,7 @@ export default function LandingPage({ onStart }) {
 }
 
 const wrap = {
-  minHeight: '100vh',
+  minHeight: '100svh',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
