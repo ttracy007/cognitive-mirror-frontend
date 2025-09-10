@@ -40,9 +40,101 @@
   backdrop-filter: blur(6px);
 }
 
-/* (optional) small screens: nudge a bit closer to the bottom */
+/* Mobile optimization: collapsible input for better UX */
 @media (max-width: 560px) {
-  .reflection-input-container { bottom: 100px; }
+  /* Ultra-compact header */
+  .chat-container {
+    padding: 0.5rem;
+  }
+  
+  .mirror-title {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+  
+  .mirror-emoji {
+    font-size: 1.1rem !important;
+  }
+  
+  /* Hide beta notice on mobile to save space */
+  .chat-container > div:first-child > div:first-child > div:last-child {
+    display: none !important;
+  }
+  
+  /* Collapsible input container */
+  .reflection-input-container {
+    bottom: 5px;
+    max-width: 98%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  /* Collapsed state - minimal footprint */
+  .reflection-input-container.collapsed {
+    padding: 0.4rem 0.8rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    max-width: 180px;
+    height: 40px;
+    right: 5px;
+    left: auto;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .reflection-input-container.collapsed::before {
+    content: "✍️ Tap to reflect...";
+    color: #666;
+    font-size: 0.85rem;
+    display: block;
+  }
+  
+  .reflection-input-container.collapsed > * {
+    display: none !important;
+  }
+  
+  /* Expanded state - full input */
+  .reflection-input-container.expanded {
+    padding: 0.3rem;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 98%;
+  }
+  
+  .reflection-input-container.expanded .reflection-textarea {
+    height: 60px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  
+  .reflection-input-container.expanded .cm-toolbar {
+    padding: 3px 5px;
+    gap: 3px 6px;
+    display: flex;
+  }
+  
+  .cm-btn {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+  }
+  
+  /* Compact user info */
+  .chat-container > div:first-child > div:last-child > div:first-child {
+    font-size: 0.7rem !important;
+    padding: 2px 5px !important;
+  }
+  
+  /* Smaller logout button */
+  .chat-container > div:first-child > div:last-child button {
+    padding: 3px 6px !important;
+    font-size: 0.75rem !important;
+  }
 }
 
 .reflection-textarea {
