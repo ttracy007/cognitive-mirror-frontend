@@ -170,9 +170,7 @@ const App = () => {
       // Test basic connectivity first
       try {
         const testResponse = await fetch(`${backendUrl}/health`, { 
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit'
+          method: 'GET'
         });
         setDebugInfo(`✅ Health check: ${testResponse.status}`);
       } catch (healthErr) {
@@ -204,12 +202,8 @@ const App = () => {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': navigator.userAgent,
-          'Origin': window.location.origin
+          'Accept': 'application/json'
         },
-        mode: 'cors',
-        credentials: 'omit',
         body: JSON.stringify(requestBody),
       });
 
