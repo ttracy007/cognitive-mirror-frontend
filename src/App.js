@@ -49,7 +49,6 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [inputExpanded, setInputExpanded] = useState(false);
-  const [debugInfo, setDebugInfo] = useState('');
   const [isListening, setIsListening] = useState(false);
   const prompts = ["What’s shaking sugar?"];
   const [showGroupedView, setShowGroupedView] = useState(false);
@@ -111,8 +110,6 @@ const App = () => {
 
  // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
   const handleSubmit = async () => {
-    console.warn("🧪 handleSubmit called from device width:", window.innerWidth);
-    console.log("📝 Entry content:", entry.trim());
 
     // Always read a stable username
     const u = (username || UsernameStore.get() || '').trim();
@@ -125,68 +122,20 @@ const App = () => {
     }
 
     // Guard rails: must have session + entry + username
-    const guardRails = { 
-      hasSession: !!s?.user, 
-      hasEntry: !!entry.trim(), 
-      hasUsername: !!u,
-      sessionUser: s?.user?.id,
-      username: u,
-      entry: entry.trim()
-    };
-    
-    setDebugInfo(`🔍 Guard Rails: ${JSON.stringify(guardRails, null, 2)}`);
-    
     if (!s?.user || !entry.trim() || !u) {
-      setDebugInfo('❌ Guard rails failed - missing required data');
       return;
     }
-
-    setDebugInfo('🚀 Starting submission...');
     setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
     setIsProcessing(true);
 
     const debug_marker = Math.random().toString(36).substring(2, 8);
     const userId = s.user.id;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    
-    const apiDetails = { 
-      backendUrl, 
-      userId, 
-      debug_marker,
-      entryLength: entry.length
-    };
-    
-    setDebugInfo(`📡 API: ${JSON.stringify(apiDetails, null, 2)}`);
 
     try {
-      // First, let's test if we can reach the backend URL at all
       if (!backendUrl) {
-        setDebugInfo('❌ Backend URL is undefined!');
         return;
       }
-      
-      setDebugInfo(`📤 Testing connection to: ${backendUrl}\n🌐 User Agent: ${navigator.userAgent}\n📡 Network: ${navigator.connection?.effectiveType || 'unknown'}`);
-      
-      // Test basic connectivity first
-      try {
-        const testResponse = await fetch(`${backendUrl}/health`, { 
-          method: 'GET'
-        });
-        setDebugInfo(`✅ Health check: ${testResponse.status}`);
-      } catch (healthErr) {
-        setDebugInfo(`❌ Health check failed: ${healthErr.message}\n🔄 Server might be sleeping - trying to wake it up...`);
-        
-        // Try to wake up the server by hitting the main endpoint
-        try {
-          await fetch(`${backendUrl}/`, { method: 'GET' });
-          setDebugInfo(`🔄 Wake-up call sent. Waiting 5 seconds for server to start...`);
-          await new Promise(resolve => setTimeout(resolve, 5000));
-        } catch (wakeErr) {
-          setDebugInfo(`❌ Cannot wake server: ${wakeErr.message}`);
-        }
-      }
-      
-      setDebugInfo('📤 Making journal-entry request...');
       
       const requestBody = {
         entry_text: entry,
@@ -195,8 +144,6 @@ const App = () => {
         user_id: userId,
         debug_marker,
       };
-      
-      setDebugInfo(`📦 Request body: ${JSON.stringify(requestBody, null, 2)}`);
       
       const res = await fetch(`${backendUrl}/journal-entry`, {
         method: 'POST',
@@ -207,39 +154,14 @@ const App = () => {
         body: JSON.stringify(requestBody),
       });
 
-      const responseInfo = { 
-        status: res.status, 
-        statusText: res.statusText,
-        ok: res.ok,
-        headers: Object.fromEntries(res.headers.entries())
-      };
-      
-      setDebugInfo(`📥 Response: ${JSON.stringify(responseInfo, null, 2)}`);
-
       if (!res.ok) {
-        const errorText = await res.text();
-        setDebugInfo(`❌ Error Response: ${res.status} ${res.statusText}\nBody: ${errorText}`);
         return;
       }
 
       const data = await res.json();
-      setDebugInfo(`✅ Success: ${JSON.stringify(data, null, 2)}`);
       const responseText = data.response || 'No response received.';
     } catch (err) {
-      const errorDetails = {
-        message: err.message || 'Unknown error',
-        name: err.name || 'Unknown',
-        stack: err.stack || 'No stack trace',
-        toString: err.toString(),
-        constructor: err.constructor?.name || 'Unknown constructor'
-      };
-      
-      setDebugInfo(`❌ Detailed Error: ${JSON.stringify(errorDetails, null, 2)}`);
-      
-      // Additional specific error checks
-      if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        setDebugInfo(`❌ Network Error: Cannot connect to ${backendUrl}\nThis might be a CORS or connectivity issue.`);
-      }
+      console.error('Error submitting journal entry:', err);
     } finally {
       setEntry('');
       setParsedTags([]);
@@ -538,51 +460,17 @@ return (
         </div>
         </div>
 
-        {/* Debug Panel for Mobile (only show on mobile and when there's debug info) */}
-        {window.innerWidth <= 768 && debugInfo && (
-          <div style={{
-            position: 'fixed',
-            top: '10px',
-            left: '10px',
-            right: '10px',
-            background: '#000',
-            color: '#0f0',
-            padding: '10px',
-            borderRadius: '5px',
-            fontSize: '10px',
-            zIndex: 9999,
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-            maxHeight: '200px',
-            overflow: 'auto'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <strong>🐛 Debug Info:</strong>
-              <button 
-                onClick={() => setDebugInfo('')}
-                style={{ background: '#333', color: '#fff', border: 'none', padding: '2px 6px', borderRadius: '3px' }}
-              >
-                ✕
-              </button>
-            </div>
-            <div style={{ marginTop: '5px' }}>{debugInfo}</div>
-          </div>
-        )}
 
         {/* Sticky Input Bar (fixed) */}
         <div
           className={`reflection-input-container ${inputExpanded ? 'expanded' : 'collapsed'}`}
           onClick={() => {
-            console.log('🔍 Input container clicked - inputExpanded:', inputExpanded, 'window width:', window.innerWidth);
             if (!inputExpanded && window.innerWidth <= 768) {
-              console.log('✅ Expanding input on mobile');
               setInputExpanded(true);
             }
           }}
           onTouchStart={(e) => {
-            console.log('👆 Touch start - inputExpanded:', inputExpanded, 'window width:', window.innerWidth);
             if (!inputExpanded && window.innerWidth <= 768) {
-              console.log('✅ Expanding input on mobile touch');
               e.preventDefault();
               setInputExpanded(true);
             }
@@ -594,11 +482,8 @@ return (
           rows="3"
           value={entry}
           onChange={(e) => {
-            console.log('📝 Textarea onChange:', e.target.value);
             setEntry(e.target.value);
           }}
-          onFocus={() => console.log('🎯 Textarea focused')}
-          onBlur={() => console.log('👋 Textarea blurred')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
