@@ -63,7 +63,7 @@ This includes:
 - `src/LoginPage.js` - Authentication flow
 
 **Environment Configuration:**
-- `.env` - Backend URLs, API keys, Supabase configuration
+- Platform environment variables (Render/Vercel) - Backend URLs, API keys, Supabase configuration
 - `public/index.html` - Mobile viewport and CORS-related meta tags
 - `package.json` - Development server configuration
 
@@ -91,13 +91,28 @@ If **any** checkbox is checked, document the change in `INTEGRATION-CHANGES.md` 
 - Touch-aware scrolling with iOS optimizations
 - Mobile-specific debug overlays for troubleshooting
 
-## Environment Variables
+## Environment Configuration Management
 
-Required environment variables:
-- `REACT_APP_BACKEND_URL`: Custom backend API URL
-- `REACT_APP_SUPABASE_URL`: Supabase project URL
+### 🚨 No More .env Merge Conflicts!
+
+**Solution:** `.env` is now gitignored and managed through platform environment variables only.
+
+**Environment Management:**
+- **Local Development**: Create your own `.env` file locally (not committed)
+- **Render.com (Backend)**: Set environment variables in Render dashboard
+- **Vercel (Frontend)**: Set environment variables in Vercel dashboard
+- **No .env files tracked in git** - eliminates merge conflicts completely
+
+**Required Environment Variables:**
+- `REACT_APP_BACKEND_URL`: Backend API URL (dev vs prod)
+- `REACT_APP_SUPABASE_URL`: Supabase project URL  
 - `REACT_APP_SUPABASE_ANON_KEY`: Supabase anonymous key
-- `REACT_APP_ENV`: Environment identifier
+- `REACT_APP_ENV`: Environment identifier (dev/demo)
+
+**Platform Configuration:**
+- **Dev Branch**: Configure dev backend URLs in platform
+- **Master Branch**: Configure production backend URLs in platform
+- **Automatic deployment** with correct environment per branch
 
 ## Deployment
 
