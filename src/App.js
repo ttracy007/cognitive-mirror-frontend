@@ -79,14 +79,14 @@ const App = () => {
     console.log(`🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'}`);
   }, []);
   
-  // 🔽 Function 3: Show Summary Trigger
-  useEffect(() => {
-    const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
-    if (!hasTriggeredSummary && history.length >= 5) {
-      setShowSummary(true);
-      localStorage.setItem('hasTriggeredSummary', 'true');
-    }
-  }, [history]);
+  // 🔽 Function 3: Show Summary Trigger (DISABLED - only show when user clicks)
+  // useEffect(() => {
+  //   const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
+  //   if (!hasTriggeredSummary && history.length >= 5) {
+  //     setShowSummary(true);
+  //     localStorage.setItem('hasTriggeredSummary', 'true');
+  //   }
+  // }, [history]);
 
    // 🔽 Function 3a: Build Current Commit Tag 
   useEffect(() => {
