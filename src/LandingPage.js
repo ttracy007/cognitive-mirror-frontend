@@ -60,19 +60,57 @@ export default function LandingPage({ onStart }) {
 
 const wrap = {
   minHeight: '100svh',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '1.25rem'
+  display: 'block',
+  padding: '1rem 1.25rem 2rem',
+  paddingTop: '16rem',
+  paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+  overflowY: 'auto'
 };
-const card = { width: 'min(760px, 92%)', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', color: '#111' };
-const h1 = { margin: '0 0 .6rem', fontSize: '2rem', fontWeight: 700, letterSpacing: '.3px' };
-const h3 = { margin: '1.1rem 0 .5rem', fontSize: '1.05rem' };
-const p  = { margin: '.5rem 0', fontSize: '1rem' };
-const ul = { margin: '.2rem 0 .6rem 1rem', padding: 0, fontSize: '.96rem', lineHeight: 1.45 };
+const card = { 
+  width: 'min(760px, 100%)', 
+  maxWidth: '100%',
+  margin: '0 auto',
+  fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', 
+  color: '#111' 
+};
+const h1 = { 
+  margin: '0 0 1rem', 
+  fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
+  fontWeight: 700, 
+  letterSpacing: '.3px',
+  textAlign: 'center'
+};
+const h3 = { 
+  margin: '1.1rem 0 .5rem', 
+  fontSize: 'clamp(1rem, 3vw, 1.05rem)' 
+};
+const p = { 
+  margin: '.5rem 0', 
+  fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' 
+};
+const ul = { 
+  margin: '.2rem 0 .6rem 1rem', 
+  padding: 0, 
+  fontSize: 'clamp(0.85rem, 2.3vw, 0.96rem)', 
+  lineHeight: 1.45 
+};
 const ol = { ...ul };
 const cta = {
-  marginTop: '1rem', padding: '.65rem 1rem', fontSize: '.95rem',
-  background: '#1f2937', color: '#fff', border: 0, borderRadius: 8, cursor: 'pointer'
+  marginTop: '1rem', 
+  padding: '.75rem 1.25rem', 
+  fontSize: 'clamp(0.9rem, 2.5vw, 0.95rem)',
+  background: '#1f2937', 
+  color: '#fff', 
+  border: 0, 
+  borderRadius: 8, 
+  cursor: 'pointer',
+  width: '100%',
+  maxWidth: '300px',
+  minHeight: '48px'
 };
-const finePrint = { marginTop: '.5rem', fontSize: '.85rem', color: '#6b7280', fontStyle: 'italic' };
+const finePrint = { 
+  marginTop: '.5rem', 
+  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)', 
+  color: '#6b7280', 
+  fontStyle: 'italic' 
+};
