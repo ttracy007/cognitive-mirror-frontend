@@ -1,0 +1,410 @@
+// Step 1: Import dependencies at the top of JournalTimeline.js 
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { supabase } from '../supabaseClient';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/timezone';
+import timezone from 'dayjs/plugin/timezone';
+ 
+
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
+import uniq from 'lodash/uniq';
+import Card from './Card';
+import { Button } from './Button';
+import ChatBubble from './ChatBubble';
+
+export default function JournalTimeline({userId, refreshTrigger, styleVariant, excludeLatestResponse }) {
+  const [journalEntries, setJournalEntries] = useState([]);
+  // const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [collapsedDays, setCollapsedDays] = useState({});
+  const [allCollapsed, setAllCollapsed] = useState(false);
+  // const [selectedTopic, setSelectedTopic] = useState('all');
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [availableThemes, setAvailableThemes] = useState([]);
+  const [collaspedMonths, setCollapsedMonths] = useState({});
+  const timelineRef = useRef(null);
+  
+  // Track zoom/pinch state to prevent scroll interference
+  const [isZooming, setIsZooming] = useState(false);
+  const [touchCount, setTouchCount] = useState(0);
+  const zoomTimeoutRef = useRef(null);
+  
+  // Track entry count changes (restored from chronology changes)
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [lastEntryCount, setLastEntryCount] = useState(0);
+  const bottomRef = useRef(null);
+
+
+
+// ✅ Canonical theme list for dropdown
+const canonicalThemes = [
+  'Meaning / Existential Anxiety',
+  'Identity / Role Confusion',
+  'Purpose / Direction',
+  'Control / Safety',
+  'Attachment / Relationships',
+  'Autonomy / Power',
+  'Vulnerability / Trust',
+  'Self-worth / Shame',
+  'Motivation / Change',
+  'Grief / Loss'
+];
+
+const [themeOptions, setThemeOptions] = useState([]);
+useEffect(() => {
+setThemeOptions(canonicalThemes);
+}, []);
+
+// Smart Insight Card 
+const [showSmartInsight, setShowSmartInsight] = useState(true);
+const [insightTheme, setInsightTheme] = useState('');
+
+// 🧠 Compute monthly mention count for selected theme
+const monthlyMentions = insightTheme
+  ? journalEntries.filter(entry => {
+      const isMatch =
+        entry.primary_theme === insightTheme ||
+        entry.secondary_theme === insightTheme;
+      const inThisMonth =
+        dayjs(entry.timestamp).isSame(dayjs(), 'month');
+      return isMatch && inThisMonth;
+    }).length
+  : 0;
+
+const [themeInsight, setThemeInsight] = useState(null);
+
+useEffect(() => {
+  const fetchInsight = async () => {
+    if (!insightTheme || !userId) {
+      setThemeInsight(null);
+      return;
+    }
+
+    // 🔽 Temporarily disabled to prevent 404 errors
+    // TODO: Re-enable when backend endpoint is implemented
+    console.log('🔍 Theme insight fetch disabled (preventing 404):', { insightTheme, userId });
+    setThemeInsight(null);
+    return;
+
+    /* DISABLED CODE:
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/mention-count?user_id=${userId}&theme=${encodeURIComponent(insightTheme)}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setThemeInsight(data);
+      } else {
+        console.error('❌ Error fetching theme insight:', data.error);
+        setThemeInsight(null);
+      }
+    } catch (err) {
+      console.error('❌ Fetch failed:', err);
+      setThemeInsight(null);
+    }
+    */
+  };
+
+  fetchInsight();
+}, [insightTheme, userId]);
+  
+useEffect(() => {
+  const fetchJournals = async () => {
+    setLoading(true);
+    console.log('🔄 JournalTimeline: FETCH TRIGGERED with refreshTrigger:', refreshTrigger, 'at', new Date().toISOString());
+
+    // Explicit fresh query with cache busting
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker, user_id')
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('❌ Error fetching journals:', error.message);
+      setLoading(false);
+      return;
+    }
+
+    console.log('🔄 BEFORE setJournalEntries - current state:', {
+      oldCount: journalEntries.length,
+      newCount: data?.length || 0,
+      refreshTrigger,
+      oldFirstId: journalEntries[0]?.id?.substring(0,8),
+      newFirstId: data?.[0]?.id?.substring(0,8)
+    });
+    
+    // Filter out the entry currently shown in Latest Response to avoid duplication
+    let filteredData = data || [];
+    if (excludeLatestResponse) {
+      filteredData = filteredData.filter(entry => 
+        entry.entry_text?.trim() !== excludeLatestResponse.trim()
+      );
+      console.log('🚫 FILTERING Latest Response from timeline:', {
+        excludeText: excludeLatestResponse.substring(0, 50) + '...',
+        beforeCount: data?.length || 0,
+        afterCount: filteredData.length
+      });
+    }
+    
+    setJournalEntries(filteredData);
+    
+    console.log('🔄 AFTER setJournalEntries - state should update:', {
+      fetchedCount: data?.length || 0,
+      refreshTrigger,
+      firstEntryId: data?.[0]?.id?.substring(0,8),
+      firstEntryTime: data?.[0]?.timestamp,
+      lastEntryId: data?.[data?.length-1]?.id?.substring(0,8),
+      lastEntryTime: data?.[data?.length-1]?.timestamp,
+      entriesWithResponses: data?.filter(e => e.response_text).length,
+      firstEntryText: data?.[0]?.entry_text?.substring(0,50) + '...'
+    });
+    setLoading(false);
+  };
+
+  fetchJournals();
+}, [userId, refreshTrigger]);
+
+  // Zoom detection handlers
+  const handleTouchStart = useCallback((e) => {
+    setTouchCount(e.touches.length);
+    if (e.touches.length >= 2) {
+      setIsZooming(true);
+      if (zoomTimeoutRef.current) {
+        clearTimeout(zoomTimeoutRef.current);
+      }
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    setTouchCount(e.touches.length);
+    if (e.touches.length < 2) {
+      // Shorter delay and only reset if we were actually zooming
+      zoomTimeoutRef.current = setTimeout(() => {
+        setIsZooming(false);
+      }, 200);
+    }
+  }, []);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (zoomTimeoutRef.current) {
+        clearTimeout(zoomTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Auto-scroll logic: only on initial load and new entries
+  useEffect(() => {
+    const currentEntryCount = journalEntries.length;
+    
+    // Check if this is initial load or new entries were added
+    const isInitialLoad = lastEntryCount === 0 && currentEntryCount > 0;
+    // FIXED: Also detect when first entry ID changes (new entries with 50-limit)
+    const firstEntryChanged = journalEntries.length > 0 && lastEntryCount > 0;
+    const hasNewEntries = (currentEntryCount > lastEntryCount && lastEntryCount > 0) || firstEntryChanged;
+    
+    // DIAGNOSTIC: Log every state change
+    console.log('🔍 AUTO-SCROLL EFFECT:', {
+      currentEntryCount,
+      lastEntryCount,
+      isInitialLoad,
+      hasNewEntries,
+      shouldAutoScroll,
+      refreshTrigger,
+      journalEntriesIds: journalEntries.map(e => e.id?.substring(0,8)),
+      latestTimestamp: journalEntries[0]?.timestamp
+    });
+    
+    if (shouldAutoScroll && (isInitialLoad || hasNewEntries) && !isZooming && touchCount < 2) {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      
+      console.log('📜 TRIGGERING AUTO-SCROLL to top (newest-first)');
+      const timeoutId = setTimeout(() => {
+        // For newest-first chronology, scroll to TOP where new entries appear
+        if (timelineRef.current) {
+          timelineRef.current.scrollTo({ 
+            top: 0,
+            behavior: isMobile ? 'auto' : 'smooth'
+          });
+        }
+        console.log('📜 AUTO-SCROLL COMPLETED (scrolled to top)');
+        
+        // After first auto-scroll, disable it until new entries arrive
+        if (isInitialLoad) {
+          setShouldAutoScroll(false);
+          console.log('📜 AUTO-SCROLL DISABLED after initial load');
+        }
+      }, isInitialLoad ? 500 : 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+    
+    // Update the count for next comparison
+    setLastEntryCount(currentEntryCount);
+    console.log('📊 UPDATED lastEntryCount to:', currentEntryCount);
+  }, [journalEntries, shouldAutoScroll, lastEntryCount, isZooming, touchCount]);
+  
+  // DISABLED: Aggressive auto-scroll re-enabling that interferes with manual scrolling
+  // Only auto-scroll on the very first load, never re-enable after that
+  // useEffect(() => {
+  //   if (journalEntries.length > lastEntryCount) {
+  //     setShouldAutoScroll(true);
+  //   }
+  // }, [refreshTrigger]);
+
+  // useEffect(() => {
+  //   const currentEntryCount = journalEntries.length;
+  //   const firstEntryChanged = journalEntries.length > 0 && lastEntryCount > 0;
+  //   const hasNewEntries = (currentEntryCount > lastEntryCount && lastEntryCount > 0) || firstEntryChanged;
+  //   
+  //   if (hasNewEntries) {
+  //     console.log('🔄 NEW ENTRIES DETECTED - Re-enabling auto-scroll');
+  //     setShouldAutoScroll(true);
+  //   }
+  // }, [journalEntries, lastEntryCount]);
+
+ // ✅ FILTER THEMES: Step 1: Filter entries by selected theme before grouping
+const filteredEntries = selectedTheme
+  ? journalEntries.filter(entry =>
+      entry.primary_theme?.toLowerCase() === selectedTheme.toLowerCase() || 
+      entry.secondary_theme?.toLowerCase() === selectedTheme.toLowerCase()
+    )
+  : journalEntries;
+
+   // ✅ Then group filtered entries by month
+  const groupedByMonth = groupBy(filteredEntries, entry =>
+    dayjs(entry.timestamp).format('YYYY-MM')
+  );
+
+  //Visual Feedback for Empty Results
+  {filteredEntries.length === 0 && (
+    <p style={{ marginTop:'1rem', fontStyle: 'italic', color: '#666' }}>
+      No journal entries found for this topic. 
+        </p>
+    )}
+  
+  const timeline = Object.entries(groupedByMonth).map(([month, monthEntries]) => {
+    const groupedByDay = groupBy(monthEntries, entry =>
+      dayjs(entry.timestamp).format('YYYY-MM-DD')
+    );
+    
+    return {
+      month,
+      days: Object.entries(groupedByDay).map(([day, entries]) => ({
+        day,
+        entries: entries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)) // 📈 Old-to-new per day
+      }))
+    };
+  });
+
+  if (loading) {
+    return <div>Loading journal entries...</div>;
+  }
+
+  if (!journalEntries.length) {
+    return <div>No entries found.</div>;
+  }
+
+  const themeSet = new Set();
+  const latestEntryId = journalEntries[journalEntries.length - 1]?.id;
+
+journalEntries.forEach(entry => {
+  if (entry.primary_theme) themeSet.add(entry.primary_theme);
+  if (entry.secondary_theme && entry.secondary_theme !== 'NONE') {
+    themeSet.add(entry.secondary_theme);
+  }
+});
+
+return (
+  <div
+    key={`timeline-${refreshTrigger}-${journalEntries[0]?.id || 'empty'}`}
+    ref={timelineRef}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+    style={{
+      padding: window.innerWidth <= 768 ? '0.5rem' : '1rem',
+      paddingBottom: window.innerWidth <= 768 ? '2rem' : '14rem', // Minimal padding on mobile
+      overflowY: 'auto',
+      maxHeight: window.innerWidth <= 768 ? 'calc(100svh - 6rem)' : 'calc(100svh - 12rem)', // More space on mobile
+      WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+      // Remove smooth scroll behavior to prevent zoom conflicts
+      scrollBehavior: 'auto',
+      willChange: 'scroll-position', // Optimize for scroll performance
+      touchAction: 'pan-x pan-y pinch-zoom', // Allow pinch-zoom and panning
+      userSelect: 'none' // Prevent text selection during zoom
+    }}
+>
+    {(() => {
+      const grouped = journalEntries.reduce((acc, entry) => {
+        const dateKey = dayjs(entry.timestamp).format('YYYY-MM-DD');
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(entry);
+        return acc;
+      }, {});
+      
+      const sorted = Object.entries(grouped).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+      
+      console.log('🎨 RENDERING TIMELINE:', {
+        totalDays: sorted.length,
+        firstDay: sorted[0]?.[0],
+        firstDayEntryCount: sorted[0]?.[1]?.length,
+        firstDayFirstEntry: sorted[0]?.[1]?.[0]?.entry_text?.substring(0, 50),
+        firstDayFirstEntryTime: sorted[0]?.[1]?.[0]?.timestamp
+      });
+      
+      return sorted;
+    })() // 🎯 NEWEST FIRST: with debugging
+      .map(([dateKey, entries]) => (
+        <div key={dateKey} style={{ marginBottom: '2rem' }}>
+          <h3 style={{
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            color: '#444'
+          }}>
+            {dayjs(dateKey).format('MMMM D, YYYY')}
+          </h3>
+          {entries
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // 🎯 FIXED: newest-first within each day too
+            .map(entry => (
+              <div key={entry.id || entry.timestamp} style={{ marginBottom: '1rem' }}>
+                {entry.entry_text && (
+                  <ChatBubble
+                    entry={{
+                      entry_text: entry.entry_text,
+                      tone_mode: 'user',
+                      entry_type: 'reflection',
+                      timestamp: entry.timestamp
+                    }}
+                    styleVariant={styleVariant}
+                    isMostRecent={entry.id === latestEntryId}
+                  />
+                )}
+          
+                {entry.response_text && (
+                  <ChatBubble
+                    entry={entry}
+                    styleVariant={styleVariant}
+                    isMostRecent={entry.id === latestEntryId}
+                  />
+                )}
+                <div style={{ height: '2.5rem' }} />
+              </div>
+          ))}
+        </div>
+      ))}
+      <div ref={bottomRef} />
+  </div>
+);
+
+}
+
+  

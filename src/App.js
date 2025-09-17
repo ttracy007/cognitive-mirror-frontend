@@ -1,13 +1,15 @@
 // 🔼 Imports and Setup      
 import React, { useEffect, useState } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
+import PatternInsightViewer from './PatternInsightViewer';
 import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
 import './App.css';
 // import DemoSofia from './pages/DemoSofia';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
-import MoodModal from './components/MoodModal'; 
+import MoodModal from './components/MoodModal';
+import LatestResponse from './components/LatestResponse'; 
 
 const App = () => {
 
@@ -42,6 +44,7 @@ const App = () => {
   const [tooltip, setTooltip] = useState("🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.");
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
+  const [showPatternInsight, setShowPatternInsight] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [summary, setSummary] = useState('');
   const [parsedTags, setParsedTags] = useState([]);
@@ -49,6 +52,7 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [inputExpanded, setInputExpanded] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
   const [isListening, setIsListening] = useState(false);
   const prompts = ["What’s shaking sugar?"];
   const [showGroupedView, setShowGroupedView] = useState(false);
@@ -66,10 +70,34 @@ const App = () => {
   const handleCloseMoodTracker = () => setShowMoodTracker(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
 
+  // 🔽 Responsive state for mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 560);
+
+  // 🔽 Latest Response State Management
+  const [latestResponse, setLatestResponse] = useState(null);
+  const [latestEntry, setLatestEntry] = useState(null);
+  const [showLatestResponse, setShowLatestResponse] = useState(false);
+  const latestResponseRef = React.useRef(null);
+
   // 🔽 Function 1: Load Saved Username (rehydrate)
   useEffect(() => {
     const saved = UsernameStore.get();
     if (saved) setUsername(saved);
+  }, []);
+
+  // 🔽 Handle window resize for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 560;
+      setIsMobile(mobile);
+      console.log('📱 Window resize - isMobile:', mobile, 'width:', window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    // Initial check
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
     // Log environment on startup
@@ -110,6 +138,8 @@ const App = () => {
 
  // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
   const handleSubmit = async () => {
+    console.warn("🧪 handleSubmit called from device width:", window.innerWidth);
+    console.log("📝 Entry content:", entry.trim());
 
     // Always read a stable username
     const u = (username || UsernameStore.get() || '').trim();
@@ -122,20 +152,71 @@ const App = () => {
     }
 
     // Guard rails: must have session + entry + username
+    const guardRails = { 
+      hasSession: !!s?.user, 
+      hasEntry: !!entry.trim(), 
+      hasUsername: !!u,
+      sessionUser: s?.user?.id,
+      username: u,
+      entry: entry.trim()
+    };
+    
+    setDebugInfo(`🔍 Guard Rails: ${JSON.stringify(guardRails, null, 2)}`);
+    
     if (!s?.user || !entry.trim() || !u) {
+      setDebugInfo('❌ Guard rails failed - missing required data');
       return;
     }
+
+    setDebugInfo('🚀 Starting submission...');
     setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
     setIsProcessing(true);
+    
+    // 🔽 Hide any previous latest response when starting new submission
+    setShowLatestResponse(false);
 
     const debug_marker = Math.random().toString(36).substring(2, 8);
     const userId = s.user.id;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    
+    const apiDetails = { 
+      backendUrl, 
+      userId, 
+      debug_marker,
+      entryLength: entry.length
+    };
+    
+    setDebugInfo(`📡 API: ${JSON.stringify(apiDetails, null, 2)}`);
 
     try {
+      // First, let's test if we can reach the backend URL at all
       if (!backendUrl) {
+        setDebugInfo('❌ Backend URL is undefined!');
         return;
       }
+      
+      setDebugInfo(`📤 Testing connection to: ${backendUrl}\n🌐 User Agent: ${navigator.userAgent}\n📡 Network: ${navigator.connection?.effectiveType || 'unknown'}`);
+      
+      // Test basic connectivity first
+      try {
+        const testResponse = await fetch(`${backendUrl}/health`, { 
+          method: 'GET'
+        });
+        setDebugInfo(`✅ Health check: ${testResponse.status}`);
+      } catch (healthErr) {
+        setDebugInfo(`❌ Health check failed: ${healthErr.message}\n🔄 Server might be sleeping - trying to wake it up...`);
+        
+        // Try to wake up the server by hitting the main endpoint
+        try {
+          await fetch(`${backendUrl}/`, { method: 'GET' });
+          setDebugInfo(`🔄 Wake-up call sent. Waiting 5 seconds for server to start...`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        } catch (wakeErr) {
+          setDebugInfo(`❌ Cannot wake server: ${wakeErr.message}`);
+        }
+      }
+      
+      setDebugInfo('📤 Making journal-entry request...');
       
       const requestBody = {
         entry_text: entry,
@@ -144,6 +225,8 @@ const App = () => {
         user_id: userId,
         debug_marker,
       };
+      
+      setDebugInfo(`📦 Request body: ${JSON.stringify(requestBody, null, 2)}`);
       
       const res = await fetch(`${backendUrl}/journal-entry`, {
         method: 'POST',
@@ -154,21 +237,82 @@ const App = () => {
         body: JSON.stringify(requestBody),
       });
 
+      const responseInfo = { 
+        status: res.status, 
+        statusText: res.statusText,
+        ok: res.ok,
+        headers: Object.fromEntries(res.headers.entries())
+      };
+      
+      setDebugInfo(`📥 Response: ${JSON.stringify(responseInfo, null, 2)}`);
+
       if (!res.ok) {
+        const errorText = await res.text();
+        setDebugInfo(`❌ Error Response: ${res.status} ${res.statusText}\nBody: ${errorText}`);
+        setShowLatestResponse(false); // Hide loading state on error
         return;
       }
 
       const data = await res.json();
-      const responseText = data.response || 'No response received.';
+      setDebugInfo(`✅ Success: ${JSON.stringify(data, null, 2)}`);
+      
+      // 🔽 Enhanced debugging for response field detection
+      console.log('🔍 Backend response data:', data);
+      console.log('🔍 Available fields:', Object.keys(data));
+      console.log('🔍 response_text (ChatBubble field):', data.response_text);
+      console.log('🔍 response (API field):', data.response);
+      console.log('🔍 journal_id (DB save confirmation):', data.journal_id);
+      console.log('🔍 Database save status:', data.saved ? '✅ SAVED' : '❌ NOT SAVED');
+      
+      // 🔽 FIX: Use the same field that ChatBubble successfully uses
+      const responseText = data.response_text || data.response || 'No response received.';
+      
+      // 🔽 Store latest response for immediate display
+      setLatestEntry(entry.trim());
+      setLatestResponse({
+        text: responseText,
+        tone: forcedTone,
+        toneName: toneName(forcedTone),
+        timestamp: new Date().toISOString()
+      });
+      setShowLatestResponse(true);
+      
+      // 🔽 Auto-scroll to show the response
+      setTimeout(() => {
+        if (latestResponseRef.current) {
+          latestResponseRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
     } catch (err) {
-      console.error('Error submitting journal entry:', err);
+      const errorDetails = {
+        message: err.message || 'Unknown error',
+        name: err.name || 'Unknown',
+        stack: err.stack || 'No stack trace',
+        toString: err.toString(),
+        constructor: err.constructor?.name || 'Unknown constructor'
+      };
+      
+      setDebugInfo(`❌ Detailed Error: ${JSON.stringify(errorDetails, null, 2)}`);
+      
+      // Additional specific error checks
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setDebugInfo(`❌ Network Error: Cannot connect to ${backendUrl}\nThis might be a CORS or connectivity issue.`);
+      }
     } finally {
       setEntry('');
       setParsedTags([]);
       setSeverityLevel('');
       setIsProcessing(false);
-      setTimeout(fetchHistory, 300);
-      setRefreshTrigger(prev => prev + 1);
+      // Add delay to ensure backend has written to database before refreshing timeline
+      setTimeout(() => {
+        setRefreshTrigger(prev => prev + 1);
+        console.log('📊 Timeline refresh triggered after submission');
+      }, 1200); // Increased delay to account for backend database write time
+      
       // Collapse input on mobile after successful submission
       if (window.innerWidth <= 768) {
         setInputExpanded(false);
@@ -180,35 +324,7 @@ const App = () => {
   const [processingMessage, setProcessingMessage] = useState("");
   
   const handlePatternInsight = async () => {
-    setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
-    setIsProcessing(true);
-  
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
-      
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/generate-pattern-insight`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userId,
-          tone_mode: forcedTone // ✅ pass selected voice
-        })
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        console.log('✅ Insight:', data.insight);
-        setRefreshTrigger(prev => prev + 1); // 🔁 trigger timeline refresh
-      } else {
-        console.error('❌ Insight error:', data.error);
-      }
-    } catch (err) {
-      console.error('❌ Insight fetch failed:', err);
-    } finally {
-      setIsProcessing(false);
-    }
+    setShowPatternInsight(true);
   };
   
    // 🔽 Function 6: Fetch Past Journals
@@ -385,74 +501,34 @@ return (
     {!showWelcome && (
       <div className="chat-container background-option-1">
         {/* Header with Logout */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1
-              style={{
-                marginBottom: '0.3rem',
-                fontSize: '1.8rem',
-                fontWeight: 600,
-                letterSpacing: '0.5px',
-                color: '#1a1a1a',
-                fontFamily: 'Georgia, serif',
-                textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-              }}
-            >
-              <span className="mirror-emoji" role="img" aria-label="mirror">
-              </span>{' '}
+        <div className="app-header">
+          <div className="header-brand">
+            <h1 className="mirror-title">
+              <span className="mirror-emoji" role="img" aria-label="Cognitive Mirror"></span>
               Cognitive Mirror
             </h1>
 
-            <div
-              style={{
-                display: 'inline-block',
-                padding: '0.2rem 0.6rem',
-                fontSize: '0.75rem',
-                color: '#555',
-                backgroundColor: '#f5f5f5',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
-                fontStyle: 'italic'
-              }}
-            >
+            <div className="beta-notice">
                🚧 Rough Beta: Responses can take up to a minute. Thanks for your patience.
             </div>
           </div>
   
         {/* Username and Logout Button Placement Top Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div
-            title={session?.user?.id || ''}
-            style={{
-              fontSize: '.85rem',
-              color: '#374151',
-              background: '#eef2ff',
-              border: '1px solid #c7d2fe',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap'
-            }}
-          >
+        <div className="header-user">
+          <div className="user-info" title={session?.user?.id || ''}>
             Signed in as <strong>{username || '—'}</strong>
             {session?.user?.id ? (
-              <span style={{ color: '#6b7280', marginLeft: 6 }}>
+              <span style={{ color: 'var(--color-text-light)', marginLeft: 6 }}>
                 ({(session.user.id).slice(0, 8)})
               </span>
             ) : null}
           </div>
 
           <button
+            className="logout-btn"
             onClick={async () => {
               await supabase.auth.signOut();
               setSession(null);
-            }}
-            style={{
-              padding: '6px 10px',
-              borderRadius: 6,
-              border: '1px solid #d1d5db',
-              background: '#fff',
-              cursor: 'pointer'
             }}
           >
             Log Out
@@ -460,17 +536,51 @@ return (
         </div>
         </div>
 
+        {/* Debug Panel for Mobile (only show on mobile and when there's debug info) */}
+        {window.innerWidth <= 768 && debugInfo && (
+          <div style={{
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
+            right: '10px',
+            background: '#000',
+            color: '#0f0',
+            padding: '10px',
+            borderRadius: '5px',
+            fontSize: '10px',
+            zIndex: 9999,
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            maxHeight: '200px',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong>🐛 Debug Info:</strong>
+              <button 
+                onClick={() => setDebugInfo('')}
+                style={{ background: '#333', color: '#fff', border: 'none', padding: '2px 6px', borderRadius: '3px' }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ marginTop: '5px' }}>{debugInfo}</div>
+          </div>
+        )}
 
         {/* Sticky Input Bar (fixed) */}
         <div
-          className={`reflection-input-container ${inputExpanded ? 'expanded' : 'collapsed'}`}
+          className={`reflection-input-container ${isMobile && !inputExpanded ? 'collapsed' : (isMobile ? 'expanded' : '')}`}
           onClick={() => {
-            if (!inputExpanded && window.innerWidth <= 768) {
+            console.log('🔍 Input container clicked - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
+            if (!inputExpanded && isMobile) {
+              console.log('✅ Expanding input on mobile');
               setInputExpanded(true);
             }
           }}
           onTouchStart={(e) => {
-            if (!inputExpanded && window.innerWidth <= 768) {
+            console.log('👆 Touch start - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
+            if (!inputExpanded && isMobile) {
+              console.log('✅ Expanding input on mobile touch');
               e.preventDefault();
               setInputExpanded(true);
             }
@@ -482,8 +592,19 @@ return (
           rows="3"
           value={entry}
           onChange={(e) => {
+            console.log('📝 Textarea onChange:', e.target.value);
             setEntry(e.target.value);
+            
+            // 🔽 Auto-dismiss latest response when user starts typing new entry
+            if (showLatestResponse && e.target.value.length > 0) {
+              setShowLatestResponse(false);
+              // Trigger timeline refresh when Latest Response dismisses
+              console.log('📝 Latest Response dismissed - triggering timeline refresh');
+              setRefreshTrigger(prev => prev + 1);
+            }
           }}
+          onFocus={() => console.log('🎯 Textarea focused')}
+          onBlur={() => console.log('👋 Textarea blurred')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -491,31 +612,16 @@ return (
                 handleSubmit();
               }
             }
-            if (e.key === 'Escape' && window.innerWidth <= 768) {
+            if (e.key === 'Escape' && isMobile) {
               setInputExpanded(false);
             }
           }}
           placeholder={placeholderPrompt}
         />
-          {/* Toolbar row: all action buttons on one line */}
-          <div
-            className="cm-toolbar"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '8px 12px',
-              padding: '6px 10px',
-              background: '#f2f2f2',
-              border: '1px solid #e6e6e6',
-              borderRadius: '6px'
-            }}
-          >
-            {/* Action buttons (one row) */}
-            <div
-              className="cm-actions"
-              style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', position: 'relative' }}
-            >
+          {/* Toolbar row: all action buttons organized */}
+          <div className="cm-toolbar">
+            {/* Action buttons section */}
+            <div className="toolbar-section cm-actions">
               {/* <button className="cm-btn" onClick={startListening} disabled={isListening}>
                 🎙️ Start
               </button>
@@ -524,7 +630,7 @@ return (
           </button> */}
           
               <button 
-                  className="cm-btn" 
+                  className="cm-btn cm-btn--primary" 
                   onClick={handleSubmit}
                   id="reflect-btn"
                   aria-label="Reflect"
@@ -534,7 +640,7 @@ return (
               </button>
 
               {/* Mobile close button when expanded */}
-              {window.innerWidth <= 768 && inputExpanded && (
+              {isMobile && inputExpanded && (
                 <button 
                   className="cm-btn" 
                   onClick={() => setInputExpanded(false)}
@@ -573,22 +679,7 @@ return (
 
               {/* Shared tooltip renderer for the three buttons */}
               {tooltipVisible && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '-2.4rem',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#333',
-                    color: '#fff',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 6,
-                    fontSize: '0.75rem',
-                    whiteSpace: 'nowrap',
-                    zIndex: 20,
-                    pointerEvents: 'none'
-                  }}
-                >
+                <div className="tooltip">
                   {tooltipVisible === 'pattern' &&
                     'Generates a unified insight based on your recent themes, topics, and emotional loops.'}
                   {tooltipVisible === 'therapist' &&
@@ -605,24 +696,14 @@ return (
               )}
             </div>
 
-            {/* Voice cluster with subtle separation and a narrower select */}
-            <div
-              className="cm-voice"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px 10px',
-                flexWrap: 'wrap',
-                borderLeft: '1px solid #e6e6e6',
-                paddingLeft: 12
-              }}
-            >
-              <label style={{ marginRight: '0.35rem' }}>🗣️ Voice:</label>
+            {/* Voice selection section */}
+            <div className="toolbar-section voice-section">
+              <label className="voice-label">🗣️ Voice:</label>
               <select
+                className="voice-select"
                 value={forcedTone}
                 onChange={handleToneChange}
                 aria-label="Select voice"
-                style={{ minWidth: 120, maxWidth: 160, padding: '6px 8px' }}
               >
                 <option value="therapist">Clara</option>
                 <option value="marcus">Marcus</option>
@@ -630,10 +711,7 @@ return (
                 <option value="movies">Movies</option>
                 <option value="verena">Verena</option>
               </select>
-              <div
-                className="cm-tone-desc"
-                aria-live="polite"
-              >
+              <div className="voice-description" aria-live="polite">
                 {toneDescription}
               </div>
             </div>
@@ -642,17 +720,36 @@ return (
         </div>
         {/* END fixed input container */}
 
+        {/* Latest Response Section - appears immediately after input */}
+        {isProcessing && (
+          <div className="latest-response-loading">
+            <div className="latest-response-loading-content">
+              <div className="latest-response-loading-spinner">🤔</div>
+              <div className="latest-response-loading-text">
+                {processingMessage || `${toneName(forcedTone)} is thinking...`}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showLatestResponse && latestResponse && latestEntry && (
+          <div ref={latestResponseRef}>
+            <LatestResponse
+              entry={latestEntry}
+              response={latestResponse}
+              onDismiss={() => setShowLatestResponse(false)}
+            />
+          </div>
+        )}
+
         {/* Timeline (outside the fixed container) */}
-        <div style={{ 
-          flex: 1, 
-          overflowY: 'auto', 
-          paddingBottom: window.innerWidth <= 768 ? '0.5rem' : '2rem',
-          WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-          // Remove smooth scroll to prevent zoom interference
-          scrollBehavior: 'auto',
-          touchAction: 'pan-x pan-y pinch-zoom' // Allow pinch-zoom
-        }}>
-          <JournalTimeline userId={session?.user?.id} refreshTrigger={refreshTrigger} styleVariant={styleVariant} />
+        <div className="chat-thread">
+          <JournalTimeline 
+            userId={session?.user?.id} 
+            refreshTrigger={refreshTrigger} 
+            styleVariant={styleVariant}
+            excludeLatestResponse={showLatestResponse && latestResponse ? latestEntry : null}
+          />
         </div>
 
         {/* Summary Viewer */}
@@ -661,6 +758,16 @@ return (
             <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
           </div>
         )}
+
+        {/* Pattern Insight Viewer */}
+        {showPatternInsight && (
+          <PatternInsightViewer 
+            onClose={() => setShowPatternInsight(false)}
+            userId={session?.user?.id}
+            toneMode={forcedTone}
+          />
+        )}
+
         {/* Mood Tracker Model */}
         {showMoodTracker && (
           <MoodModal

@@ -1,0 +1,783 @@
+// 🔼 Imports and Setup      
+import React, { useEffect, useState } from 'react'; 
+import SummaryViewer from './SummaryViewer'; 
+import PatternInsightViewer from './PatternInsightViewer';
+import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
+import './App.css';
+// import DemoSofia from './pages/DemoSofia';
+import LandingPage from './LandingPage';
+import LoginPage from './LoginPage';
+import JournalTimeline from './components/JournalTimeline';
+import MoodModal from './components/MoodModal';
+import LatestResponse from './components/LatestResponse'; 
+
+const App = () => {
+
+  // --- Tone descriptions map ---
+  const toneDescriptions = {
+    therapist: "🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.",
+    marcus: "🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.",
+    frank: "💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.",
+    movies: "🎬 Movies – A movie buff who only speaks through movie metaphors.",
+    verena: "🌸 Verena – A clarity-driven life coach unphased by self-pity."
+  };
+
+  // Default to Clara
+  const [forcedTone, setForcedTone] = useState("therapist");
+  // Keep a visible description bound to the current selection
+  const [toneDescription, setToneDescription] = useState(toneDescriptions["therapist"]);
+
+  const handleToneChange = (e) => {
+    const val = e.target.value;
+    setForcedTone(val);
+    setToneDescription(toneDescriptions[val] || "");
+  };
+
+  const toneName = (t) =>
+  ({ therapist: 'Clara', marcus: 'Marcus', frank: 'Tony', movies: 'Movies', verena: 'Verena' }[t] || 'Mirror');
+
+  // 🔽 Existing states (no change to their order beyond moving forcedTone here)
+  const [showLogin, setShowLogin] = useState(false);
+  const [session, setSession] = useState(null);
+  const [entry, setEntry] = useState('');
+  const [history, setHistory] = useState([]);
+  const [tooltip, setTooltip] = useState("🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.");
+  const [latestEntryId, setLatestEntryId] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const [showPatternInsight, setShowPatternInsight] = useState(false);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summary, setSummary] = useState('');
+  const [parsedTags, setParsedTags] = useState([]);
+  const [severityLevel, setSeverityLevel] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+  const [inputExpanded, setInputExpanded] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const prompts = ["What’s shaking sugar?"];
+  const [showGroupedView, setShowGroupedView] = useState(false);
+  const [placeholderPrompt, setPlaceholderPrompt] = useState(() =>
+    prompts[Math.floor(Math.random() * prompts.length)] 
+  );
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  let transcriptBuffer = '';
+  const [tooltipVisible, setTooltipVisible] = useState(null); // 'pattern' | 'therapist' | 'mood' | null
+  const [styleVariant, setStyleVariant] = useState("D")
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeStep, setWelcomeStep] =useState(1);
+  const [username, setUsername] = useState('');
+  const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const handleCloseMoodTracker = () => setShowMoodTracker(false);
+  const handleOpenMoodTracker = () => setShowMoodTracker(true);
+
+  // 🔽 Responsive state for mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 560);
+
+  // 🔽 Latest Response State Management
+  const [latestResponse, setLatestResponse] = useState(null);
+  const [latestEntry, setLatestEntry] = useState(null);
+  const [showLatestResponse, setShowLatestResponse] = useState(false);
+  const latestResponseRef = React.useRef(null);
+
+  // 🔽 Function 1: Load Saved Username (rehydrate)
+  useEffect(() => {
+    const saved = UsernameStore.get();
+    if (saved) setUsername(saved);
+  }, []);
+
+  // 🔽 Handle window resize for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 560;
+      setIsMobile(mobile);
+      console.log('📱 Window resize - isMobile:', mobile, 'width:', window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    // Initial check
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+    // Log environment on startup
+  useEffect(() => {
+    console.log(`🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode`);
+    console.log(`🛰️ Backend: ${process.env.REACT_APP_BACKEND_URL || 'unset'}`);
+    console.log(`🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'}`);
+  }, []);
+  
+  // 🔽 Function 3: Show Summary Trigger (DISABLED - only show when user clicks)
+  // useEffect(() => {
+  //   const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
+  //   if (!hasTriggeredSummary && history.length >= 5) {
+  //     setShowSummary(true);
+  //     localStorage.setItem('hasTriggeredSummary', 'true');
+  //   }
+  // }, [history]);
+
+   // 🔽 Function 3a: Build Current Commit Tag 
+  useEffect(() => {
+    fetch('/build-version.txt')
+      .then(res => res.text())
+      .then(text => {
+         console.log("🛠️ App.js version:", text);
+         // console.log(`🧱 Frontend build version: ${text}`);
+      });
+  }, []);
+
+  // 🔽 Function 4: Auth Setup (boot + subscribe once)
+    useEffect(() => {
+      let stop = () => {};
+      (async () => {
+        setSession(await getBootSession());
+        stop = subscribeAuth(setSession);
+      })();
+      return () => stop();
+    }, []);
+
+ // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
+  const handleSubmit = async () => {
+    console.warn("🧪 handleSubmit called from device width:", window.innerWidth);
+    console.log("📝 Entry content:", entry.trim());
+
+    // Always read a stable username
+    const u = (username || UsernameStore.get() || '').trim();
+
+    // Make sure we have a session
+    let s = session;
+    if (!s) {
+      s = await getBootSession();
+      if (s) setSession(s);
+    }
+
+    // Guard rails: must have session + entry + username
+    const guardRails = { 
+      hasSession: !!s?.user, 
+      hasEntry: !!entry.trim(), 
+      hasUsername: !!u,
+      sessionUser: s?.user?.id,
+      username: u,
+      entry: entry.trim()
+    };
+    
+    setDebugInfo(`🔍 Guard Rails: ${JSON.stringify(guardRails, null, 2)}`);
+    
+    if (!s?.user || !entry.trim() || !u) {
+      setDebugInfo('❌ Guard rails failed - missing required data');
+      return;
+    }
+
+    setDebugInfo('🚀 Starting submission...');
+    setProcessingMessage(`⏳ ${toneName(forcedTone)} is thinking...`);
+    setIsProcessing(true);
+    
+    // 🔽 Hide any previous latest response when starting new submission
+    setShowLatestResponse(false);
+
+    const debug_marker = Math.random().toString(36).substring(2, 8);
+    const userId = s.user.id;
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    
+    const apiDetails = { 
+      backendUrl, 
+      userId, 
+      debug_marker,
+      entryLength: entry.length
+    };
+    
+    setDebugInfo(`📡 API: ${JSON.stringify(apiDetails, null, 2)}`);
+
+    try {
+      // First, let's test if we can reach the backend URL at all
+      if (!backendUrl) {
+        setDebugInfo('❌ Backend URL is undefined!');
+        return;
+      }
+      
+      setDebugInfo(`📤 Testing connection to: ${backendUrl}\n🌐 User Agent: ${navigator.userAgent}\n📡 Network: ${navigator.connection?.effectiveType || 'unknown'}`);
+      
+      // Test basic connectivity first
+      try {
+        const testResponse = await fetch(`${backendUrl}/health`, { 
+          method: 'GET'
+        });
+        setDebugInfo(`✅ Health check: ${testResponse.status}`);
+      } catch (healthErr) {
+        setDebugInfo(`❌ Health check failed: ${healthErr.message}\n🔄 Server might be sleeping - trying to wake it up...`);
+        
+        // Try to wake up the server by hitting the main endpoint
+        try {
+          await fetch(`${backendUrl}/`, { method: 'GET' });
+          setDebugInfo(`🔄 Wake-up call sent. Waiting 5 seconds for server to start...`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        } catch (wakeErr) {
+          setDebugInfo(`❌ Cannot wake server: ${wakeErr.message}`);
+        }
+      }
+      
+      setDebugInfo('📤 Making journal-entry request...');
+      
+      const requestBody = {
+        entry_text: entry,
+        tone_mode: forcedTone,
+        username: u,
+        user_id: userId,
+        debug_marker,
+      };
+      
+      setDebugInfo(`📦 Request body: ${JSON.stringify(requestBody, null, 2)}`);
+      
+      const res = await fetch(`${backendUrl}/journal-entry`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const responseInfo = { 
+        status: res.status, 
+        statusText: res.statusText,
+        ok: res.ok,
+        headers: Object.fromEntries(res.headers.entries())
+      };
+      
+      setDebugInfo(`📥 Response: ${JSON.stringify(responseInfo, null, 2)}`);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        setDebugInfo(`❌ Error Response: ${res.status} ${res.statusText}\nBody: ${errorText}`);
+        setShowLatestResponse(false); // Hide loading state on error
+        return;
+      }
+
+      const data = await res.json();
+      setDebugInfo(`✅ Success: ${JSON.stringify(data, null, 2)}`);
+      
+      // 🔽 Enhanced debugging for response field detection
+      console.log('🔍 Backend response data:', data);
+      console.log('🔍 Available fields:', Object.keys(data));
+      console.log('🔍 response_text (ChatBubble field):', data.response_text);
+      console.log('🔍 response (API field):', data.response);
+      console.log('🔍 journal_id (DB save confirmation):', data.journal_id);
+      console.log('🔍 Database save status:', data.saved ? '✅ SAVED' : '❌ NOT SAVED');
+      
+      // 🔽 FIX: Use the same field that ChatBubble successfully uses
+      const responseText = data.response_text || data.response || 'No response received.';
+      
+      // 🔽 Store latest response for immediate display
+      setLatestEntry(entry.trim());
+      setLatestResponse({
+        text: responseText,
+        tone: forcedTone,
+        toneName: toneName(forcedTone),
+        timestamp: new Date().toISOString()
+      });
+      setShowLatestResponse(true);
+      
+      // 🔽 Auto-scroll to show the response
+      setTimeout(() => {
+        if (latestResponseRef.current) {
+          latestResponseRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+    } catch (err) {
+      const errorDetails = {
+        message: err.message || 'Unknown error',
+        name: err.name || 'Unknown',
+        stack: err.stack || 'No stack trace',
+        toString: err.toString(),
+        constructor: err.constructor?.name || 'Unknown constructor'
+      };
+      
+      setDebugInfo(`❌ Detailed Error: ${JSON.stringify(errorDetails, null, 2)}`);
+      
+      // Additional specific error checks
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setDebugInfo(`❌ Network Error: Cannot connect to ${backendUrl}\nThis might be a CORS or connectivity issue.`);
+      }
+    } finally {
+      setEntry('');
+      setParsedTags([]);
+      setSeverityLevel('');
+      setIsProcessing(false);
+      // Add delay to ensure backend has written to database before refreshing timeline
+      setTimeout(() => {
+        setRefreshTrigger(prev => prev + 1);
+        console.log('📊 Timeline refresh triggered after submission');
+      }, 1200); // Increased delay to account for backend database write time
+      
+      // Collapse input on mobile after successful submission
+      if (window.innerWidth <= 768) {
+        setInputExpanded(false);
+      }
+    }
+  };
+
+  // 🔽 Function 5b: Generate Pattern Insight
+  const [processingMessage, setProcessingMessage] = useState("");
+  
+  const handlePatternInsight = async () => {
+    setShowPatternInsight(true);
+  };
+  
+   // 🔽 Function 6: Fetch Past Journals
+  const fetchHistory = async () => {
+    const user = session?.user;
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('journals')
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker')
+      .eq('user_id', user.id)
+      .order('timestamp', { ascending: false });
+      
+    if (error) {
+    console.error("❌ Error fetching history:", error.message);
+    return;
+  }
+
+  // 🔽 Function 6a: Filter Out No Respose, No debug markers 
+
+  const showAll = true; // <== True all entries, False filtered 
+  const filtered = showAll
+    ? (data || [])
+    : (data || []).filter(entry =>
+    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
+    entry.debug_marker?.trim() !== ''
+  );
+  // console.log("📜 Filtered journal history:", filtered);  // <== Enable if False 
+  setHistory(filtered);
+};
+
+  useEffect(() => {
+    if (session) fetchHistory();
+  }, [session]);
+
+  // 🔽 UI State Routing
+  if (!session && !showLogin) {
+    return <LandingPage onStart={() => setShowLogin(true)} />;
+  }
+
+  if (!session) {
+    return (
+      <LoginPage
+        onAuthSuccess={(session, username) => {
+          setSession(session);
+          setUsername(username);
+          UsernameStore.set(username); // <--persist
+        }}
+      />
+    );
+  }
+
+// 🔽 Function 7: Generate Handoff Summaries  
+
+  // 🔽 Tone Display Utility
+  const displayTone = (mode) => {
+    const t = mode?.trim().toLowerCase();
+    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Marcus Aurelius';
+  };
+
+  const getToneStyle = (mode) => {
+    const tone = mode?.trim().toLowerCase();
+    switch (tone) {
+      case 'frank':
+      case 'frank friend':
+        return {
+          backgroundColor: '#fff1f1',
+          borderColor: '#cc0000',
+          label: '🔴 Tony',
+        };
+      case 'marcus':
+      case 'marcus aurelius':
+        return {
+          backgroundColor: '#f0fdf4',
+          borderColor: '#2e7d32',
+          label: '🟢 Marcus Aurelius',
+        };
+      case 'therapist':
+        return {
+          backgroundColor: '#fef6ff',
+          borderColor: '#b755e5',
+          label: '🟣 Clara',
+        };
+      case 'movies':
+        return {
+          backgroundColor: '#fdfaf6',
+          borderColor: '#ff8c00',
+          label: '🎬 Movie Metaphors Man',
+        };
+      case 'verena':
+          return {
+            backgroundColor: '#ffeaf0',
+            borderColor: '#ec407a',
+            label: '🌸 Verena',
+        };  
+      default:
+        return {
+          backgroundColor: '#eeeeee',
+          borderColor: '#999999',
+          label: '❓ Unknown',
+        };
+    }
+  };
+
+    // Centralize tooltip copy in one place
+    const TOOLTIP_TEXT = {
+      pattern: "Generates a unified insight based on your recent themes, topics, and emotional loops.",
+      therapist: "A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.",
+      mood: "Visualizes your emotional trends over time. Coming soon."
+    };
+
+// 🔽 UI Rendering
+return (
+  <>
+    {/* Step 1: Voice Introduction + Begin */}
+    {showWelcome && welcomeStep === 1 && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(255,255,255,0.96)',
+          zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          padding: '2rem',
+          textAlign: 'center',
+          fontFamily: 'sans-serif',
+          overflowY: 'auto'
+        }}
+      >
+        <div style={{ maxWidth: '700px', width: '90%' }}>
+          <h2 style={{ marginBottom: '1rem', fontSize: '1.6rem' }}>✨ Choose Your Companion</h2>
+          <ul style={{ textAlign: 'left', fontSize: '1rem', marginBottom: '2rem' }}>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>💪🍷 Tony</b> – A frank, no-bullshit friend who’s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🧘 Marcus Aurelius</b> – Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. If inspired he may quote from his own journal, <i>Meditations</i>.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🩺 Clara</b> – A warm, grounded therapist who sees the pattern beneath the panic.
+            </li>
+            <li style={{ marginBottom: '1rem' }}>
+              <b>🎬 Movie Metaphor Man</b> – Only thinks in movie metaphors—no matter what you say. Your problems are part of the hero's journey.
+            </li>
+            <li style={{ marginBottom: '1.5rem' }}>
+              <b>🌸 Verena</b> – Verena is a clarity-driven career coach who helps you stop spinning your wheels and start building something real.
+            </li>
+          </ul>
+
+          <button
+            onClick={() => setShowWelcome(false)}
+            style={{
+              padding: '0.8rem 1.5rem',
+              fontSize: '1rem',
+              borderRadius: '6px',
+              backgroundColor: '#374151',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Let’s begin →
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* MAIN APP INTERFACE — Only render when welcome is dismissed */}
+    {!showWelcome && (
+      <div className="chat-container background-option-1">
+        {/* Header with Logout */}
+        <div className="app-header">
+          <div className="header-brand">
+            <h1 className="mirror-title">
+              <span className="mirror-emoji" role="img" aria-label="Cognitive Mirror"></span>
+              Cognitive Mirror
+            </h1>
+
+            <div className="beta-notice">
+               🚧 Rough Beta: Responses can take up to a minute. Thanks for your patience.
+            </div>
+          </div>
+  
+        {/* Username and Logout Button Placement Top Right */}
+        <div className="header-user">
+          <div className="user-info" title={session?.user?.id || ''}>
+            Signed in as <strong>{username || '—'}</strong>
+            {session?.user?.id ? (
+              <span style={{ color: 'var(--color-text-light)', marginLeft: 6 }}>
+                ({(session.user.id).slice(0, 8)})
+              </span>
+            ) : null}
+          </div>
+
+          <button
+            className="logout-btn"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setSession(null);
+            }}
+          >
+            Log Out
+          </button>
+        </div>
+        </div>
+
+        {/* Debug Panel for Mobile (only show on mobile and when there's debug info) */}
+        {window.innerWidth <= 768 && debugInfo && (
+          <div style={{
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
+            right: '10px',
+            background: '#000',
+            color: '#0f0',
+            padding: '10px',
+            borderRadius: '5px',
+            fontSize: '10px',
+            zIndex: 9999,
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            maxHeight: '200px',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong>🐛 Debug Info:</strong>
+              <button 
+                onClick={() => setDebugInfo('')}
+                style={{ background: '#333', color: '#fff', border: 'none', padding: '2px 6px', borderRadius: '3px' }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ marginTop: '5px' }}>{debugInfo}</div>
+          </div>
+        )}
+
+        {/* Sticky Input Bar (fixed) */}
+        <div
+          className={`reflection-input-container ${isMobile && !inputExpanded ? 'collapsed' : (isMobile ? 'expanded' : '')}`}
+          onClick={() => {
+            console.log('🔍 Input container clicked - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
+            if (!inputExpanded && isMobile) {
+              console.log('✅ Expanding input on mobile');
+              setInputExpanded(true);
+            }
+          }}
+          onTouchStart={(e) => {
+            console.log('👆 Touch start - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
+            if (!inputExpanded && isMobile) {
+              console.log('✅ Expanding input on mobile touch');
+              e.preventDefault();
+              setInputExpanded(true);
+            }
+          }}
+          style={{ touchAction: 'manipulation' }}
+        >
+          <textarea
+          className="reflection-textarea"
+          rows="3"
+          value={entry}
+          onChange={(e) => {
+            console.log('📝 Textarea onChange:', e.target.value);
+            setEntry(e.target.value);
+            
+            // 🔽 Auto-dismiss latest response when user starts typing new entry
+            if (showLatestResponse && e.target.value.length > 0) {
+              setShowLatestResponse(false);
+              // Trigger timeline refresh when Latest Response dismisses
+              console.log('📝 Latest Response dismissed - triggering timeline refresh');
+              setRefreshTrigger(prev => prev + 1);
+            }
+          }}
+          onFocus={() => console.log('🎯 Textarea focused')}
+          onBlur={() => console.log('👋 Textarea blurred')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (entry.trim() && !isProcessing) {
+                handleSubmit();
+              }
+            }
+            if (e.key === 'Escape' && isMobile) {
+              setInputExpanded(false);
+            }
+          }}
+          placeholder={placeholderPrompt}
+        />
+          {/* Toolbar row: all action buttons organized */}
+          <div className="cm-toolbar">
+            {/* Action buttons section */}
+            <div className="toolbar-section cm-actions">
+              {/* <button className="cm-btn" onClick={startListening} disabled={isListening}>
+                🎙️ Start
+              </button>
+              <button className="cm-btn" onClick={stopListening} disabled={!isListening}>
+                🛑 Stop
+          </button> */}
+          
+              <button 
+                  className="cm-btn cm-btn--primary" 
+                  onClick={handleSubmit}
+                  id="reflect-btn"
+                  aria-label="Reflect"
+                  type="button" 
+                  disabled={isProcessing || !entry.trim()}>
+                🧠 Reflect
+              </button>
+
+              {/* Mobile close button when expanded */}
+              {isMobile && inputExpanded && (
+                <button 
+                  className="cm-btn" 
+                  onClick={() => setInputExpanded(false)}
+                  aria-label="Close"
+                  type="button">
+                  ✕ Close
+                </button>
+              )}
+
+              <button
+                className="cm-btn"
+                onClick={handlePatternInsight}
+                onMouseEnter={() => setTooltipVisible('pattern')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                🧭 See Pattern Insight
+              </button>
+
+              <button
+                className="cm-btn"
+                onClick={() => setShowSummary(true)}
+                onMouseEnter={() => setTooltipVisible('therapist')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                🩺 Therapist Summary
+              </button>
+
+              <button
+                className="cm-btn"
+                onClick={handleOpenMoodTracker /* your existing handler */}
+                onMouseEnter={() => setTooltipVisible('mood')}
+                onMouseLeave={() => setTooltipVisible(null)}
+              >
+                📊 Mood Tracker
+              </button>
+
+              {/* Shared tooltip renderer for the three buttons */}
+              {tooltipVisible && (
+                <div className="tooltip">
+                  {tooltipVisible === 'pattern' &&
+                    'Generates a unified insight based on your recent themes, topics, and emotional loops.'}
+                  {tooltipVisible === 'therapist' &&
+                    'A handoff-style recap of emotional themes, loops, and potential focus areas for therapy.'}
+                  {tooltipVisible === 'mood' && 'Visualizes your emotional trends over time.'}
+                </div>
+              )}
+
+              {isListening && <span>🎧 Listening…</span>}
+              {isProcessing && (
+                <div className="processing-message">
+                  ⏳ {toneName(forcedTone)} is thinking<span className="dots"></span>
+                </div>
+              )}
+            </div>
+
+            {/* Voice selection section */}
+            <div className="toolbar-section voice-section">
+              <label className="voice-label">🗣️ Voice:</label>
+              <select
+                className="voice-select"
+                value={forcedTone}
+                onChange={handleToneChange}
+                aria-label="Select voice"
+              >
+                <option value="therapist">Clara</option>
+                <option value="marcus">Marcus</option>
+                <option value="frank">Tony</option>
+                <option value="movies">Movies</option>
+                <option value="verena">Verena</option>
+              </select>
+              <div className="voice-description" aria-live="polite">
+                {toneDescription}
+              </div>
+            </div>
+          </div>
+          {/* END toolbar */}
+        </div>
+        {/* END fixed input container */}
+
+        {/* Latest Response Section - appears immediately after input */}
+        {isProcessing && (
+          <div className="latest-response-loading">
+            <div className="latest-response-loading-content">
+              <div className="latest-response-loading-spinner">🤔</div>
+              <div className="latest-response-loading-text">
+                {processingMessage || `${toneName(forcedTone)} is thinking...`}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showLatestResponse && latestResponse && latestEntry && (
+          <div ref={latestResponseRef}>
+            <LatestResponse
+              entry={latestEntry}
+              response={latestResponse}
+              onDismiss={() => setShowLatestResponse(false)}
+            />
+          </div>
+        )}
+
+        {/* Timeline (outside the fixed container) */}
+        <div className="chat-thread">
+          <JournalTimeline 
+            userId={session?.user?.id} 
+            refreshTrigger={refreshTrigger} 
+            styleVariant={styleVariant}
+            excludeLatestResponse={showLatestResponse && latestResponse ? latestEntry : null}
+          />
+        </div>
+
+        {/* Summary Viewer */}
+        {showSummary && (
+          <div style={{ marginTop: '1rem' }}>
+            <SummaryViewer history={history} onClose={() => setShowSummary(false)} />
+          </div>
+        )}
+
+        {/* Pattern Insight Viewer */}
+        {showPatternInsight && (
+          <PatternInsightViewer 
+            onClose={() => setShowPatternInsight(false)}
+            userId={session?.user?.id}
+            toneMode={forcedTone}
+          />
+        )}
+
+        {/* Mood Tracker Model */}
+        {showMoodTracker && (
+          <MoodModal
+            userId={session?.user?.id}
+            onClose={handleCloseMoodTracker}
+          />
+        )}
+      </div>
+    )}
+  </>
+);
+}
+export default App;

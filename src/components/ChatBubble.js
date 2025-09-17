@@ -10,10 +10,7 @@ export default function ChatBubble({ entry, isMostRecent = false, styleVariant =
   const style = getToneStyle(entry.tone_mode || 'frank');
   const isUserEntry = !entry.response_text && !isInsight;
 
-  if (isMostRecent) {
-    console.log('Tone Mode:', entry.tone_mode);
-    console.log('Resolved Style:', getToneStyle(entry.tone_mode || 'frank'));
-  }
+  // Removed console spam for debugging
 
 const bubbleStyle = (() => {
   switch (styleVariant) {

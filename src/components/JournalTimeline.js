@@ -17,7 +17,7 @@ import Card from './Card';
 import { Button } from './Button';
 import ChatBubble from './ChatBubble';
 
-export default function JournalTimeline({userId, refreshTrigger, styleVariant }) {
+export default function JournalTimeline({userId, refreshTrigger, styleVariant, excludeLatestResponse }) {
   const [journalEntries, setJournalEntries] = useState([]);
   // const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,6 @@ export default function JournalTimeline({userId, refreshTrigger, styleVariant })
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [availableThemes, setAvailableThemes] = useState([]);
   const [collaspedMonths, setCollapsedMonths] = useState({});
-  const bottomRef = useRef(null);
   const timelineRef = useRef(null);
   
   // Track zoom/pinch state to prevent scroll interference
@@ -35,9 +34,10 @@ export default function JournalTimeline({userId, refreshTrigger, styleVariant })
   const [touchCount, setTouchCount] = useState(0);
   const zoomTimeoutRef = useRef(null);
   
-  // Track if we should auto-scroll (only on initial load and new entries)
+  // Track entry count changes (restored from chronology changes)
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [lastEntryCount, setLastEntryCount] = useState(0);
+  const bottomRef = useRef(null);
 
 
 
@@ -85,6 +85,13 @@ useEffect(() => {
       return;
     }
 
+    // 🔽 Temporarily disabled to prevent 404 errors
+    // TODO: Re-enable when backend endpoint is implemented
+    console.log('🔍 Theme insight fetch disabled (preventing 404):', { insightTheme, userId });
+    setThemeInsight(null);
+    return;
+
+    /* DISABLED CODE:
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/mention-count?user_id=${userId}&theme=${encodeURIComponent(insightTheme)}`
@@ -100,6 +107,7 @@ useEffect(() => {
       console.error('❌ Fetch failed:', err);
       setThemeInsight(null);
     }
+    */
   };
 
   fetchInsight();
@@ -108,14 +116,15 @@ useEffect(() => {
 useEffect(() => {
   const fetchJournals = async () => {
     setLoading(true);
+    console.log('🔄 JournalTimeline: FETCH TRIGGERED with refreshTrigger:', refreshTrigger, 'at', new Date().toISOString());
 
-    // Add cache busting for mobile browsers
+    // Explicit fresh query with cache busting
     const { data, error } = await supabase
       .from('journals')
-      .select('*')  // ✅ Include all fields for flexibility
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker, user_id')
       .eq('user_id', userId)
       .order('timestamp', { ascending: false })
-      .limit(50); // Limit to prevent huge mobile data loads
+      .limit(50);
 
     if (error) {
       console.error('❌ Error fetching journals:', error.message);
@@ -123,10 +132,39 @@ useEffect(() => {
       return;
     }
 
-    setJournalEntries(data || []);
-    console.log('✅ journalEntries populated:', data?.length || 0, 'entries'); 
-    console.log('📱 Mobile device:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-    console.log('🕐 Latest entry timestamp:', data?.[0]?.timestamp);
+    console.log('🔄 BEFORE setJournalEntries - current state:', {
+      oldCount: journalEntries.length,
+      newCount: data?.length || 0,
+      refreshTrigger,
+      oldFirstId: journalEntries[0]?.id?.substring(0,8),
+      newFirstId: data?.[0]?.id?.substring(0,8)
+    });
+    
+    // Filter out the entry currently shown in Latest Response to avoid duplication
+    let filteredData = data || [];
+    if (excludeLatestResponse) {
+      filteredData = filteredData.filter(entry => 
+        entry.entry_text?.trim() !== excludeLatestResponse.trim()
+      );
+      console.log('🚫 FILTERING Latest Response from timeline:', {
+        excludeText: excludeLatestResponse.substring(0, 50) + '...',
+        beforeCount: data?.length || 0,
+        afterCount: filteredData.length
+      });
+    }
+    
+    setJournalEntries(filteredData);
+    
+    console.log('🔄 AFTER setJournalEntries - state should update:', {
+      fetchedCount: data?.length || 0,
+      refreshTrigger,
+      firstEntryId: data?.[0]?.id?.substring(0,8),
+      firstEntryTime: data?.[0]?.timestamp,
+      lastEntryId: data?.[data?.length-1]?.id?.substring(0,8),
+      lastEntryTime: data?.[data?.length-1]?.timestamp,
+      entriesWithResponses: data?.filter(e => e.response_text).length,
+      firstEntryText: data?.[0]?.entry_text?.substring(0,50) + '...'
+    });
     setLoading(false);
   };
 
@@ -169,20 +207,40 @@ useEffect(() => {
     
     // Check if this is initial load or new entries were added
     const isInitialLoad = lastEntryCount === 0 && currentEntryCount > 0;
-    const hasNewEntries = currentEntryCount > lastEntryCount && lastEntryCount > 0;
+    // FIXED: Also detect when first entry ID changes (new entries with 50-limit)
+    const firstEntryChanged = journalEntries.length > 0 && lastEntryCount > 0;
+    const hasNewEntries = (currentEntryCount > lastEntryCount && lastEntryCount > 0) || firstEntryChanged;
     
-    if (bottomRef.current && shouldAutoScroll && (isInitialLoad || hasNewEntries) && !isZooming && touchCount < 2) {
+    // DIAGNOSTIC: Log every state change
+    console.log('🔍 AUTO-SCROLL EFFECT:', {
+      currentEntryCount,
+      lastEntryCount,
+      isInitialLoad,
+      hasNewEntries,
+      shouldAutoScroll,
+      refreshTrigger,
+      journalEntriesIds: journalEntries.map(e => e.id?.substring(0,8)),
+      latestTimestamp: journalEntries[0]?.timestamp
+    });
+    
+    if (shouldAutoScroll && (isInitialLoad || hasNewEntries) && !isZooming && touchCount < 2) {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
       
+      console.log('📜 TRIGGERING AUTO-SCROLL to top (newest-first)');
       const timeoutId = setTimeout(() => {
-        bottomRef.current.scrollIntoView({ 
-          behavior: isMobile ? 'auto' : 'smooth',
-          block: 'end'
-        });
+        // For newest-first chronology, scroll to TOP where new entries appear
+        if (timelineRef.current) {
+          timelineRef.current.scrollTo({ 
+            top: 0,
+            behavior: isMobile ? 'auto' : 'smooth'
+          });
+        }
+        console.log('📜 AUTO-SCROLL COMPLETED (scrolled to top)');
         
         // After first auto-scroll, disable it until new entries arrive
         if (isInitialLoad) {
           setShouldAutoScroll(false);
+          console.log('📜 AUTO-SCROLL DISABLED after initial load');
         }
       }, isInitialLoad ? 500 : 100);
       
@@ -191,14 +249,27 @@ useEffect(() => {
     
     // Update the count for next comparison
     setLastEntryCount(currentEntryCount);
+    console.log('📊 UPDATED lastEntryCount to:', currentEntryCount);
   }, [journalEntries, shouldAutoScroll, lastEntryCount, isZooming, touchCount]);
   
-  // Re-enable auto-scroll when new entries are added (from submissions)
-  useEffect(() => {
-    if (journalEntries.length > lastEntryCount) {
-      setShouldAutoScroll(true);
-    }
-  }, [refreshTrigger]); // When refresh trigger changes (new submission)
+  // DISABLED: Aggressive auto-scroll re-enabling that interferes with manual scrolling
+  // Only auto-scroll on the very first load, never re-enable after that
+  // useEffect(() => {
+  //   if (journalEntries.length > lastEntryCount) {
+  //     setShouldAutoScroll(true);
+  //   }
+  // }, [refreshTrigger]);
+
+  // useEffect(() => {
+  //   const currentEntryCount = journalEntries.length;
+  //   const firstEntryChanged = journalEntries.length > 0 && lastEntryCount > 0;
+  //   const hasNewEntries = (currentEntryCount > lastEntryCount && lastEntryCount > 0) || firstEntryChanged;
+  //   
+  //   if (hasNewEntries) {
+  //     console.log('🔄 NEW ENTRIES DETECTED - Re-enabling auto-scroll');
+  //     setShouldAutoScroll(true);
+  //   }
+  // }, [journalEntries, lastEntryCount]);
 
  // ✅ FILTER THEMES: Step 1: Filter entries by selected theme before grouping
 const filteredEntries = selectedTheme
@@ -254,6 +325,7 @@ journalEntries.forEach(entry => {
 
 return (
   <div
+    key={`timeline-${refreshTrigger}-${journalEntries[0]?.id || 'empty'}`}
     ref={timelineRef}
     onTouchStart={handleTouchStart}
     onTouchEnd={handleTouchEnd}
@@ -270,15 +342,26 @@ return (
       userSelect: 'none' // Prevent text selection during zoom
     }}
 >
-    {Object.entries(
-      journalEntries.reduce((acc, entry) => {
+    {(() => {
+      const grouped = journalEntries.reduce((acc, entry) => {
         const dateKey = dayjs(entry.timestamp).format('YYYY-MM-DD');
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(entry);
         return acc;
-      }, {})
-    )
-      .sort((a, b) => new Date(a[0]) - new Date(b[0])) // 🪃 Recent date first
+      }, {});
+      
+      const sorted = Object.entries(grouped).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+      
+      console.log('🎨 RENDERING TIMELINE:', {
+        totalDays: sorted.length,
+        firstDay: sorted[0]?.[0],
+        firstDayEntryCount: sorted[0]?.[1]?.length,
+        firstDayFirstEntry: sorted[0]?.[1]?.[0]?.entry_text?.substring(0, 50),
+        firstDayFirstEntryTime: sorted[0]?.[1]?.[0]?.timestamp
+      });
+      
+      return sorted;
+    })() // 🎯 NEWEST FIRST: with debugging
       .map(([dateKey, entries]) => (
         <div key={dateKey} style={{ marginBottom: '2rem' }}>
           <h3 style={{
@@ -290,7 +373,7 @@ return (
             {dayjs(dateKey).format('MMMM D, YYYY')}
           </h3>
           {entries
-            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // 🎯 FIXED: newest-first within each day too
             .map(entry => (
               <div key={entry.id || entry.timestamp} style={{ marginBottom: '1rem' }}>
                 {entry.entry_text && (
@@ -298,7 +381,8 @@ return (
                     entry={{
                       entry_text: entry.entry_text,
                       tone_mode: 'user',
-                      entry_type: 'reflection'
+                      entry_type: 'reflection',
+                      timestamp: entry.timestamp
                     }}
                     styleVariant={styleVariant}
                     isMostRecent={entry.id === latestEntryId}
