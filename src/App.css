@@ -203,8 +203,14 @@
     z-index: 100;
   }
   
+  /* Ensure parent doesn't clip fixed positioned elements */
+  .reflection-input-container {
+    contain: none !important;
+  }
+  
   /* Collapsed state - minimal footprint with guaranteed visibility */
   .reflection-input-container.collapsed {
+    position: fixed !important;
     padding: 0.6rem 1rem;
     background-color: rgba(255, 255, 255, 0.98);
     border: 2px solid var(--color-accent);
@@ -213,12 +219,12 @@
     min-height: 48px;
     right: 16px;
     left: auto;
+    bottom: 16px !important;
     margin: 0;
     display: flex !important;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    position: fixed;
     backdrop-filter: blur(10px);
     touch-action: manipulation;
     /* Ensure always visible above other content */
@@ -226,8 +232,9 @@
     /* Prevent any accidental hiding */
     visibility: visible !important;
     opacity: 1 !important;
-    /* Position at bottom right corner of mobile viewport */
-    bottom: 24px;
+    /* Position at bottom right corner of mobile viewport - fixed to true viewport */
+    bottom: 20px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
     /* Ensure it's fully within viewport */
     transform: translateX(0);
   }

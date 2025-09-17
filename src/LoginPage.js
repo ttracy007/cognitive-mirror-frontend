@@ -92,85 +92,131 @@ const LoginPage = ({ onAuthSuccess }) => {
         left: 0,
         width: '100%',
         height: '100%',
+        minHeight: '100svh',
         backgroundColor: 'rgba(255,255,255,0.96)',
         zIndex: 1000,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         flexDirection: 'column',
-        padding: '2rem',
+        padding: '1rem',
+        paddingTop: 'max(2rem, env(safe-area-inset-top) + 2rem)',
+        paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
         textAlign: 'center',
-        fontFamily: 'sans-serif'
+        fontFamily: 'sans-serif',
+        overflowY: 'auto'
       }}
     >
-      <h2 style={{ fontSize: '1.6rem', marginBottom: '1rem' }}>What should we call you?</h2>
-      <p style={{ fontStyle: 'italic', marginBottom: '1.5rem' }}>
-        Don’t worry — everything you say here is like Vegas. Stays in the Mirror.
-      </p>
-
-      <input
-        type="text"
-        required
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Enter a name"
-        style={{
-          padding: '0.75rem',
-          fontSize: '1rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          marginBottom: '1.25rem',
-          width: '100%',
+      <div style={{ 
+        width: '100%', 
+        maxWidth: '400px', 
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        flex: '1',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 4rem)'
+      }}>
+        <h2 style={{ 
+          fontSize: 'clamp(1.3rem, 4vw, 1.6rem)', 
+          marginBottom: '1rem',
+          lineHeight: 1.2
+        }}>
+          What should we call you?
+        </h2>
+        <p style={{ 
+          fontStyle: 'italic', 
+          marginBottom: '1.5rem',
+          fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
           maxWidth: '300px'
-        }}
-      />
+        }}>
+          Don't worry — everything you say here is like Vegas. Stays in the Mirror.
+        </p>
 
-      <input
-        type={showPassword ? 'text' : 'password'}
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter a password"
-        style={{
-          padding: '0.75rem',
-          fontSize: '1rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          marginBottom: '1.25rem',
-          width: '100%',
-          maxWidth: '300px'
-        }}
-      />
-      <span
-        onClick={() => setShowPassword(!showPassword)}
-        style={{ cursor: 'pointer', fontSize: '0.95rem', marginBottom: '1.25rem', color: '#555' }}
-      >
-        {showPassword ? '🙈 Hide password' : '👁️ Show password'}
-      </span>
+        <input
+          type="text"
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter a name"
+          style={{
+            padding: '0.75rem',
+            fontSize: 'clamp(1rem, 3vw, 1rem)',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            marginBottom: '1.25rem',
+            width: '100%',
+            maxWidth: '300px',
+            minHeight: '48px',
+            boxSizing: 'border-box'
+          }}
+        />
 
-      <button
-        onClick={handleLoginOrSignup}
-        style={{
-          padding: '0.8rem 1.5rem',
-          fontSize: '1rem',
-          borderRadius: '6px',
-          backgroundColor: '#374151',
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-          width: '100%',
-          maxWidth: '300px',
-          marginTop: '1rem',
-          opacity: isSubmitting ? 0.7 : 1
-        }}
-        disabled={isSubmitting || !username.trim() || !password.trim()}
-      >
-        {isSubmitting ? 'Signing in…' : 'Start Reflecting →'}
-      </button>
+        <input
+          type={showPassword ? 'text' : 'password'}
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter a password"
+          style={{
+            padding: '0.75rem',
+            fontSize: 'clamp(1rem, 3vw, 1rem)',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            marginBottom: '1.25rem',
+            width: '100%',
+            maxWidth: '300px',
+            minHeight: '48px',
+            boxSizing: 'border-box'
+          }}
+        />
+        <span
+          onClick={() => setShowPassword(!showPassword)}
+          style={{ 
+            cursor: 'pointer', 
+            fontSize: 'clamp(0.9rem, 2.5vw, 0.95rem)', 
+            marginBottom: '1.25rem', 
+            color: '#555',
+            minHeight: '24px',
+            display: 'inline-block'
+          }}
+        >
+          {showPassword ? '🙈 Hide password' : '👁️ Show password'}
+        </span>
 
-      {errorMsg && (
-        <p style={{ color: 'red', marginTop: '1rem', fontSize: '0.9rem' }}>{errorMsg}</p>
-      )}
+        <button
+          onClick={handleLoginOrSignup}
+          style={{
+            padding: '0.8rem 1.5rem',
+            fontSize: 'clamp(1rem, 3vw, 1rem)',
+            borderRadius: '6px',
+            backgroundColor: '#374151',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+            width: '100%',
+            maxWidth: '300px',
+            marginTop: '1rem',
+            minHeight: '48px',
+            opacity: isSubmitting ? 0.7 : 1
+          }}
+          disabled={isSubmitting || !username.trim() || !password.trim()}
+        >
+          {isSubmitting ? 'Signing in…' : 'Start Reflecting →'}
+        </button>
+
+        {errorMsg && (
+          <p style={{ 
+            color: 'red', 
+            marginTop: '1rem', 
+            fontSize: 'clamp(0.85rem, 2.3vw, 0.9rem)',
+            maxWidth: '300px'
+          }}>
+            {errorMsg}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
