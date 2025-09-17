@@ -120,5 +120,69 @@ If **any** checkbox is checked, document the change in `INTEGRATION-CHANGES.md` 
 - Backend deploys to Render.com
 - Requires CORS configuration for cross-origin requests
 
+## Git Merge Strategy
+
+### Common Merge Conflicts & Resolutions
+
+**BEFORE MERGING DEV TO MASTER:**
+1. **Clean dev branch first**: Remove .env files, ignore cache conflicts
+2. **Expect cache conflicts**: `node_modules/.cache/` files ALWAYS conflict - ignore them
+3. **Environment files**: `.env` should NOT be merged between branches
+4. **Binary file conflicts**: Accept all cache file conflicts automatically
+
+**Recommended Merge Strategy:**
+```bash
+# In master worktree
+cd /Users/mac/Projects/cognitive-mirror-frontend
+git checkout master
+git merge dev --strategy-option=ours node_modules/.cache/
+git rm .env  # Always remove environment files 
+git add .
+git commit -m "Merge dev: [description] - resolve cache conflicts"
+git push origin master
+```
+
+**Common Conflict Files to Ignore:**
+- `node_modules/.cache/.eslintcache`
+- `node_modules/.cache/default-development/*.pack`
+- `.env` (should be gitignored)
+
+## Claude Cognitive Bias Corrections
+
+### Anti-Scope-Escalation Protocol
+**BEFORE implementing ANY solution:**
+- What is the MINIMAL change that solves this specific problem?
+- Am I adding features that weren't requested?
+- Could this be solved by changing 1-3 lines instead of rewriting components?
+
+### Diagnosis-First Protocol  
+**BEFORE assuming code is broken:**
+- Is this a deployment/environment issue?
+- Is the "working version" actually deployed and running?
+- What specific evidence proves the code logic is wrong?
+
+### Simplicity-First Hierarchy
+**WHEN multiple solutions exist:**
+1. Environment/config change (preferred)
+2. Single-line code modification
+3. Component modification  
+4. Architecture change (last resort)
+
+**NEVER start with #4 for simple issues**
+
+### Context Disambiguation
+**"Working version" requires clarification:**
+- Working deployed = Live production behavior
+- Working local = Local development behavior  
+- Working git = Previous commit state
+
+**These are often different - always specify which one**
+
+### Common Anti-Patterns to Avoid
+- ❌ Rewriting components when the issue is CORS/environment
+- ❌ Adding manual controls when auto-functionality works fine
+- ❌ Assuming code logic is wrong before checking deployment status
+- ❌ Over-engineering solutions when 1-line fixes exist
+
 ---
-*Last updated: 2025-01-10*
+*Last updated: 2025-01-15*

@@ -9,7 +9,6 @@ const SummaryViewer = ({ history, onClose }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -17,7 +16,6 @@ const SummaryViewer = ({ history, onClose }) => {
 
   const generateAllSummaries = async () => {
   setIsLoading(true);
-  setIsModalOpen(true);
 
   try {
     const types = ['insight', 'clinical'];
@@ -53,67 +51,85 @@ const SummaryViewer = ({ history, onClose }) => {
   useEffect(() => {
     generateAllSummaries();
   }, []);
-  
-  // React.useEffect(() => {
-  //   generateAllSummaries();
-  // }, []);
 
   return (
-    <div
-      style={{
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        fontFamily: 'sans-serif',
-        paddingBottom: '6rem'
-      }}
-    >
-      <h2>🧾 Handoff Summaries</h2>
-
-      {isLoading ? (
-        <p>🔄 Generating summaries...</p>
-      ) : (
-        <>
-          {/* Insight Summary */}
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>🧠 Insight Summary</h3>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
-            <strong>Empathic. Reflective. Grounded.</strong><br />
-            A therapist-to-therapist narrative that distills emotional patterns, protective strategies, and therapeutic needs.
+    <div className="therapy-prep-modal-overlay">
+      <div className="therapy-prep-modal">
+        <div className="therapy-prep-header">
+          <h2 className="therapy-prep-title">Session Prep Summary</h2>
+          <p className="therapy-prep-subtitle">
+            Key insights to bring to your therapy session
           </p>
-          <SummaryBlock
-            label="Insight Summary"
-            content={summaries.insight|| 'Summary not available.'}
-            onCopy={() => copyToClipboard(summaries.insight?.summary)}
-          />
+          <button 
+            className="therapy-prep-close"
+            onClick={onClose}
+            aria-label="Close summary"
+          >
+            ×
+          </button>
+        </div>
 
-          {/* Clinical Summary */}
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '0.25rem' }}>🧠 Clinical Summary</h3>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginTop: 0, marginBottom: '1rem' }}>
-            <strong>Structured. DSM-Informed. Objective.</strong><br />
-            A concise intake-style overview highlighting symptom patterns, cognitive tendencies, and behavioral dynamics.
-          </p>
-          <SummaryBlock
-            label="Clinical Summary"
-            content={summaries.clinical || 'Summary not available.'}
-            onCopy={() => copyToClipboard(summaries.clinical?.summary)}
-          />
+        <div className="therapy-prep-content">
+          {isLoading ? (
+            <div className="therapy-prep-loading">
+              <div className="loading-spinner"></div>
+              <h3>Preparing your insights...</h3>
+              <p>Analyzing patterns from your recent reflections</p>
+            </div>
+          ) : (
+            <div className="therapy-prep-sections">
+              {/* Key Themes Section */}
+              <div className="therapy-prep-section">
+                <div className="section-header">
+                  <h3>🎯 Key Themes This Week</h3>
+                  <p>What patterns have emerged in your thoughts and feelings</p>
+                </div>
+                <div className="summary-card insight-card">
+                  <div className="summary-content">
+                    {summaries.insight || 'Generating insights from your recent reflections...'}
+                  </div>
+                  <button 
+                    className="copy-button"
+                    onClick={() => copyToClipboard(summaries.insight)}
+                    disabled={!summaries.insight}
+                  >
+                    📋 Copy for Session
+                  </button>
+                </div>
+              </div>
 
-          
-        </>
-      )}
+              {/* Patterns Section */}
+              <div className="therapy-prep-section">
+                <div className="section-header">
+                  <h3>📊 Patterns I've Noticed</h3>
+                  <p>Behavioral and emotional patterns worth exploring together</p>
+                </div>
+                <div className="summary-card clinical-card">
+                  <div className="summary-content">
+                    {summaries.clinical || 'Analyzing behavioral patterns and themes...'}
+                  </div>
+                  <button 
+                    className="copy-button"
+                    onClick={() => copyToClipboard(summaries.clinical)}
+                    disabled={!summaries.clinical}
+                  >
+                    📋 Copy for Session
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
-      <button
-        onClick={onClose}
-        style={{
-          marginTop: '2rem',
-          padding: '0.75rem 1.5rem',
-          fontSize: '1rem',
-          backgroundColor: '#eee',
-          border: '1px solid #ccc',
-          cursor: 'pointer',
-        }}
-      >
-        Close
-      </button>
+        <div className="therapy-prep-footer">
+          <button
+            className="therapy-prep-done-button"
+            onClick={onClose}
+          >
+            Ready for My Session
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
