@@ -62,7 +62,7 @@ const wrap = {
   minHeight: '100svh',
   display: 'block',
   padding: '1rem 1.25rem 2rem',
-  paddingTop: '16rem',
+  paddingTop: '20rem',
   paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
   overflowY: 'auto'
 };
