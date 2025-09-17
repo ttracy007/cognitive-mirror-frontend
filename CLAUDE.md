@@ -1,5 +1,60 @@
 # Cognitive Mirror Frontend - Claude Development Notes
 
+## 🚨 MANDATORY: Quality Control Protocols
+
+### STOP - DIAGNOSE FIRST PROTOCOL
+**Before ANY code changes, complete this checklist:**
+
+#### 1. Evidence Collection (Required)
+- [ ] Console logs showing actual errors (screenshots/text)
+- [ ] Network tab showing API request/response data
+- [ ] Database state verification (what data actually exists)
+- [ ] Component state inspection (what values are present)
+
+#### 2. Diagnostic Hierarchy (Complete in order)
+- [ ] **Level 1: Data Source** - Is data in database? (Check Supabase directly)
+- [ ] **Level 2: API Layer** - Is backend saving/returning data correctly?
+- [ ] **Level 3: Transport Layer** - Is frontend sending correct requests?
+- [ ] **Level 4: Display Layer** - Is frontend displaying existing data?
+
+**RULE: Only proceed to next level after confirming previous level works**
+
+#### 3. Root Cause vs Symptom Check
+- [ ] Timeline not updating = **Data source problem**, not display problem
+- [ ] API returns response but no DB entry = **Backend issue**, not frontend
+- [ ] Multiple competing systems = **Architecture problem**, not timing issue
+
+### CHANGE AUTHORIZATION MATRIX
+
+**MINOR** (Immediate approval):
+- CSS styling, text changes, visual adjustments
+
+**MODERATE** (Evidence required):
+- Component logic, state management
+- Requires evidence-based justification before proceeding
+
+**MAJOR** (Complete diagnostic protocol):
+- Data flow changes, API integration modifications
+- Must complete full diagnostic hierarchy first
+
+**CRITICAL** (Human approval required):
+- System architecture changes
+- Multiple component modifications
+
+### VERIFICATION PROTOCOL (Mandatory)
+1. Make ONE minimal change
+2. Test specific functionality immediately
+3. Provide evidence that fix works (screenshots/logs)
+4. Only then claim success
+5. If test fails, revert change immediately before trying again
+
+### FAILURE RECOVERY PROTOCOL
+**After 3 failed attempts at same problem:**
+1. STOP making changes immediately
+2. Document all attempted solutions and their failures
+3. Consider rollback to known working state
+4. Re-evaluate problem from first principles using diagnostic hierarchy
+
 ## Project Overview
 
 React-based frontend for the Cognitive Mirror journaling application with AI-powered responses and insights.
@@ -37,9 +92,7 @@ npm run lint
 
 ## Integration Documentation
 
-Complete frontend/backend integration docs are in the backend repo at:
-
-**`/Users/mac/Projects/cognitive-mirror-backend-dev/INTEGRATION.md`**
+**Single Source of Truth**: `/Users/mac/Projects/cognitive-mirror-backend-dev/INTEGRATION.md`
 
 This includes:
 - API endpoint specifications with request/response formats
@@ -69,7 +122,7 @@ This includes:
 
 **Integration Change Process:**
 1. **Before committing** - Check if your changes affect backend integration
-2. **If yes** - Document in `INTEGRATION-CHANGES.md` using the provided template
+2. **If yes** - Document changes directly in backend integration guide, not in staging files
 3. **Coordinate** - Notify backend team of pending changes
 4. **Verify** - Test integration after backend updates are deployed
 5. **Archive** - Move completed changes to archive section
@@ -82,14 +135,14 @@ This includes:
 - [ ] Does this affect CORS requirements?
 - [ ] Does this impact mobile-specific backend needs?
 
-If **any** checkbox is checked, document the change in `INTEGRATION-CHANGES.md` immediately.
+If **any** checkbox is checked, document the change directly in backend integration guide immediately.
 
 ## Mobile Optimizations
 
 - Pinch-zoom detection to prevent scroll conflicts
 - Collapsible input container for better screen utilization
 - Touch-aware scrolling with iOS optimizations
-- Mobile-specific debug overlays for troubleshooting
+- Environment-based debug overlays (development only)
 
 ## Environment Configuration Management
 
@@ -146,6 +199,29 @@ git push origin master
 - `node_modules/.cache/.eslintcache`
 - `node_modules/.cache/default-development/*.pack`
 - `.env` (should be gitignored)
+
+## Git Worktree Protocol
+
+**Repository Structure:**
+- **Dev Worktree**: `/Users/mac/Projects/cognitive-mirror-frontend-dev` (dev branch)
+- **Master Worktree**: `/Users/mac/Projects/cognitive-mirror-frontend` (master branch)
+
+**Deployment Commands (Copy exactly):**
+```bash
+# 1. Push dev changes
+git push origin dev
+
+# 2. Merge dev to master (from dev worktree)
+git -C /Users/mac/Projects/cognitive-mirror-frontend merge dev
+
+# 3. Push master to production
+git -C /Users/mac/Projects/cognitive-mirror-frontend push origin master
+```
+
+**Critical Rules:**
+- Always use `-C` flag with full path for cross-worktree operations
+- Never try to checkout master from dev worktree
+- Never change working directory - use `git -C` instead
 
 ## Claude Cognitive Bias Corrections
 
