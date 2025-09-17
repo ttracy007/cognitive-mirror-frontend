@@ -226,8 +226,8 @@
     /* Prevent any accidental hiding */
     visibility: visible !important;
     opacity: 1 !important;
-    /* Position properly visible but near bottom */
-    bottom: 220px;
+    /* Position at bottom right corner of mobile viewport */
+    bottom: 24px;
     /* Ensure it's fully within viewport */
     transform: translateX(0);
   }

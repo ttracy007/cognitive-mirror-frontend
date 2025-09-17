@@ -536,8 +536,8 @@ return (
         </div>
         </div>
 
-        {/* Debug Panel for Mobile (only show on mobile and when there's debug info) */}
-        {window.innerWidth <= 768 && debugInfo && (
+        {/* Debug Panel for Mobile (only show in development environment) */}
+        {process.env.NODE_ENV === 'development' && window.innerWidth <= 768 && debugInfo && (
           <div style={{
             position: 'fixed',
             top: '10px',
