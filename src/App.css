@@ -80,6 +80,9 @@
   contain: layout style;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal shifts during state transitions */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* === HEADER SECTION === */
@@ -167,6 +170,13 @@
   margin-right: auto;
   /* Prevent content from shifting during mobile interactions */
   contain: layout;
+  /* Prevent horizontal shifts during state transitions */
+  width: calc(100% - var(--space-4)); /* Ensure proper inset from parent edges */
+  box-sizing: border-box;
+  /* Use transform for any animations instead of layout changes */
+  will-change: transform, opacity;
+  /* Ensure content stays within rounded borders */
+  overflow: hidden;
 }
 
 /* Ultra-compact mobile breakpoint for small screens */
@@ -269,6 +279,9 @@
     /* Ensure proper keyboard handling */
     transform: translateZ(0);
     will-change: transform;
+    /* Ensure content stays within rounded borders on mobile */
+    overflow: hidden;
+    border-radius: var(--radius-xl);
   }
   
   .reflection-input-container.expanded .reflection-textarea {
@@ -334,7 +347,7 @@
 }
 
 .reflection-textarea {
-  width: 100%;
+  width: calc(100% - var(--space-1)); /* Reduced constraint to align with voice description */
   min-height: 120px;
   padding: var(--space-4);
   font-size: var(--font-size-base);
@@ -353,6 +366,9 @@
   touch-action: manipulation;
   /* Prevent zoom on iOS */
   font-size: max(16px, var(--font-size-base));
+  /* Ensure textarea respects parent border radius and aligns with voice section */
+  margin-right: var(--space-1); /* Reduced margin to align with voice description area */
+  box-sizing: border-box; /* Include padding and border in width calculation */
 }
 
 .reflection-textarea:focus {
@@ -375,6 +391,8 @@
   background-color: var(--color-surface-soft);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-lg);
+  /* Ensure toolbar respects parent container's border radius */
+  padding-right: calc(var(--space-4) + var(--space-2)); /* Extra right padding for border radius clearance */
 }
 
 .toolbar-section {
@@ -446,6 +464,10 @@
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
+  /* Ensure voice section respects border radius boundaries */
+  padding-right: var(--space-4); /* Increased right padding to respect parent's curved border */
+  max-width: 100%; /* Ensure section doesn't exceed container width */
+  overflow: hidden; /* Clip any overflow beyond boundaries */
 }
 
 .voice-label {
@@ -468,8 +490,12 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
   font-style: italic;
-  max-width: 300px;
+  max-width: 250px; /* Further reduced to ensure border radius clearance */
   line-height: 1.4;
+  margin-right: var(--space-4); /* Increased right margin for better border clearance */
+  word-wrap: break-word; /* Ensure long text wraps properly */
+  overflow-wrap: break-word; /* Modern fallback */
+  flex-shrink: 1; /* Allow shrinking to fit within container */
 }
 
 /* === PROCESSING STATE === */
