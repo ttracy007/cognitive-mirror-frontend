@@ -464,7 +464,9 @@
   gap: var(--space-3);
   flex-wrap: wrap;
   /* Ensure voice section respects border radius boundaries */
-  padding-right: var(--space-2); /* Additional right padding to respect parent's curved border */
+  padding-right: var(--space-4); /* Increased right padding to respect parent's curved border */
+  max-width: 100%; /* Ensure section doesn't exceed container width */
+  overflow: hidden; /* Clip any overflow beyond boundaries */
 }
 
 .voice-label {
@@ -487,9 +489,12 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
   font-style: italic;
-  max-width: 280px; /* Reduced to account for border radius */
+  max-width: 250px; /* Further reduced to ensure border radius clearance */
   line-height: 1.4;
-  margin-right: var(--space-1); /* Additional right margin for border clearance */
+  margin-right: var(--space-4); /* Increased right margin for better border clearance */
+  word-wrap: break-word; /* Ensure long text wraps properly */
+  overflow-wrap: break-word; /* Modern fallback */
+  flex-shrink: 1; /* Allow shrinking to fit within container */
 }
 
 /* === PROCESSING STATE === */
