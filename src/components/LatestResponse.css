@@ -14,6 +14,11 @@
   margin-left: auto;
   margin-right: auto;
   position: relative;
+  /* Prevent horizontal shifts during state transitions */
+  width: 100%;
+  box-sizing: border-box;
+  /* Use transform for animations to avoid layout reflow */
+  will-change: transform, opacity;
 }
 
 .latest-response-header {
@@ -151,6 +156,11 @@
   margin-right: auto;
   text-align: center;
   color: var(--color-text-soft);
+  /* Prevent horizontal shifts during loading state */
+  width: 100%;
+  box-sizing: border-box;
+  /* Use transform for animations to avoid layout reflow */
+  will-change: transform, opacity;
 }
 
 .latest-response-loading-content {
@@ -220,4 +230,20 @@
 
 .latest-response-container.fade-in {
   animation: slideInFromTop 0.4s ease-out;
+}
+
+/* Smooth loading state entrance */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.latest-response-loading {
+  animation: fadeInScale 0.3s ease-out;
 }

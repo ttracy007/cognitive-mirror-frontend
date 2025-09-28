@@ -80,6 +80,9 @@
   contain: layout style;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal shifts during state transitions */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* === HEADER SECTION === */
@@ -167,6 +170,11 @@
   margin-right: auto;
   /* Prevent content from shifting during mobile interactions */
   contain: layout;
+  /* Prevent horizontal shifts during state transitions */
+  width: 100%;
+  box-sizing: border-box;
+  /* Use transform for any animations instead of layout changes */
+  will-change: transform, opacity;
 }
 
 /* Ultra-compact mobile breakpoint for small screens */
