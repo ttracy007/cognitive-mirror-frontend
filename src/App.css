@@ -171,10 +171,12 @@
   /* Prevent content from shifting during mobile interactions */
   contain: layout;
   /* Prevent horizontal shifts during state transitions */
-  width: 100%;
+  width: calc(100% - var(--space-4)); /* Ensure proper inset from parent edges */
   box-sizing: border-box;
   /* Use transform for any animations instead of layout changes */
   will-change: transform, opacity;
+  /* Ensure content stays within rounded borders */
+  overflow: hidden;
 }
 
 /* Ultra-compact mobile breakpoint for small screens */
@@ -277,6 +279,9 @@
     /* Ensure proper keyboard handling */
     transform: translateZ(0);
     will-change: transform;
+    /* Ensure content stays within rounded borders on mobile */
+    overflow: hidden;
+    border-radius: var(--radius-xl);
   }
   
   .reflection-input-container.expanded .reflection-textarea {
