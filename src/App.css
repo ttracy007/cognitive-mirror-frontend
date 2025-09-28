@@ -347,7 +347,7 @@
 }
 
 .reflection-textarea {
-  width: 100%;
+  width: calc(100% - var(--space-2)); /* Reduce width to create proper right clearance */
   min-height: 120px;
   padding: var(--space-4);
   font-size: var(--font-size-base);
@@ -367,7 +367,8 @@
   /* Prevent zoom on iOS */
   font-size: max(16px, var(--font-size-base));
   /* Ensure textarea respects parent border radius */
-  margin-right: var(--space-1); /* Slight right margin for border clearance */
+  margin-right: var(--space-2); /* Increased right margin for better border clearance */
+  box-sizing: border-box; /* Include padding and border in width calculation */
 }
 
 .reflection-textarea:focus {
