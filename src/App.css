@@ -366,6 +366,8 @@
   touch-action: manipulation;
   /* Prevent zoom on iOS */
   font-size: max(16px, var(--font-size-base));
+  /* Ensure textarea respects parent border radius */
+  margin-right: var(--space-1); /* Slight right margin for border clearance */
 }
 
 .reflection-textarea:focus {
@@ -388,6 +390,8 @@
   background-color: var(--color-surface-soft);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-lg);
+  /* Ensure toolbar respects parent container's border radius */
+  padding-right: calc(var(--space-4) + var(--space-2)); /* Extra right padding for border radius clearance */
 }
 
 .toolbar-section {
@@ -459,6 +463,8 @@
   align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
+  /* Ensure voice section respects border radius boundaries */
+  padding-right: var(--space-2); /* Additional right padding to respect parent's curved border */
 }
 
 .voice-label {
@@ -481,8 +487,9 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
   font-style: italic;
-  max-width: 300px;
+  max-width: 280px; /* Reduced to account for border radius */
   line-height: 1.4;
+  margin-right: var(--space-1); /* Additional right margin for border clearance */
 }
 
 /* === PROCESSING STATE === */
