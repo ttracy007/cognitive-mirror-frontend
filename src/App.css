@@ -347,7 +347,7 @@
 }
 
 .reflection-textarea {
-  width: calc(100% - var(--space-2)); /* Reduce width to create proper right clearance */
+  width: calc(100% - var(--space-1)); /* Reduced constraint to align with voice description */
   min-height: 120px;
   padding: var(--space-4);
   font-size: var(--font-size-base);
@@ -366,8 +366,8 @@
   touch-action: manipulation;
   /* Prevent zoom on iOS */
   font-size: max(16px, var(--font-size-base));
-  /* Ensure textarea respects parent border radius */
-  margin-right: var(--space-2); /* Increased right margin for better border clearance */
+  /* Ensure textarea respects parent border radius and aligns with voice section */
+  margin-right: var(--space-1); /* Reduced margin to align with voice description area */
   box-sizing: border-box; /* Include padding and border in width calculation */
 }
 
