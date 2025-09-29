@@ -949,7 +949,7 @@ return (
               </button>
               <button className="cm-btn" onClick={stopListening} disabled={!isListening}>
                 🛑 Stop
-          </button> */}
+              </button> */}
           
               {/* Button layout: Split if voice supported, single if not */}
               {voiceSupported ? (
