@@ -1564,10 +1564,10 @@
 .voice-modal {
   background: #dc2626; /* Claude-style red */
   border-radius: 12px; /* Smaller radius for compact size */
-  padding: var(--space-2) var(--space-3); /* Much smaller padding */
+  padding: var(--space-1) var(--space-2); /* Ultra compact padding for 1/3 size */
   width: 100%;
-  max-width: 180px; /* Reduced from 300px to ~1/3 size */
-  min-width: 160px; /* Proportionally smaller minimum */
+  max-width: 120px; /* Further reduced to 1/3 of original 300px */
+  min-width: 100px; /* Proportionally smaller minimum */
   text-align: center;
   box-shadow:
     0 6px 12px rgba(220, 38, 38, 0.15),
@@ -1761,6 +1761,6 @@
 }
 
 .voice-modal-inline .voice-modal {
-  max-width: 160px; /* Much smaller for compact inline positioning */
+  max-width: 120px; /* Much smaller for compact inline positioning - matches desktop */
   margin: 0;
 }
