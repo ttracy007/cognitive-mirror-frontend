@@ -1713,6 +1713,8 @@
 
 /* Mobile optimizations for voice modal */
 @media (max-width: 768px) {
+  .voice-modal-overlay .voice-modal,
+  .voice-modal-inline .voice-modal,
   .voice-modal {
     margin: var(--space-4);
     max-width: none;
@@ -1738,7 +1740,7 @@
 
   /* Mobile voice modal overlay with calming background */
   .voice-modal-overlay {
-    background: rgba(107, 114, 128, 0.4); /* Calm gray overlay instead of transparent */
+    background: #6b7280 !important; /* Calm gray background instead of red */
   }
 
   .voice-modal-inline {
