@@ -76,6 +76,7 @@ const App = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [voiceError, setVoiceError] = useState('');
   const [voiceDebugLogs, setVoiceDebugLogs] = useState([]);
+  const [explicitStop, setExplicitStop] = useState(false); // Track if user explicitly stopped recording
 
   // 🔽 Browser Support Detection
   const [voiceSupported, setVoiceSupported] = useState(true);
@@ -376,6 +377,7 @@ const App = () => {
   const startVoiceRecording = async () => {
     console.log("🔧 DEBUGGING: Voice recording started - new implementation active");
     addVoiceDebugLog("🎙️ Starting voice recording...");
+    setExplicitStop(false); // Reset the explicit stop flag for new recording
 
     try {
       // Enhanced environment detection for HTTPS requirements
@@ -581,12 +583,12 @@ const App = () => {
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
         // For mobile: restart recognition to maintain continuous capture
-        if (isMobile && isRecording && !voiceError) {
+        if (isMobile && isRecording && !voiceError && !explicitStop) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
             // Small delay to prevent rapid restart issues
             setTimeout(() => {
-              if (isRecording && !voiceError) {
+              if (isRecording && !voiceError && !explicitStop) {
                 recognitionInstance.start();
               }
             }, 100);
@@ -618,6 +620,7 @@ const App = () => {
 
   const stopVoiceRecording = () => {
     console.log("🔧 DEBUGGING: Stopping voice recording");
+    setExplicitStop(true); // Prevent auto-restart
     if (recognition) {
       recognition.stop();
       recognition.onresult = null; // Prevent further result processing
