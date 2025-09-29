@@ -90,7 +90,6 @@ const App = () => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 560;
       setIsMobile(mobile);
-      console.log('📱 Window resize - isMobile:', mobile, 'width:', window.innerWidth);
     };
 
     window.addEventListener('resize', handleResize);
@@ -102,27 +101,14 @@ const App = () => {
 
     // Log environment on startup
   useEffect(() => {
-    console.log(`🚀 Running in ${process.env.REACT_APP_ENV || 'unknown'} mode`);
-    console.log(`🛰️ Backend: ${process.env.REACT_APP_BACKEND_URL || 'unset'}`);
-    console.log(`🗄️ Supabase: ${process.env.REACT_APP_SUPABASE_URL || 'unset'}`);
   }, []);
   
-  // 🔽 Function 3: Show Summary Trigger (DISABLED - only show when user clicks)
-  // useEffect(() => {
-  //   const hasTriggeredSummary = localStorage.getItem('hasTriggeredSummary');
-  //   if (!hasTriggeredSummary && history.length >= 5) {
-  //     setShowSummary(true);
-  //     localStorage.setItem('hasTriggeredSummary', 'true');
-  //   }
-  // }, [history]);
 
    // 🔽 Function 3a: Build Current Commit Tag 
   useEffect(() => {
     fetch('/build-version.txt')
       .then(res => res.text())
       .then(text => {
-         console.log("🛠️ App.js version:", text);
-         // console.log(`🧱 Frontend build version: ${text}`);
       });
   }, []);
 
@@ -139,7 +125,6 @@ const App = () => {
  // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
   const handleSubmit = async () => {
     console.warn("🧪 handleSubmit called from device width:", window.innerWidth);
-    console.log("📝 Entry content:", entry.trim());
 
     // Always read a stable username
     const u = (username || UsernameStore.get() || '').trim();
@@ -175,14 +160,12 @@ const App = () => {
     // 🔽 Hide any previous latest response when starting new submission
     setShowLatestResponse(false);
 
-    const debug_marker = Math.random().toString(36).substring(2, 8);
     const userId = s.user.id;
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     
     const apiDetails = { 
       backendUrl, 
       userId, 
-      debug_marker,
       entryLength: entry.length
     };
     
@@ -223,7 +206,6 @@ const App = () => {
         tone_mode: forcedTone,
         username: u,
         user_id: userId,
-        debug_marker,
       };
       
       setDebugInfo(`📦 Request body: ${JSON.stringify(requestBody, null, 2)}`);
@@ -256,13 +238,6 @@ const App = () => {
       const data = await res.json();
       setDebugInfo(`✅ Success: ${JSON.stringify(data, null, 2)}`);
       
-      // 🔽 Enhanced debugging for response field detection
-      console.log('🔍 Backend response data:', data);
-      console.log('🔍 Available fields:', Object.keys(data));
-      console.log('🔍 response_text (ChatBubble field):', data.response_text);
-      console.log('🔍 response (API field):', data.response);
-      console.log('🔍 journal_id (DB save confirmation):', data.journal_id);
-      console.log('🔍 Database save status:', data.saved ? '✅ SAVED' : '❌ NOT SAVED');
       
       // 🔽 FIX: Use the same field that ChatBubble successfully uses
       const responseText = data.response_text || data.response || 'No response received.';
@@ -310,7 +285,6 @@ const App = () => {
       // Add delay to ensure backend has written to database before refreshing timeline
       setTimeout(() => {
         setRefreshTrigger(prev => prev + 1);
-        console.log('📊 Timeline refresh triggered after submission');
       }, 1200); // Increased delay to account for backend database write time
       
       // Collapse input on mobile after successful submission
@@ -333,7 +307,7 @@ const App = () => {
     if (!user) return;
     const { data, error } = await supabase
       .from('journals')
-      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker')
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp')
       .eq('user_id', user.id)
       .order('timestamp', { ascending: false });
       
@@ -342,14 +316,13 @@ const App = () => {
     return;
   }
 
-  // 🔽 Function 6a: Filter Out No Respose, No debug markers 
+  // 🔽 Function 6a: Filter Out No Response 
 
   const showAll = true; // <== True all entries, False filtered 
   const filtered = showAll
     ? (data || [])
     : (data || []).filter(entry =>
-    entry.response_text?.trim().toLowerCase() !== 'no response received.' &&
-    entry.debug_marker?.trim() !== ''
+    entry.response_text?.trim().toLowerCase() !== 'no response received.'
   );
   // console.log("📜 Filtered journal history:", filtered);  // <== Enable if False 
   setHistory(filtered);
@@ -571,14 +544,12 @@ return (
         <div
           className={`reflection-input-container ${isMobile && !inputExpanded ? 'collapsed' : (isMobile ? 'expanded' : '')}`}
           onClick={() => {
-            console.log('🔍 Input container clicked - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
             if (!inputExpanded && isMobile) {
               console.log('✅ Expanding input on mobile');
               setInputExpanded(true);
             }
           }}
           onTouchStart={(e) => {
-            console.log('👆 Touch start - inputExpanded:', inputExpanded, 'isMobile:', isMobile);
             if (!inputExpanded && isMobile) {
               console.log('✅ Expanding input on mobile touch');
               e.preventDefault();
@@ -592,19 +563,15 @@ return (
           rows="3"
           value={entry}
           onChange={(e) => {
-            console.log('📝 Textarea onChange:', e.target.value);
             setEntry(e.target.value);
             
             // 🔽 Auto-dismiss latest response when user starts typing new entry
             if (showLatestResponse && e.target.value.length > 0) {
               setShowLatestResponse(false);
               // Trigger timeline refresh when Latest Response dismisses
-              console.log('📝 Latest Response dismissed - triggering timeline refresh');
               setRefreshTrigger(prev => prev + 1);
             }
           }}
-          onFocus={() => console.log('🎯 Textarea focused')}
-          onBlur={() => console.log('👋 Textarea blurred')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -737,7 +704,16 @@ return (
             <LatestResponse
               entry={latestEntry}
               response={latestResponse}
-              onDismiss={() => setShowLatestResponse(false)}
+              onDismiss={() => {
+                setShowLatestResponse(false);
+                // Trigger timeline refresh to navigate to journal timeline (consistent with auto-close behavior)
+                setRefreshTrigger(prev => prev + 1);
+
+                // Mobile-specific: Immediately open "Tap to Reflect" input for seamless journaling flow
+                if (isMobile) {
+                  setInputExpanded(true);
+                }
+              }}
             />
           </div>
         )}
