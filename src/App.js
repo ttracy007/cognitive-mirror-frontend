@@ -75,9 +75,81 @@ const App = () => {
   const [showVoiceModal, setShowVoiceModal] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [voiceError, setVoiceError] = useState('');
+  const [voiceDebugLogs, setVoiceDebugLogs] = useState([]);
+
+  // 🔽 Browser Support Detection
+  const [voiceSupported, setVoiceSupported] = useState(true);
+
+  // 🔽 Voice Debug Helper Function
+  const addVoiceDebugLog = (message) => {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(message); // Also log to console
+    setVoiceDebugLogs(prev => [...prev.slice(-9), `${timestamp}: ${message}`]); // Keep last 10 logs
+  };
+
+  // 🔽 Transcription Quality Enhancement
+  const enhanceTranscription = (text) => {
+    if (!text || text.trim().length === 0) return text;
+
+    let enhanced = text.trim();
+
+    // Clean up extra spaces
+    enhanced = enhanced.replace(/\s+/g, ' ');
+
+    // Add periods at the end if missing
+    if (!/[.!?]$/.test(enhanced)) {
+      enhanced += '.';
+    }
+
+    // Capitalize first letter
+    enhanced = enhanced.charAt(0).toUpperCase() + enhanced.slice(1);
+
+    // Add periods before new sentences that start with capital letters (but aren't already punctuated)
+    enhanced = enhanced.replace(/([a-z])\s+([A-Z][a-z])/g, '$1. $2');
+
+    // Fix common word capitalization (I, I'm, etc.)
+    enhanced = enhanced.replace(/\bi\b/g, 'I');
+    enhanced = enhanced.replace(/\bi'm\b/g, "I'm");
+    enhanced = enhanced.replace(/\bi'll\b/g, "I'll");
+    enhanced = enhanced.replace(/\bi've\b/g, "I've");
+    enhanced = enhanced.replace(/\bi'd\b/g, "I'd");
+
+    // Add question marks for obvious questions
+    enhanced = enhanced.replace(/(\bwhat|\bhow|\bwhy|\bwhen|\bwhere|\bwho|\bis|\bdo|\bdoes|\bcan|\bcould|\bwould|\bshould)\b([^.!?]*?)(\.|$)/gi, (match, start, middle, end) => {
+      if (middle.length > 0 && !middle.includes('.') && !middle.includes('!')) {
+        return start + middle + '?';
+      }
+      return match;
+    });
+
+    return enhanced;
+  };
 
   // 🔽 Responsive state for mobile detection
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 560);
+
+  // 🔽 Browser Support Detection Effect
+  React.useEffect(() => {
+    const checkVoiceSupport = () => {
+      const SpeechRecognition = window.SpeechRecognition ||
+                               window.webkitSpeechRecognition ||
+                               window.mozSpeechRecognition ||
+                               window.msSpeechRecognition;
+
+      const isFirefox = /Firefox/i.test(navigator.userAgent);
+
+      if (!SpeechRecognition && !isFirefox) {
+        setVoiceSupported(false);
+        console.log('🔇 Voice input disabled: Browser not supported');
+      } else if (isFirefox) {
+        // Firefox: Show voice button but with helpful messaging
+        setVoiceSupported(true);
+        console.log('🔇 Firefox detected: Voice button available with helpful messaging');
+      }
+    };
+
+    checkVoiceSupport();
+  }, []);
 
   // 🔽 Latest Response State Management
   const [latestResponse, setLatestResponse] = useState(null);
@@ -302,31 +374,148 @@ const App = () => {
 
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
-    try {
-      // Check for Web Speech API support
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    console.log("🔧 DEBUGGING: Voice recording started - new implementation active");
+    addVoiceDebugLog("🎙️ Starting voice recording...");
 
-      if (!SpeechRecognition) {
-        setVoiceError('Voice transcription is not supported in your browser. Please type your entry or try Chrome/Safari.');
+    try {
+      // Enhanced environment detection for HTTPS requirements
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
+      const isHTTPS = location.protocol === 'https:';
+
+      // Log environment details for debugging
+      addVoiceDebugLog(`🌐 Environment: ${isDevelopment ? 'development' : isProduction ? 'production' : 'unknown'}`);
+      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobile}`);
+      addVoiceDebugLog(`📍 Host: ${location.hostname}`);
+
+      // Check HTTPS requirement for mobile browsers
+      const requiresHTTPS = !isHTTPS && !isDevelopment && isMobile;
+
+      if (requiresHTTPS) {
+        addVoiceDebugLog("❌ HTTPS required for mobile microphone access in production");
+        const message = isDevelopment
+          ? 'Voice recording requires HTTPS on mobile devices. This works in production (Vercel uses HTTPS automatically).'
+          : 'Voice recording requires a secure HTTPS connection on mobile devices. Production deployments use HTTPS automatically.';
+        setVoiceError(message);
         return;
       }
 
-      // Request microphone permission
+      addVoiceDebugLog(`✅ HTTPS check passed - ${isHTTPS ? 'HTTPS' : 'localhost development'} environment`);
+
+      // Special handling for Firefox - show helpful message instead of attempting voice recognition
+      const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
+      if (isFirefoxBrowser) {
+        addVoiceDebugLog("🦊 Firefox browser detected - showing helpful message");
+        setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
+        return;
+      }
+
+      // Check for Web Speech API support with all vendor prefixes
+      addVoiceDebugLog("🔍 Checking Speech Recognition API...");
+      const SpeechRecognition = window.SpeechRecognition ||
+                               window.webkitSpeechRecognition ||
+                               window.mozSpeechRecognition ||
+                               window.msSpeechRecognition;
+
+      const apiStatus = {
+        standard: !!window.SpeechRecognition,
+        webkit: !!window.webkitSpeechRecognition,
+        mozilla: !!window.mozSpeechRecognition,
+        microsoft: !!window.msSpeechRecognition
+      };
+      addVoiceDebugLog(`🔧 APIs: std:${apiStatus.standard} webkit:${apiStatus.webkit} moz:${apiStatus.mozilla} ms:${apiStatus.microsoft}`);
+
+      if (!SpeechRecognition) {
+        addVoiceDebugLog("❌ Speech Recognition not supported");
+
+        // Detect browser for specific error messages
+        const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = navigator.userAgent.toLowerCase().includes('android');
+
+        let errorMessage = 'Voice transcription is not supported in this browser.';
+
+        if (isFirefox) {
+          errorMessage = 'Voice transcription is not supported in Firefox. Please use Chrome, Safari, or Edge.';
+        } else if (isIOS) {
+          errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
+        } else if (isAndroid) {
+          errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
+        } else {
+          errorMessage = 'Voice transcription requires Chrome, Safari, or Edge browser.';
+        }
+
+        setVoiceError(errorMessage);
+        return;
+      }
+      addVoiceDebugLog("✅ Speech Recognition supported");
+
+      // Request microphone permission with enhanced mobile compatibility
+      addVoiceDebugLog("🎤 Requesting microphone permission...");
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        let stream;
+
+        // Modern browsers with MediaDevices API
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          addVoiceDebugLog("🔧 Using modern MediaDevices API");
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          });
+        }
+        // Legacy getUserMedia with proper binding
+        else if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
+          const getUserMedia = navigator.getUserMedia ||
+                              navigator.webkitGetUserMedia ||
+                              navigator.mozGetUserMedia ||
+                              navigator.msGetUserMedia;
+
+          addVoiceDebugLog("🔧 Using legacy getUserMedia with proper binding");
+          stream = await new Promise((resolve, reject) => {
+            getUserMedia.call(navigator, { audio: true }, resolve, reject);
+          });
+        }
+        else {
+          throw new Error('getUserMedia not supported in this browser');
+        }
+
+        addVoiceDebugLog("✅ Microphone permission granted");
+        // Clean up the stream immediately
+        if (stream && stream.getTracks) {
+          stream.getTracks().forEach(track => track.stop());
+        }
       } catch (permissionError) {
-        setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings.');
+        addVoiceDebugLog(`❌ Microphone error: ${permissionError.message || permissionError.name || 'Permission denied'}`);
+        setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings and try again.');
         return;
       }
 
       // Initialize speech recognition
+      addVoiceDebugLog("🚀 Creating Speech Recognition instance...");
       const recognitionInstance = new SpeechRecognition();
       recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = true;
+      recognitionInstance.interimResults = false;
       recognitionInstance.lang = 'en-US';
+      recognitionInstance.maxAlternatives = 1;
+
+      // Mobile-specific optimizations for better speech continuation
+      if (isMobile) {
+        addVoiceDebugLog("📱 Applying mobile speech optimizations");
+        // Some mobile browsers benefit from these settings
+        try {
+          recognitionInstance.grammars = new webkitSpeechGrammarList();
+        } catch (e) {
+          // Graceful fallback if grammars not supported
+        }
+      }
 
       // Set up event handlers
       recognitionInstance.onstart = () => {
+        addVoiceDebugLog("🎤 Recognition started! Opening modal...");
         setIsRecording(true);
         setShowVoiceModal(true);
         setVoiceError('');
@@ -334,12 +523,43 @@ const App = () => {
       };
 
       recognitionInstance.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+        // Check if recording is still active - prevent processing if stopped
+        if (!isRecording) {
+          console.log("🔧 DEBUGGING: Ignoring result - recording stopped");
+          return;
         }
-        // Update entry with current transcript
-        setEntry(transcript);
+
+        // Build complete transcript from all final results
+        let finalTranscript = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript + ' ';
+          }
+        }
+
+        if (finalTranscript.trim()) {
+          addVoiceDebugLog(`📝 Final transcription: "${finalTranscript.slice(-50)}..."`);
+
+          // Apply transcription enhancement to final results
+          const enhancedTranscript = enhanceTranscription(finalTranscript);
+
+          // For multiple recording sessions: append to existing text instead of replacing
+          setEntry(prevEntry => {
+            const existingText = prevEntry.trim();
+            const newText = enhancedTranscript.trim();
+
+            if (existingText) {
+              // Add space between existing and new text
+              const combinedText = existingText + ' ' + newText;
+              console.log("🔧 DEBUGGING: Appending text - existing:", existingText, "new:", newText, "combined:", combinedText);
+              return combinedText;
+            } else {
+              console.log("🔧 DEBUGGING: Setting initial text:", newText);
+              return newText;
+            }
+          });
+        }
       };
 
       recognitionInstance.onerror = (event) => {
@@ -365,8 +585,10 @@ const App = () => {
       };
 
       // Start recording
+      addVoiceDebugLog("📢 About to start recognition...");
       recognitionInstance.start();
-      setRecognitionState(recognitionInstance);
+      addVoiceDebugLog("✅ Recognition.start() called successfully");
+      setRecognition(recognitionInstance);
 
     } catch (error) {
       console.error('Error starting voice recording:', error);
@@ -375,12 +597,16 @@ const App = () => {
   };
 
   const stopVoiceRecording = () => {
+    console.log("🔧 DEBUGGING: Stopping voice recording");
     if (recognition) {
       recognition.stop();
+      recognition.onresult = null; // Prevent further result processing
+      recognition.onend = null; // Prevent onend from interfering
     }
     setIsRecording(false);
     setShowVoiceModal(false);
     setRecordingTime(0);
+    setRecognition(null); // Clear recognition instance
   };
 
   const cancelVoiceRecording = () => {
@@ -630,7 +856,7 @@ return (
         </div>
 
         {/* Debug Panel for Mobile (only show in development environment) */}
-        {process.env.NODE_ENV === 'development' && window.innerWidth <= 768 && debugInfo && (
+        {process.env.NODE_ENV === 'development' && window.innerWidth <= 768 && (debugInfo || voiceDebugLogs.length > 0) && (
           <div style={{
             position: 'fixed',
             top: '10px',
@@ -649,14 +875,23 @@ return (
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <strong>🐛 Debug Info:</strong>
-              <button 
-                onClick={() => setDebugInfo('')}
+              <button
+                onClick={() => {
+                  setDebugInfo('');
+                  setVoiceDebugLogs([]);
+                }}
                 style={{ background: '#333', color: '#fff', border: 'none', padding: '2px 6px', borderRadius: '3px' }}
               >
                 ✕
               </button>
             </div>
-            <div style={{ marginTop: '5px' }}>{debugInfo}</div>
+            {debugInfo && <div style={{ marginTop: '5px' }}>{debugInfo}</div>}
+            {voiceDebugLogs.length > 0 && (
+              <div style={{ marginTop: '5px', borderTop: '1px solid #333', paddingTop: '5px' }}>
+                <strong>🎙️ Voice Debug:</strong>
+                <div>{voiceDebugLogs.join('\n')}</div>
+              </div>
+            )}
           </div>
         )}
 
@@ -716,10 +951,85 @@ return (
                 🛑 Stop
           </button> */}
           
-              {/* Split button layout: Reflect (50%) + Voice (50%) */}
-              <div className="cm-button-row">
+              {/* Button layout: Split if voice supported, single if not */}
+              {voiceSupported ? (
+                <>
+                  <div className="cm-button-row">
+                    <button
+                        className="cm-btn cm-btn--primary cm-btn--split"
+                        onClick={handleSubmit}
+                        id="reflect-btn"
+                        aria-label="Reflect"
+                        type="button"
+                        disabled={isProcessing || !entry.trim()}>
+                      🧠 Reflect
+                    </button>
+
+                    <button
+                        className="cm-btn cm-btn--voice cm-btn--split"
+                        onClick={startVoiceRecording}
+                        aria-label="Voice transcription"
+                        type="button"
+                        disabled={isProcessing || isRecording}>
+                      🎙️ Voice
+                    </button>
+                  </div>
+
+                  {/* Voice Recording Modal - positioned within input container */}
+                  {showVoiceModal && (
+                    <div className="voice-modal-inline">
+                      <div className="voice-modal">
+                        <div className="voice-modal-header">
+                          <button
+                            className="voice-modal-cancel"
+                            onClick={cancelVoiceRecording}
+                            aria-label="Cancel recording"
+                            type="button">
+                            ✕
+                          </button>
+                          <button
+                            className="voice-modal-send"
+                            onClick={stopVoiceRecording}
+                            aria-label="Finish recording"
+                            type="button">
+                            ↑
+                          </button>
+                        </div>
+
+                        <div className="voice-visualizer">
+                          <div className="voice-line" style={{ '--delay': 0 }}></div>
+                          <div className="voice-line" style={{ '--delay': 1 }}></div>
+                          <div className="voice-line" style={{ '--delay': 2 }}></div>
+                          <div className="voice-line" style={{ '--delay': 3 }}></div>
+                          <div className="voice-line" style={{ '--delay': 4 }}></div>
+                          <div className="voice-line" style={{ '--delay': 5 }}></div>
+                          <div className="voice-line" style={{ '--delay': 6 }}></div>
+                          <div className="voice-line" style={{ '--delay': 7 }}></div>
+                          <div className="voice-line" style={{ '--delay': 8 }}></div>
+                          <div className="voice-line" style={{ '--delay': 9 }}></div>
+                          <div className="voice-line" style={{ '--delay': 10 }}></div>
+                          <div className="voice-line" style={{ '--delay': 11 }}></div>
+                          <div className="voice-line" style={{ '--delay': 12 }}></div>
+                          <div className="voice-line" style={{ '--delay': 13 }}></div>
+                          <div className="voice-line" style={{ '--delay': 14 }}></div>
+                        </div>
+
+                        <div className="voice-timer">
+                          {formatTime(recordingTime)}
+                        </div>
+
+                        {voiceError && (
+                          <div className="voice-error">
+                            {voiceError}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
                 <button
-                    className="cm-btn cm-btn--primary cm-btn--split"
+                    className="cm-btn cm-btn--primary"
                     onClick={handleSubmit}
                     id="reflect-btn"
                     aria-label="Reflect"
@@ -727,16 +1037,7 @@ return (
                     disabled={isProcessing || !entry.trim()}>
                   🧠 Reflect
                 </button>
-
-                <button
-                    className="cm-btn cm-btn--voice cm-btn--split"
-                    onClick={startVoiceRecording}
-                    aria-label="Voice transcription"
-                    type="button"
-                    disabled={isProcessing || isRecording}>
-                  🎙️ Voice
-                </button>
-              </div>
+              )}
 
               {/* Mobile close button when expanded */}
               {isMobile && inputExpanded && (
@@ -850,49 +1151,6 @@ return (
           </div>
         )}
 
-        {/* Voice Recording Modal - Claude-style red interface */}
-        {showVoiceModal && (
-          <div className="voice-modal-overlay">
-            <div className="voice-modal">
-              <div className="voice-modal-header">
-                <button
-                  className="voice-modal-cancel"
-                  onClick={cancelVoiceRecording}
-                  aria-label="Cancel recording"
-                  type="button">
-                  ✕
-                </button>
-                <button
-                  className="voice-modal-send"
-                  onClick={stopVoiceRecording}
-                  aria-label="Finish recording"
-                  type="button">
-                  ↑
-                </button>
-              </div>
-
-              <div className="voice-visualizer">
-                <div className="voice-line" style={{ '--delay': 0 }}></div>
-                <div className="voice-line" style={{ '--delay': 1 }}></div>
-                <div className="voice-line" style={{ '--delay': 2 }}></div>
-                <div className="voice-line" style={{ '--delay': 3 }}></div>
-                <div className="voice-line" style={{ '--delay': 4 }}></div>
-                <div className="voice-line" style={{ '--delay': 5 }}></div>
-                <div className="voice-line" style={{ '--delay': 6 }}></div>
-              </div>
-
-              <div className="voice-timer">
-                {formatTime(recordingTime)}
-              </div>
-
-              {voiceError && (
-                <div className="voice-error">
-                  {voiceError}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Timeline (outside the fixed container) */}
         <div className="chat-thread">

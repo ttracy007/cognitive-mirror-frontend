@@ -1545,33 +1545,48 @@
 }
 
 /* === VOICE RECORDING MODAL === */
-/* Claude-style red recording interface */
+/* Elegant Claude-style compact interface - no invasive overlay */
 .voice-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(220, 38, 38, 0.95); /* Red overlay */
-  backdrop-filter: blur(8px);
+  background: transparent; /* No distracting overlay */
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 2000;
-  padding: var(--space-4);
+  padding: 0 var(--space-4) 140px var(--space-4); /* Position above input */
+  pointer-events: none; /* Let clicks pass through overlay */
 }
 
 .voice-modal {
   background: #dc2626; /* Claude-style red */
-  border-radius: var(--radius-xl);
-  padding: var(--space-8);
+  border-radius: 12px; /* Smaller radius for compact size */
+  padding: var(--space-2) var(--space-3); /* Much smaller padding */
   width: 100%;
-  max-width: 400px;
+  max-width: 180px; /* Reduced from 300px to ~1/3 size */
+  min-width: 160px; /* Proportionally smaller minimum */
   text-align: center;
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.25),
+    0 6px 12px rgba(220, 38, 38, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(255, 255, 255, 0.1);
-  animation: slideInFromBottom 0.3s ease-out;
+  animation: elegantSlideIn 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother animation */
+  position: relative;
+  pointer-events: auto; /* Modal itself is clickable */
+}
+
+@keyframes elegantSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes slideInFromBottom {
@@ -1589,22 +1604,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-4); /* Reduced spacing for compactness */
 }
 
 .voice-modal-cancel,
 .voice-modal-send {
-  width: 48px;
-  height: 48px;
+  width: 24px; /* Much smaller for compact modal */
+  height: 24px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 0.75rem; /* Much smaller font */
+  font-weight: 600;
   touch-action: manipulation;
 }
 
@@ -1628,42 +1643,60 @@
   transform: scale(1.05);
 }
 
-/* Voice visualizer with animated lines */
+/* Voice visualizer - compact and elegant */
 .voice-visualizer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  height: 80px;
-  margin-bottom: var(--space-6);
+  justify-content: space-between; /* Distribute across full width */
+  gap: 1px; /* Minimal gap for compact size */
+  height: 40px; /* Much smaller height - was 80px */
+  margin-bottom: var(--space-2); /* Smaller margin */
+  padding: var(--space-1) var(--space-2); /* Smaller padding */
+  width: 100%; /* Ensure full width */
 }
 
 .voice-line {
-  width: 4px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 2px;
-  animation: voicePulse 1.5s ease-in-out infinite;
-  animation-delay: calc(var(--delay) * 0.1s);
-  height: 20px; /* Base height */
+  flex: 1; /* Allow lines to grow and fill available space */
+  max-width: 4px; /* Much smaller for compact modal */
+  min-width: 2px; /* Smaller minimum width */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+  border-radius: 1px;
+  animation: elegantVoicePulse 1.3s ease-in-out infinite;
+  animation-delay: calc(var(--delay) * 0.08s); /* Faster cascade for more lines */
+  height: 8px; /* Much smaller base height - was 16px */
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.25);
+  transform-origin: center bottom;
 }
 
-@keyframes voicePulse {
+@keyframes elegantVoicePulse {
   0%, 100% {
-    height: 20px;
-    opacity: 0.6;
+    height: 8px;
+    opacity: 0.5;
+    transform: scaleY(0.9);
+  }
+  25% {
+    height: 14px;
+    opacity: 0.75;
+    transform: scaleY(1.1);
   }
   50% {
-    height: 60px;
+    height: 24px;
     opacity: 1;
+    transform: scaleY(1.3);
+  }
+  75% {
+    height: 18px;
+    opacity: 0.85;
+    transform: scaleY(1.2);
   }
 }
 
 /* Timer display */
 .voice-timer {
   color: white;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
@@ -1684,6 +1717,8 @@
     margin: var(--space-4);
     max-width: none;
     padding: var(--space-6);
+    /* Calming background for wellness app */
+    background: #6b7280 !important; /* Calm gray instead of alarming red - force override */
   }
 
   .voice-modal-cancel,
@@ -1700,4 +1735,30 @@
   .voice-timer {
     font-size: var(--font-size-lg);
   }
+
+  /* Mobile voice modal overlay with calming background */
+  .voice-modal-overlay {
+    background: rgba(107, 114, 128, 0.4); /* Calm gray overlay instead of transparent */
+  }
+
+  .voice-modal-inline {
+    /* For inline modals on mobile, use softer styling */
+    background: rgba(107, 114, 128, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2);
+  }
+}
+
+/* Inline voice modal positioning within input container */
+.voice-modal-inline {
+  margin: var(--space-3) 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: auto;
+  width: 100%;
+}
+
+.voice-modal-inline .voice-modal {
+  max-width: 160px; /* Much smaller for compact inline positioning */
+  margin: 0;
 }
