@@ -70,6 +70,12 @@ const App = () => {
   const handleCloseMoodTracker = () => setShowMoodTracker(false);
   const handleOpenMoodTracker = () => setShowMoodTracker(true);
 
+  // 🔽 Voice Recording State Management
+  const [isRecording, setIsRecording] = useState(false);
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [voiceError, setVoiceError] = useState('');
+
   // 🔽 Responsive state for mobile detection
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 560);
 
@@ -294,7 +300,121 @@ const App = () => {
     }
   };
 
-  // 🔽 Function 5b: Generate Pattern Insight
+  // 🔽 Function 5b: Voice Recording Functions
+  const startVoiceRecording = async () => {
+    try {
+      // Check for Web Speech API support
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        setVoiceError('Voice transcription is not supported in your browser. Please type your entry or try Chrome/Safari.');
+        return;
+      }
+
+      // Request microphone permission
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (permissionError) {
+        setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings.');
+        return;
+      }
+
+      // Initialize speech recognition
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = true;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = 'en-US';
+
+      // Set up event handlers
+      recognitionInstance.onstart = () => {
+        setIsRecording(true);
+        setShowVoiceModal(true);
+        setVoiceError('');
+        setRecordingTime(0);
+      };
+
+      recognitionInstance.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        // Update entry with current transcript
+        setEntry(transcript);
+      };
+
+      recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        let errorMessage = 'Voice recognition error. Please try again.';
+
+        if (event.error === 'network') {
+          errorMessage = 'Voice transcription requires an internet connection.';
+        } else if (event.error === 'not-allowed') {
+          errorMessage = 'Microphone access denied. Please enable microphone permissions.';
+        } else if (event.error === 'no-speech') {
+          errorMessage = 'No speech detected. Please try again.';
+        }
+
+        setVoiceError(errorMessage);
+        stopVoiceRecording();
+      };
+
+      recognitionInstance.onend = () => {
+        setIsRecording(false);
+        setShowVoiceModal(false);
+        setRecordingTime(0);
+      };
+
+      // Start recording
+      recognitionInstance.start();
+      setRecognitionState(recognitionInstance);
+
+    } catch (error) {
+      console.error('Error starting voice recording:', error);
+      setVoiceError('Failed to start voice recording. Please try again.');
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    if (recognition) {
+      recognition.stop();
+    }
+    setIsRecording(false);
+    setShowVoiceModal(false);
+    setRecordingTime(0);
+  };
+
+  const cancelVoiceRecording = () => {
+    if (recognition) {
+      recognition.stop();
+    }
+    setIsRecording(false);
+    setShowVoiceModal(false);
+    setRecordingTime(0);
+    // Don't keep the transcribed text on cancel
+    setEntry('');
+  };
+
+  // Timer for recording duration
+  React.useEffect(() => {
+    let interval = null;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime(time => time + 1);
+      }, 1000);
+    } else if (!isRecording && recordingTime !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording, recordingTime]);
+
+  // Format recording time as MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // 🔽 Function 5c: Generate Pattern Insight
   const [processingMessage, setProcessingMessage] = useState("");
   
   const handlePatternInsight = async () => {
@@ -596,15 +716,27 @@ return (
                 🛑 Stop
           </button> */}
           
-              <button 
-                  className="cm-btn cm-btn--primary" 
-                  onClick={handleSubmit}
-                  id="reflect-btn"
-                  aria-label="Reflect"
-                  type="button" 
-                  disabled={isProcessing || !entry.trim()}>
-                🧠 Reflect
-              </button>
+              {/* Split button layout: Reflect (50%) + Voice (50%) */}
+              <div className="cm-button-row">
+                <button
+                    className="cm-btn cm-btn--primary cm-btn--split"
+                    onClick={handleSubmit}
+                    id="reflect-btn"
+                    aria-label="Reflect"
+                    type="button"
+                    disabled={isProcessing || !entry.trim()}>
+                  🧠 Reflect
+                </button>
+
+                <button
+                    className="cm-btn cm-btn--voice cm-btn--split"
+                    onClick={startVoiceRecording}
+                    aria-label="Voice transcription"
+                    type="button"
+                    disabled={isProcessing || isRecording}>
+                  🎙️ Voice
+                </button>
+              </div>
 
               {/* Mobile close button when expanded */}
               {isMobile && inputExpanded && (
@@ -715,6 +847,50 @@ return (
                 }
               }}
             />
+          </div>
+        )}
+
+        {/* Voice Recording Modal - Claude-style red interface */}
+        {showVoiceModal && (
+          <div className="voice-modal-overlay">
+            <div className="voice-modal">
+              <div className="voice-modal-header">
+                <button
+                  className="voice-modal-cancel"
+                  onClick={cancelVoiceRecording}
+                  aria-label="Cancel recording"
+                  type="button">
+                  ✕
+                </button>
+                <button
+                  className="voice-modal-send"
+                  onClick={stopVoiceRecording}
+                  aria-label="Finish recording"
+                  type="button">
+                  ↑
+                </button>
+              </div>
+
+              <div className="voice-visualizer">
+                <div className="voice-line" style={{ '--delay': 0 }}></div>
+                <div className="voice-line" style={{ '--delay': 1 }}></div>
+                <div className="voice-line" style={{ '--delay': 2 }}></div>
+                <div className="voice-line" style={{ '--delay': 3 }}></div>
+                <div className="voice-line" style={{ '--delay': 4 }}></div>
+                <div className="voice-line" style={{ '--delay': 5 }}></div>
+                <div className="voice-line" style={{ '--delay': 6 }}></div>
+              </div>
+
+              <div className="voice-timer">
+                {formatTime(recordingTime)}
+              </div>
+
+              {voiceError && (
+                <div className="voice-error">
+                  {voiceError}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
