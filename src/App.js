@@ -579,9 +579,29 @@ const App = () => {
       };
 
       recognitionInstance.onend = () => {
-        setIsRecording(false);
-        setShowVoiceModal(false);
-        setRecordingTime(0);
+        // Mobile speech recognition often ends automatically after silence
+        // For mobile: restart recognition to maintain continuous capture
+        if (isMobile && isRecording && !voiceError) {
+          addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
+          try {
+            // Small delay to prevent rapid restart issues
+            setTimeout(() => {
+              if (isRecording && !voiceError) {
+                recognitionInstance.start();
+              }
+            }, 100);
+          } catch (error) {
+            addVoiceDebugLog(`❌ Auto-restart failed: ${error.message}`);
+            setIsRecording(false);
+            setShowVoiceModal(false);
+            setRecordingTime(0);
+          }
+        } else {
+          // Desktop or intentional stop
+          setIsRecording(false);
+          setShowVoiceModal(false);
+          setRecordingTime(0);
+        }
       };
 
       // Start recording
