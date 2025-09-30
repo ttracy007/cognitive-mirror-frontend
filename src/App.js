@@ -455,7 +455,7 @@ const App = () => {
       if (isChromeMobile) {
         addVoiceDebugLog("🚫 Chrome mobile detected - redirecting to Safari for better voice quality");
         setShowVoiceModal(true);
-        setVoiceError('For best voice transcription quality on mobile, please use Safari. Chrome mobile has known accuracy issues.');
+        setVoiceError('For best voice transcription quality on mobile, please use Safari.');
         return;
       }
 
