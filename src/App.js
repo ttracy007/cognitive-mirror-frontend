@@ -534,12 +534,7 @@ const App = () => {
       // Mobile-specific optimizations for better speech continuation
       if (isMobileDevice) {
         addVoiceDebugLog("📱 Applying mobile speech optimizations");
-        // Some mobile browsers benefit from these settings
-        try {
-          recognitionInstance.grammars = new webkitSpeechGrammarList();
-        } catch (e) {
-          // Graceful fallback if grammars not supported
-        }
+        // Removed webkitSpeechGrammarList - causes issues with Chrome mobile
       }
 
       // Set up event handlers
