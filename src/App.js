@@ -1,5 +1,5 @@
 // 🔼 Imports and Setup      
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect, useState, useRef } from 'react'; 
 import SummaryViewer from './SummaryViewer'; 
 import PatternInsightViewer from './PatternInsightViewer';
 import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
