@@ -387,7 +387,6 @@ const App = () => {
 
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
-    console.log("🔧 DEBUGGING: Voice recording started - optimized permission handling active");
     addVoiceDebugLog("🎙️ Starting voice recording...");
     setExplicitStop(false); // Reset the explicit stop flag for new recording
     explicitStopRef.current = false;
@@ -395,13 +394,14 @@ const App = () => {
     try {
       // Enhanced environment detection for HTTPS requirements
       const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
       const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
       const isHTTPS = location.protocol === 'https:';
 
       // Log environment details for debugging
       addVoiceDebugLog(`🌐 Environment: ${isDevelopment ? 'development' : isProduction ? 'production' : 'unknown'}`);
-      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobileDevice}`);
+      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobileDevice} | Chrome Mobile: ${isChromeMobile}`);
       addVoiceDebugLog(`📍 Host: ${location.hostname}`);
 
       // Check HTTPS requirement for mobile browsers
@@ -601,16 +601,17 @@ const App = () => {
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
         // For mobile: restart recognition to maintain continuous capture
-        if (isMobileDevice && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+        // EXCEPTION: Disable auto-restart for Chrome mobile to prevent chirping/short-circuit
+        if (isMobileDevice && !isChromeMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
-            // Small delay to prevent rapid restart issues
+            // Longer delay to prevent AirPods feedback loop and rapid restart issues
             setTimeout(() => {
               if (isRecordingRef.current && !voiceError && !explicitStopRef.current) {
                 // Keep result tracking continuous across restarts
                 recognitionInstance.start();
               }
-            }, 100);
+            }, 500); // Increased from 100ms to 500ms to prevent audio feedback
           } catch (error) {
             addVoiceDebugLog(`❌ Auto-restart failed: ${error.message}`);
             setIsRecording(false);
@@ -619,7 +620,8 @@ const App = () => {
             setRecordingTime(0);
           }
         } else {
-          // Desktop or intentional stop
+          // Desktop, Chrome mobile, or intentional stop
+          addVoiceDebugLog(`${isChromeMobile ? "🤖 Chrome mobile" : "🖥️ Desktop/Other"} recognition ended - stopping recording to prevent audio issues`);
           setIsRecording(false);
           isRecordingRef.current = false;
           setShowVoiceModal(false);
