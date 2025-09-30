@@ -205,6 +205,12 @@ const App = () => {
   const handleSubmit = async () => {
     console.warn("🧪 handleSubmit called from device width:", window.innerWidth);
 
+    // Stop voice recording if active
+    if (isRecording) {
+      console.log("🔧 SUBMIT: Stopping voice recording before submission");
+      stopVoiceRecording();
+    }
+
     // Always read a stable username
     const u = (username || UsernameStore.get() || '').trim();
 
@@ -525,12 +531,6 @@ const App = () => {
       };
 
       recognitionInstance.onresult = (event) => {
-        // Check if recording is still active - prevent processing if stopped
-        if (!isRecording) {
-          console.log("🔧 DEBUGGING: Ignoring result - recording stopped");
-          return;
-        }
-
         // Build complete transcript from all final results
         let finalTranscript = '';
 
@@ -541,23 +541,22 @@ const App = () => {
         }
 
         if (finalTranscript.trim()) {
-          addVoiceDebugLog(`📝 Final transcription: "${finalTranscript.slice(-50)}..."`);
+          addVoiceDebugLog(`📝 Final transcription: "${finalTranscript.trim()}"`);
 
           // Apply transcription enhancement to final results
           const enhancedTranscript = enhanceTranscription(finalTranscript);
 
-          // For multiple recording sessions: append to existing text instead of replacing
+          // Append to existing text
           setEntry(prevEntry => {
             const existingText = prevEntry.trim();
             const newText = enhancedTranscript.trim();
 
             if (existingText) {
-              // Add space between existing and new text
               const combinedText = existingText + ' ' + newText;
-              console.log("🔧 DEBUGGING: Appending text - existing:", existingText, "new:", newText, "combined:", combinedText);
+              console.log("🔧 TRANSCRIPTION: Appending - existing:", existingText, "new:", newText, "result:", combinedText);
               return combinedText;
             } else {
-              console.log("🔧 DEBUGGING: Setting initial text:", newText);
+              console.log("🔧 TRANSCRIPTION: Initial text:", newText);
               return newText;
             }
           });
@@ -619,17 +618,23 @@ const App = () => {
   };
 
   const stopVoiceRecording = () => {
-    console.log("🔧 DEBUGGING: Stopping voice recording");
+    console.log("🔧 VOICE: Stopping recording completely");
     setExplicitStop(true); // Prevent auto-restart
+
     if (recognition) {
       recognition.stop();
-      recognition.onresult = null; // Prevent further result processing
-      recognition.onend = null; // Prevent onend from interfering
+      recognition.onresult = null;
+      recognition.onend = null;
+      recognition.onerror = null;
     }
+
     setIsRecording(false);
     setShowVoiceModal(false);
     setRecordingTime(0);
-    setRecognition(null); // Clear recognition instance
+    setRecognition(null);
+    setVoiceError('');
+
+    console.log("🔧 VOICE: Recording stopped and cleaned up");
   };
 
   const cancelVoiceRecording = () => {
@@ -1012,8 +1017,11 @@ return (
                           </button>
                           <button
                             className="voice-modal-send"
-                            onClick={stopVoiceRecording}
-                            aria-label="Finish recording"
+                            onClick={() => {
+                              stopVoiceRecording();
+                              handleSubmit();
+                            }}
+                            aria-label="Finish recording and submit"
                             type="button">
                             ↑
                           </button>
