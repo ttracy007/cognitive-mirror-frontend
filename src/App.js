@@ -120,8 +120,8 @@ const App = () => {
     enhanced = enhanced.replace(/\bi've\b/g, "I've");
     enhanced = enhanced.replace(/\bi'd\b/g, "I'd");
 
-    // Add question marks for obvious questions
-    enhanced = enhanced.replace(/(\bwhat|\bhow|\bwhy|\bwhen|\bwhere|\bwho|\bis|\bdo|\bdoes|\bcan|\bcould|\bwould|\bshould)\b([^.!?]*?)(\.|$)/gi, (match, start, middle, end) => {
+    // Add question marks for obvious questions (only at sentence start)
+    enhanced = enhanced.replace(/^(\bwhat|\bhow|\bwhy|\bwhen|\bwhere|\bwho|\bare|\bdo|\bdoes|\bcan|\bcould|\bwould|\bshould)\b([^.!?]*?)(\.|$)/gi, (match, start, middle, end) => {
       if (middle.length > 0 && !middle.includes('.') && !middle.includes('!')) {
         return start + middle + '?';
       }
