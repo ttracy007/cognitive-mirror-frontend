@@ -724,7 +724,31 @@ const App = () => {
         // Handle interim results for live feedback (improved UX)
         if (interimTranscript.trim()) {
           addVoiceDebugLog(`🔄 Interim: "${interimTranscript.trim()}"`);
-          // Note: Could add interim display overlay in future for better UX
+
+          // CHROME iOS FIX: Chrome iOS often provides only interim results, never final
+          // If we detect Chrome iOS and have interim results but no final results, treat interim as final
+          const isChromeIOS = /CriOS/i.test(navigator.userAgent);
+          if (isChromeIOS && !newFinalTranscript.trim()) {
+            addVoiceDebugLog(`🍎 Chrome iOS detected: treating interim as final result`);
+
+            // Apply transcription enhancement to interim results for Chrome iOS
+            const enhancedTranscript = enhanceTranscription(interimTranscript);
+
+            // Update entry with interim result (treated as final for Chrome iOS)
+            setEntry(prevEntry => {
+              const existingText = prevEntry.trim();
+              const newText = enhancedTranscript.trim();
+
+              if (existingText) {
+                const combinedText = existingText + ' ' + newText;
+                console.log("🔧 CHROME iOS INTERIM->FINAL: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
+                return combinedText;
+              } else {
+                console.log("🔧 CHROME iOS INTERIM->FINAL: First text:", newText);
+                return newText;
+              }
+            });
+          }
         }
       };
 
