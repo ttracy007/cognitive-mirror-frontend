@@ -527,7 +527,7 @@ const App = () => {
       addVoiceDebugLog("🚀 Creating Speech Recognition instance...");
       const recognitionInstance = new SpeechRecognition();
       recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = false;
+      recognitionInstance.interimResults = isMobileDevice; // Enable interim results on mobile for faster feedback
       recognitionInstance.lang = 'en-US';
       recognitionInstance.maxAlternatives = 1;
 
@@ -1043,7 +1043,7 @@ return (
                           ? 'Voice transcription ready - click to start recording'
                           : 'Click to enable voice transcription (will request microphone permission)'
                         }>
-                      🎙️ {permissionStatus === 'denied' ? '🚫' : permissionStatus === 'granted' ? '✅' : ''} Voice
+                      🎙️ Voice
                     </button>
                   </div>
 
