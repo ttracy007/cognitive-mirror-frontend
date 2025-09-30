@@ -81,6 +81,7 @@ const App = () => {
   // Refs to avoid React closure issues in recognition handlers
   const isRecordingRef = useRef(false);
   const explicitStopRef = useRef(false);
+  const lastProcessedResultRef = useRef(0);
 
   // 🔽 Browser Support Detection
   const [voiceSupported, setVoiceSupported] = useState(true);
@@ -531,38 +532,40 @@ const App = () => {
         addVoiceDebugLog("🎤 Recognition started! Opening modal...");
         setIsRecording(true);
         isRecordingRef.current = true;
+        lastProcessedResultRef.current = 0; // Reset result tracking
         setShowVoiceModal(true);
         setVoiceError('');
         setRecordingTime(0);
       };
 
       recognitionInstance.onresult = (event) => {
-        // Build complete transcript from all final results
-        let finalTranscript = '';
+        // Only process NEW final results since last processed index
+        let newTranscript = '';
 
-        for (let i = 0; i < event.results.length; i++) {
+        for (let i = lastProcessedResultRef.current; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + ' ';
+            newTranscript += event.results[i][0].transcript + ' ';
+            lastProcessedResultRef.current = i + 1; // Update processed index
           }
         }
 
-        if (finalTranscript.trim()) {
-          addVoiceDebugLog(`📝 Final transcription: "${finalTranscript.trim()}"`);
+        if (newTranscript.trim()) {
+          addVoiceDebugLog(`📝 New transcription: "${newTranscript.trim()}"`);
 
-          // Apply transcription enhancement to final results
-          const enhancedTranscript = enhanceTranscription(finalTranscript);
+          // Apply transcription enhancement to new results only
+          const enhancedTranscript = enhanceTranscription(newTranscript);
 
-          // Append to existing text
+          // Append new text to existing entry
           setEntry(prevEntry => {
             const existingText = prevEntry.trim();
             const newText = enhancedTranscript.trim();
 
             if (existingText) {
               const combinedText = existingText + ' ' + newText;
-              console.log("🔧 TRANSCRIPTION: Appending - existing:", existingText, "new:", newText, "result:", combinedText);
+              console.log("🔧 TRANSCRIPTION: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
               return combinedText;
             } else {
-              console.log("🔧 TRANSCRIPTION: Initial text:", newText);
+              console.log("🔧 TRANSCRIPTION: First text:", newText);
               return newText;
             }
           });
@@ -594,6 +597,7 @@ const App = () => {
             // Small delay to prevent rapid restart issues
             setTimeout(() => {
               if (isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+                // Keep result tracking continuous across restarts
                 recognitionInstance.start();
               }
             }, 100);
