@@ -436,10 +436,10 @@ const App = () => {
     // IMMEDIATE Firefox check - prioritize user experience
     const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
     if (isFirefoxBrowser) {
-      addVoiceDebugLog("🦊 Firefox detected immediately - showing browser guidance");
-      // Show modal first so error message is visible
-      setShowVoiceModal(true);
-      setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
+      addVoiceDebugLog("🦊 Firefox detected - showing clean tooltip");
+      // Show clean tooltip instead of clunky modal
+      setTooltip('Voice transcription requires Chrome, Safari, or Edge browser.');
+      setTimeout(() => setTooltip(''), 4000); // Auto-hide after 4 seconds
       return;
     }
     setExplicitStop(false); // Reset the explicit stop flag for new recording
