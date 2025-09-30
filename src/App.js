@@ -78,6 +78,10 @@ const App = () => {
   const [voiceDebugLogs, setVoiceDebugLogs] = useState([]);
   const [explicitStop, setExplicitStop] = useState(false); // Track if user explicitly stopped recording
 
+  // Refs to avoid React closure issues in recognition handlers
+  const isRecordingRef = useRef(false);
+  const explicitStopRef = useRef(false);
+
   // 🔽 Browser Support Detection
   const [voiceSupported, setVoiceSupported] = useState(true);
 
@@ -384,6 +388,7 @@ const App = () => {
     console.log("🔧 DEBUGGING: Voice recording started - new implementation active");
     addVoiceDebugLog("🎙️ Starting voice recording...");
     setExplicitStop(false); // Reset the explicit stop flag for new recording
+    explicitStopRef.current = false;
 
     try {
       // Enhanced environment detection for HTTPS requirements
@@ -525,6 +530,7 @@ const App = () => {
       recognitionInstance.onstart = () => {
         addVoiceDebugLog("🎤 Recognition started! Opening modal...");
         setIsRecording(true);
+        isRecordingRef.current = true;
         setShowVoiceModal(true);
         setVoiceError('');
         setRecordingTime(0);
@@ -582,24 +588,26 @@ const App = () => {
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
         // For mobile: restart recognition to maintain continuous capture
-        if (isMobile && isRecording && !voiceError && !explicitStop) {
+        if (isMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
             // Small delay to prevent rapid restart issues
             setTimeout(() => {
-              if (isRecording && !voiceError && !explicitStop) {
+              if (isRecordingRef.current && !voiceError && !explicitStopRef.current) {
                 recognitionInstance.start();
               }
             }, 100);
           } catch (error) {
             addVoiceDebugLog(`❌ Auto-restart failed: ${error.message}`);
             setIsRecording(false);
+            isRecordingRef.current = false;
             setShowVoiceModal(false);
             setRecordingTime(0);
           }
         } else {
           // Desktop or intentional stop
           setIsRecording(false);
+          isRecordingRef.current = false;
           setShowVoiceModal(false);
           setRecordingTime(0);
         }
@@ -619,7 +627,8 @@ const App = () => {
 
   const stopVoiceRecording = () => {
     console.log("🔧 VOICE: Stopping recording completely");
-    setExplicitStop(true); // Prevent auto-restart
+    setExplicitStop(true);
+    explicitStopRef.current = true; // Prevent auto-restart
 
     if (recognition) {
       recognition.stop();
@@ -629,6 +638,7 @@ const App = () => {
     }
 
     setIsRecording(false);
+    isRecordingRef.current = false;
     setShowVoiceModal(false);
     setRecordingTime(0);
     setRecognition(null);
