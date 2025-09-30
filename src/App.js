@@ -432,6 +432,14 @@ const App = () => {
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
     addVoiceDebugLog("🎙️ Starting voice recording...");
+
+    // IMMEDIATE Firefox check - prioritize user experience
+    const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
+    if (isFirefoxBrowser) {
+      addVoiceDebugLog("🦊 Firefox detected immediately - showing browser guidance");
+      setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
+      return;
+    }
     setExplicitStop(false); // Reset the explicit stop flag for new recording
     explicitStopRef.current = false;
 
