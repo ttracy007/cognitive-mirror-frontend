@@ -880,33 +880,12 @@ const App = () => {
     console.log('USER AGENT:', navigator.userAgent);
     console.log('CHROME DETECTION:', { chromeTest: /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent), mobile: isMobileDevice, result: isChromeMobile });
 
-    // COMPREHENSIVE CHROME MOBILE DEBUG: All info in one alert
-    const voiceData = window.lastVoiceResults || { totalResults: 0, finalCount: 0, latestTranscript: 'none' };
-    const userAgent = navigator.userAgent;
-    const chromeTests = {
-      basic: /Chrome/i.test(userAgent),
-      criOS: /CriOS/i.test(userAgent),
-      crMo: /CrMo/i.test(userAgent),
-      crOS: /CrOS/i.test(userAgent),
-      includes: userAgent.includes('Chrome')
-    };
-
-    alert(`🔍 COMPREHENSIVE DEBUG:
-📱 Mobile: ${isMobileDevice}
-🤖 Chrome: ${isChromeMobile}
-🎤 Recording: ${isRecording}
-🔧 Recognition: ${!!recognition}
-📝 Voice Results: ${voiceData.totalResults} total, ${voiceData.finalCount} final
-💬 Latest: "${voiceData.latestTranscript}"
-🧪 Chrome Tests: ${Object.entries(chromeTests).map(([k,v]) => `${k}:${v}`).join(', ')}
-📋 User Agent: ${userAgent.substring(0, 100)}...`);
 
     addVoiceDebugLog("📤 Smart submit: Finishing recording with grace period...");
     addVoiceDebugLog(`🔍 SUBMIT DEBUG - Mobile: ${isMobileDevice}, Chrome Mobile: ${isChromeMobile}, Recording: ${isRecording}`);
 
     if (!recognition || !isRecording) {
       addVoiceDebugLog("⚠️ No active recording to finish");
-      alert("NO RECORDING - Going straight to submit");
       handleSubmit();
       return;
     }
@@ -917,7 +896,6 @@ const App = () => {
 
     // Chrome mobile needs much longer grace period
     const gracePeriod = isChromeMobile ? 5000 : 1500; // 5 seconds for Chrome mobile
-    alert(`GRACE PERIOD: ${gracePeriod}ms for ${isChromeMobile ? 'Chrome Mobile' : 'Other'}`);
 
     // Create a promise that resolves when final results are processed
     const waitForFinalResults = new Promise((resolve) => {
@@ -928,7 +906,6 @@ const App = () => {
       const originalOnResult = recognition.onresult;
       recognition.onresult = (event) => {
         // CHROME DEBUG: Log all speech recognition events
-        alert(`SPEECH EVENT: ${event.results.length} results, last isFinal=${event.results[event.results.length-1]?.isFinal}`);
 
         // Call original handler first
         if (originalOnResult) {
@@ -940,7 +917,6 @@ const App = () => {
           if (event.results[i].isFinal) {
             hasReceivedFinalResult = true;
             addVoiceDebugLog("✅ Final result captured during grace period");
-            alert("FINAL RESULT RECEIVED!");
 
             // Clear timeout and resolve after brief processing delay
             clearTimeout(finalResultTimeout);
@@ -954,7 +930,6 @@ const App = () => {
       const originalOnEnd = recognition.onend;
       recognition.onend = () => {
         addVoiceDebugLog("🎤 Recognition ended during smart submit");
-        alert("RECOGNITION ENDED - resolving");
         clearTimeout(finalResultTimeout);
         resolve();
       };
@@ -962,7 +937,6 @@ const App = () => {
       // Set timeout for maximum wait time - much longer for Chrome mobile
       finalResultTimeout = setTimeout(() => {
         addVoiceDebugLog("⏱️ Grace period timeout - proceeding with submit");
-        alert("TIMEOUT - proceeding with submit");
         resolve();
       }, gracePeriod);
     });
