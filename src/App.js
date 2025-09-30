@@ -439,7 +439,7 @@ const App = () => {
       addVoiceDebugLog("🦊 Firefox detected immediately - showing browser guidance");
       // Show modal first so error message is visible
       setShowVoiceModal(true);
-      setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
+      setVoiceError('Voice transcription requires Safari or Chrome.');
       return;
     }
     setExplicitStop(false); // Reset the explicit stop flag for new recording
@@ -509,13 +509,13 @@ const App = () => {
         let errorMessage = 'Voice transcription is not supported in this browser.';
 
         if (isFirefox) {
-          errorMessage = 'Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.';
+          errorMessage = 'Voice transcription is not supported in Firefox. For voice input, please use Safari. You can still type your journal entries normally.';
         } else if (isIOS) {
           errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
         } else if (isAndroid) {
           errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
         } else {
-          errorMessage = 'Voice transcription requires Chrome, Safari, or Edge browser. Firefox users: please switch to one of these browsers for voice input.';
+          errorMessage = 'Voice transcription requires Safari or Chrome. Firefox users: please switch to Safari or Chrome for voice input.';
         }
 
         setVoiceError(errorMessage);
@@ -1371,27 +1371,31 @@ return (
                           </button>
                         </div>
 
-                        <div className="voice-visualizer">
-                          <div className="voice-line" style={{ '--delay': 0 }}></div>
-                          <div className="voice-line" style={{ '--delay': 1 }}></div>
-                          <div className="voice-line" style={{ '--delay': 2 }}></div>
-                          <div className="voice-line" style={{ '--delay': 3 }}></div>
-                          <div className="voice-line" style={{ '--delay': 4 }}></div>
-                          <div className="voice-line" style={{ '--delay': 5 }}></div>
-                          <div className="voice-line" style={{ '--delay': 6 }}></div>
-                          <div className="voice-line" style={{ '--delay': 7 }}></div>
-                          <div className="voice-line" style={{ '--delay': 8 }}></div>
-                          <div className="voice-line" style={{ '--delay': 9 }}></div>
-                          <div className="voice-line" style={{ '--delay': 10 }}></div>
-                          <div className="voice-line" style={{ '--delay': 11 }}></div>
-                          <div className="voice-line" style={{ '--delay': 12 }}></div>
-                          <div className="voice-line" style={{ '--delay': 13 }}></div>
-                          <div className="voice-line" style={{ '--delay': 14 }}></div>
-                        </div>
+                        {!voiceError && (
+                          <div className="voice-visualizer">
+                            <div className="voice-line" style={{ '--delay': 0 }}></div>
+                            <div className="voice-line" style={{ '--delay': 1 }}></div>
+                            <div className="voice-line" style={{ '--delay': 2 }}></div>
+                            <div className="voice-line" style={{ '--delay': 3 }}></div>
+                            <div className="voice-line" style={{ '--delay': 4 }}></div>
+                            <div className="voice-line" style={{ '--delay': 5 }}></div>
+                            <div className="voice-line" style={{ '--delay': 6 }}></div>
+                            <div className="voice-line" style={{ '--delay': 7 }}></div>
+                            <div className="voice-line" style={{ '--delay': 8 }}></div>
+                            <div className="voice-line" style={{ '--delay': 9 }}></div>
+                            <div className="voice-line" style={{ '--delay': 10 }}></div>
+                            <div className="voice-line" style={{ '--delay': 11 }}></div>
+                            <div className="voice-line" style={{ '--delay': 12 }}></div>
+                            <div className="voice-line" style={{ '--delay': 13 }}></div>
+                            <div className="voice-line" style={{ '--delay': 14 }}></div>
+                          </div>
+                        )}
 
-                        <div className="voice-timer">
-                          {formatTime(recordingTime)}
-                        </div>
+                        {!voiceError && (
+                          <div className="voice-timer">
+                            {formatTime(recordingTime)}
+                          </div>
+                        )}
 
                         {voiceError && (
                           <div className="voice-error">
