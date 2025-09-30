@@ -667,10 +667,14 @@ const App = () => {
   };
 
   const cancelVoiceRecording = () => {
+    setExplicitStop(true);
+    explicitStopRef.current = true; // Prevent auto-restart
+
     if (recognition) {
       recognition.stop();
     }
     setIsRecording(false);
+    isRecordingRef.current = false;
     setShowVoiceModal(false);
     setRecordingTime(0);
     // Don't keep the transcribed text on cancel
