@@ -585,10 +585,54 @@ const App = () => {
 
       addVoiceDebugLog(`🎯 Recognition configured: continuous=${recognitionInstance.continuous}, interim=${recognitionInstance.interimResults}, lang=${recognitionInstance.lang}`);
 
+      // Chrome mobile diagnostic logging
+      if (isChromeMobile) {
+        addVoiceDebugLog(`🤖 CHROME MOBILE DIAGNOSTICS:`);
+        addVoiceDebugLog(`   - User Agent: ${navigator.userAgent}`);
+        addVoiceDebugLog(`   - SpeechRecognition type: ${recognitionInstance.constructor.name}`);
+        addVoiceDebugLog(`   - Available properties: ${Object.getOwnPropertyNames(recognitionInstance).join(', ')}`);
+
+        // Test Chrome mobile specific settings
+        try {
+          if (recognitionInstance.webkitSpeech !== undefined) {
+            addVoiceDebugLog(`   - webkitSpeech available: ${recognitionInstance.webkitSpeech}`);
+          }
+          if (recognitionInstance.grammars !== undefined) {
+            addVoiceDebugLog(`   - grammars available: ${recognitionInstance.grammars}`);
+          }
+        } catch (e) {
+          addVoiceDebugLog(`   - Property check error: ${e.message}`);
+        }
+      }
+
       // Mobile-specific optimizations for better speech continuation
       if (isMobileDevice) {
         addVoiceDebugLog("📱 Applying mobile speech optimizations");
-        // Removed webkitSpeechGrammarList - causes issues with Chrome mobile
+
+        // Chrome mobile specific settings for better accuracy
+        if (isChromeMobile) {
+          addVoiceDebugLog("🤖 Applying Chrome mobile specific optimizations");
+
+          // Try Chrome mobile specific settings
+          try {
+            // Force English language more explicitly
+            recognitionInstance.lang = 'en-US';
+
+            // Disable some chrome mobile features that may interfere
+            if (recognitionInstance.webkitSpeechGrammarList) {
+              recognitionInstance.webkitSpeechGrammarList = null;
+            }
+
+            // Try to force higher quality audio processing
+            if (recognitionInstance.audiostart) {
+              addVoiceDebugLog("   - audiostart event available");
+            }
+
+            addVoiceDebugLog("   - Chrome mobile optimizations applied");
+          } catch (chromeError) {
+            addVoiceDebugLog(`   - Chrome optimization error: ${chromeError.message}`);
+          }
+        }
       }
 
       // Set up event handlers
@@ -754,7 +798,11 @@ const App = () => {
 
   // 🔽 Smart Submit: Allows final speech processing before submission
   const finishVoiceRecordingAndSubmit = async () => {
+    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
+
     addVoiceDebugLog("📤 Smart submit: Finishing recording with grace period...");
+    addVoiceDebugLog(`🔍 SUBMIT DEBUG - Mobile: ${isMobileDevice}, Chrome Mobile: ${isChromeMobile}, Recording: ${isRecording}`);
 
     if (!recognition || !isRecording) {
       addVoiceDebugLog("⚠️ No active recording to finish");
