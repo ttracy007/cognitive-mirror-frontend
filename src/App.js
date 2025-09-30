@@ -437,6 +437,8 @@ const App = () => {
     const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
     if (isFirefoxBrowser) {
       addVoiceDebugLog("🦊 Firefox detected immediately - showing browser guidance");
+      // Show modal first so error message is visible
+      setShowVoiceModal(true);
       setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
       return;
     }
