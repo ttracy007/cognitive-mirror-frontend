@@ -393,18 +393,18 @@ const App = () => {
 
     try {
       // Enhanced environment detection for HTTPS requirements
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
       const isHTTPS = location.protocol === 'https:';
 
       // Log environment details for debugging
       addVoiceDebugLog(`🌐 Environment: ${isDevelopment ? 'development' : isProduction ? 'production' : 'unknown'}`);
-      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobile}`);
+      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobileDevice}`);
       addVoiceDebugLog(`📍 Host: ${location.hostname}`);
 
       // Check HTTPS requirement for mobile browsers
-      const requiresHTTPS = !isHTTPS && !isDevelopment && isMobile;
+      const requiresHTTPS = !isHTTPS && !isDevelopment && isMobileDevice;
 
       if (requiresHTTPS) {
         addVoiceDebugLog("❌ HTTPS required for mobile microphone access in production");
@@ -517,7 +517,7 @@ const App = () => {
       recognitionInstance.maxAlternatives = 1;
 
       // Mobile-specific optimizations for better speech continuation
-      if (isMobile) {
+      if (isMobileDevice) {
         addVoiceDebugLog("📱 Applying mobile speech optimizations");
         // Some mobile browsers benefit from these settings
         try {
@@ -591,7 +591,7 @@ const App = () => {
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
         // For mobile: restart recognition to maintain continuous capture
-        if (isMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+        if (isMobileDevice && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
             // Small delay to prevent rapid restart issues
