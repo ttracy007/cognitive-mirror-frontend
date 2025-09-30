@@ -64,7 +64,7 @@ const App = () => {
   const [tooltipVisible, setTooltipVisible] = useState(null); // 'pattern' | 'therapist' | 'mood' | null
   const [styleVariant, setStyleVariant] = useState("D")
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeStep, setWelcomeStep] =useState(1);
+  const [welcomeStep, setWelcomeStep] = useState(1);
   const [username, setUsername] = useState('');
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const handleCloseMoodTracker = () => setShowMoodTracker(false);
@@ -77,6 +77,7 @@ const App = () => {
   const [voiceError, setVoiceError] = useState('');
   const [voiceDebugLogs, setVoiceDebugLogs] = useState([]);
   const [explicitStop, setExplicitStop] = useState(false); // Track if user explicitly stopped recording
+  const [permissionStatus, setPermissionStatus] = useState(null); // 'granted', 'denied', 'prompt', or null
 
   // Refs to avoid React closure issues in recognition handlers
   const isRecordingRef = useRef(false);
@@ -386,25 +387,25 @@ const App = () => {
 
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
-    console.log("🔧 DEBUGGING: Voice recording started - new implementation active");
     addVoiceDebugLog("🎙️ Starting voice recording...");
     setExplicitStop(false); // Reset the explicit stop flag for new recording
     explicitStopRef.current = false;
 
     try {
       // Enhanced environment detection for HTTPS requirements
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
       const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
       const isHTTPS = location.protocol === 'https:';
 
       // Log environment details for debugging
       addVoiceDebugLog(`🌐 Environment: ${isDevelopment ? 'development' : isProduction ? 'production' : 'unknown'}`);
-      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobile}`);
+      addVoiceDebugLog(`🔒 Protocol: ${location.protocol} | Mobile: ${isMobileDevice} | Chrome Mobile: ${isChromeMobile}`);
       addVoiceDebugLog(`📍 Host: ${location.hostname}`);
 
       // Check HTTPS requirement for mobile browsers
-      const requiresHTTPS = !isHTTPS && !isDevelopment && isMobile;
+      const requiresHTTPS = !isHTTPS && !isDevelopment && isMobileDevice;
 
       if (requiresHTTPS) {
         addVoiceDebugLog("❌ HTTPS required for mobile microphone access in production");
@@ -465,66 +466,75 @@ const App = () => {
       }
       addVoiceDebugLog("✅ Speech Recognition supported");
 
-      // Request microphone permission with enhanced mobile compatibility
-      addVoiceDebugLog("🎤 Requesting microphone permission...");
-      try {
-        let stream;
-
-        // Modern browsers with MediaDevices API
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          addVoiceDebugLog("🔧 Using modern MediaDevices API");
-          stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true
-            }
-          });
-        }
-        // Legacy getUserMedia with proper binding
-        else if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
-          const getUserMedia = navigator.getUserMedia ||
-                              navigator.webkitGetUserMedia ||
-                              navigator.mozGetUserMedia ||
-                              navigator.msGetUserMedia;
-
-          addVoiceDebugLog("🔧 Using legacy getUserMedia with proper binding");
-          stream = await new Promise((resolve, reject) => {
-            getUserMedia.call(navigator, { audio: true }, resolve, reject);
-          });
-        }
-        else {
-          throw new Error('getUserMedia not supported in this browser');
-        }
-
-        addVoiceDebugLog("✅ Microphone permission granted");
-        // Clean up the stream immediately
-        if (stream && stream.getTracks) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-      } catch (permissionError) {
-        addVoiceDebugLog(`❌ Microphone error: ${permissionError.message || permissionError.name || 'Permission denied'}`);
-        setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings and try again.');
+      // 🔽 OPTIMIZED PERMISSION HANDLING - Check cached status first
+      if (permissionStatus === 'denied') {
+        addVoiceDebugLog("❌ Permission previously denied - showing cached message");
+        setVoiceError('Microphone access was denied. Please enable microphone permissions in your browser settings and refresh the page to try voice input again.');
         return;
+      }
+
+      // Only request permission if we haven't cached a granted status
+      if (permissionStatus !== 'granted') {
+        addVoiceDebugLog("🎤 Requesting microphone permission (not cached)...");
+        try {
+          let stream;
+
+          // Modern browsers with MediaDevices API
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            addVoiceDebugLog("🔧 Using modern MediaDevices API");
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+              }
+            });
+          }
+          // Legacy getUserMedia with proper binding
+          else if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
+            const getUserMedia = navigator.getUserMedia ||
+                                navigator.webkitGetUserMedia ||
+                                navigator.mozGetUserMedia ||
+                                navigator.msGetUserMedia;
+
+            addVoiceDebugLog("🔧 Using legacy getUserMedia with proper binding");
+            stream = await new Promise((resolve, reject) => {
+              getUserMedia.call(navigator, { audio: true }, resolve, reject);
+            });
+          }
+          else {
+            throw new Error('getUserMedia not supported in this browser');
+          }
+
+          addVoiceDebugLog("✅ Microphone permission granted and cached");
+          setPermissionStatus('granted'); // Cache the granted status
+
+          // Clean up the stream immediately
+          if (stream && stream.getTracks) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+        } catch (permissionError) {
+          addVoiceDebugLog(`❌ Microphone error: ${permissionError.message || permissionError.name || 'Permission denied'}`);
+          setPermissionStatus('denied'); // Cache the denied status
+          setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings and refresh the page to try again.');
+          return;
+        }
+      } else {
+        addVoiceDebugLog("✅ Using cached microphone permission");
       }
 
       // Initialize speech recognition
       addVoiceDebugLog("🚀 Creating Speech Recognition instance...");
       const recognitionInstance = new SpeechRecognition();
       recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = false;
+      recognitionInstance.interimResults = isMobileDevice; // Enable interim results on mobile for faster feedback
       recognitionInstance.lang = 'en-US';
       recognitionInstance.maxAlternatives = 1;
 
       // Mobile-specific optimizations for better speech continuation
-      if (isMobile) {
+      if (isMobileDevice) {
         addVoiceDebugLog("📱 Applying mobile speech optimizations");
-        // Some mobile browsers benefit from these settings
-        try {
-          recognitionInstance.grammars = new webkitSpeechGrammarList();
-        } catch (e) {
-          // Graceful fallback if grammars not supported
-        }
+        // Removed webkitSpeechGrammarList - causes issues with Chrome mobile
       }
 
       // Set up event handlers
@@ -591,16 +601,17 @@ const App = () => {
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
         // For mobile: restart recognition to maintain continuous capture
-        if (isMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+        // EXCEPTION: Disable auto-restart for Chrome mobile to prevent chirping/short-circuit
+        if (isMobileDevice && !isChromeMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
-            // Small delay to prevent rapid restart issues
+            // Longer delay to prevent AirPods feedback loop and rapid restart issues
             setTimeout(() => {
               if (isRecordingRef.current && !voiceError && !explicitStopRef.current) {
                 // Keep result tracking continuous across restarts
                 recognitionInstance.start();
               }
-            }, 100);
+            }, 500); // Increased from 100ms to 500ms to prevent audio feedback
           } catch (error) {
             addVoiceDebugLog(`❌ Auto-restart failed: ${error.message}`);
             setIsRecording(false);
@@ -609,7 +620,8 @@ const App = () => {
             setRecordingTime(0);
           }
         } else {
-          // Desktop or intentional stop
+          // Desktop, Chrome mobile, or intentional stop
+          addVoiceDebugLog(`${isChromeMobile ? "🤖 Chrome mobile" : "🖥️ Desktop/Other"} recognition ended - stopping recording to prevent audio issues`);
           setIsRecording(false);
           isRecordingRef.current = false;
           setShowVoiceModal(false);
@@ -652,10 +664,14 @@ const App = () => {
   };
 
   const cancelVoiceRecording = () => {
+    setExplicitStop(true);
+    explicitStopRef.current = true; // Prevent auto-restart
+
     if (recognition) {
       recognition.stop();
     }
     setIsRecording(false);
+    isRecordingRef.current = false;
     setShowVoiceModal(false);
     setRecordingTime(0);
     // Don't keep the transcribed text on cancel
@@ -1010,9 +1026,20 @@ return (
                     <button
                         className="cm-btn cm-btn--voice cm-btn--split"
                         onClick={startVoiceRecording}
-                        aria-label="Voice transcription"
+                        aria-label={permissionStatus === 'denied'
+                          ? 'Voice transcription - Permission needed'
+                          : permissionStatus === 'granted'
+                          ? 'Voice transcription - Ready'
+                          : 'Voice transcription - Will request permission'
+                        }
                         type="button"
-                        disabled={isProcessing || isRecording}>
+                        disabled={isProcessing || isRecording}
+                        title={permissionStatus === 'denied'
+                          ? 'Microphone access denied. Enable permissions in browser settings and refresh.'
+                          : permissionStatus === 'granted'
+                          ? 'Voice transcription ready - click to start recording'
+                          : 'Click to enable voice transcription (will request microphone permission)'
+                        }>
                       🎙️ Voice
                     </button>
                   </div>
