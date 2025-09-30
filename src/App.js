@@ -100,8 +100,14 @@ const App = () => {
 
     let enhanced = text.trim();
 
+    // Remove filler words early (before punctuation processing)
+    enhanced = enhanced.replace(/\b(um|uh|like|you know|uhm|ah|er|well)\b\s*/gi, '');
+
     // Clean up extra spaces
     enhanced = enhanced.replace(/\s+/g, ' ');
+
+    // Apply mental health context corrections
+    enhanced = applyMentalHealthCorrections(enhanced);
 
     // Add periods at the end if missing
     if (!/[.!?]$/.test(enhanced)) {
@@ -110,6 +116,10 @@ const App = () => {
 
     // Capitalize first letter
     enhanced = enhanced.charAt(0).toUpperCase() + enhanced.slice(1);
+
+    // Capitalize after punctuation
+    enhanced = enhanced.replace(/([.!?])\s*([a-z])/g, (match, punct, letter) =>
+      punct + ' ' + letter.toUpperCase());
 
     // Add periods before new sentences that start with capital letters (but aren't already punctuated)
     enhanced = enhanced.replace(/([a-z])\s+([A-Z][a-z])/g, '$1. $2');
@@ -121,7 +131,8 @@ const App = () => {
     enhanced = enhanced.replace(/\bi've\b/g, "I've");
     enhanced = enhanced.replace(/\bi'd\b/g, "I'd");
 
-    // Add question marks for obvious questions (only at sentence start)
+    // Add question marks for obvious questions
+    enhanced = enhanced.replace(/\b(what|where|when|who|why|how)\b[^?]*$/gi, match => match + '?');
     enhanced = enhanced.replace(/^(\bwhat|\bhow|\bwhy|\bwhen|\bwhere|\bwho|\bare|\bdo|\bdoes|\bcan|\bcould|\bwould|\bshould)\b([^.!?]*?)(\.|$)/gi, (match, start, middle, end) => {
       if (middle.length > 0 && !middle.includes('.') && !middle.includes('!')) {
         return start + middle + '?';
@@ -129,7 +140,40 @@ const App = () => {
       return match;
     });
 
+    // Final cleanup
+    enhanced = enhanced.replace(/\s+/g, ' ').trim();
+
     return enhanced;
+  };
+
+  // Mental health context corrections
+  const applyMentalHealthCorrections = (text) => {
+    const corrections = {
+      'anxious': ['ankshus', 'anshus'],
+      'depression': ['depreshun'],
+      'therapy': ['therapee'],
+      'mindfulness': ['mindfullness'],
+      'meditation': ['meditashun'],
+      'overwhelmed': ['ovawhelmed'],
+      'emotions': ['emoshuns'],
+      'feelings': ['feelins'],
+      'grateful': ['gratefull'],
+      'breathing': ['breathin'],
+      'stressed': ['strest'],
+      'triggered': ['trigerd'],
+      'boundaries': ['boundrys'],
+      'self-care': ['selfcare', 'self care']
+    };
+
+    let corrected = text;
+    Object.entries(corrections).forEach(([correct, variants]) => {
+      variants.forEach(variant => {
+        const regex = new RegExp(`\\b${variant}\\b`, 'gi');
+        corrected = corrected.replace(regex, correct);
+      });
+    });
+
+    return corrected;
   };
 
   // 🔽 Responsive state for mobile detection
