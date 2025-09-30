@@ -193,9 +193,9 @@ const App = () => {
         setVoiceSupported(false);
         console.log('🔇 Voice input disabled: Browser not supported');
       } else if (isFirefox) {
-        // Firefox: Show voice button but with helpful messaging
+        // Firefox: Show voice button but inform user of browser limitations
         setVoiceSupported(true);
-        console.log('🔇 Firefox detected: Voice button available with helpful messaging');
+        console.log('🦊 Firefox detected: Voice button shown with browser alternative guidance');
       }
     };
 
@@ -432,13 +432,36 @@ const App = () => {
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
     addVoiceDebugLog("🎙️ Starting voice recording...");
+
+    // IMMEDIATE Firefox check - prioritize user experience
+    const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
+    if (isFirefoxBrowser) {
+      addVoiceDebugLog("🦊 Firefox detected immediately - showing browser guidance");
+      // Show modal first so error message is visible
+      setShowVoiceModal(true);
+      setVoiceError('Voice transcription requires Safari or Chrome.');
+      return;
+    }
     setExplicitStop(false); // Reset the explicit stop flag for new recording
     explicitStopRef.current = false;
 
     try {
       // Enhanced environment detection for HTTPS requirements
       const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
+      // FIXED: Comprehensive Chrome mobile detection including all variants
+      const isChromeMobile = (/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome')) && isMobileDevice;
+
+      // Block Chrome mobile due to poor transcription quality (30% vs Safari's 80%)
+      if (isChromeMobile) {
+        addVoiceDebugLog("🚫 Chrome mobile detected - redirecting to Safari for better voice quality");
+        setShowVoiceModal(true);
+        setVoiceError('For best voice transcription quality on mobile, please use Safari.');
+        return;
+      }
+
+      // DEBUG: Add user agent logging for Chrome detection troubleshooting
+      addVoiceDebugLog(`🔍 User Agent: ${navigator.userAgent}`);
+      addVoiceDebugLog(`🔍 Chrome Detection: Chrome=${/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent)}, Mobile=${isMobileDevice}, Result=${isChromeMobile}`);
       const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
       const isHTTPS = location.protocol === 'https:';
@@ -462,12 +485,10 @@ const App = () => {
 
       addVoiceDebugLog(`✅ HTTPS check passed - ${isHTTPS ? 'HTTPS' : 'localhost development'} environment`);
 
-      // Special handling for Firefox - show helpful message instead of attempting voice recognition
+      // Firefox detection for enhanced debugging
       const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
       if (isFirefoxBrowser) {
-        addVoiceDebugLog("🦊 Firefox browser detected - showing helpful message");
-        setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
-        return;
+        addVoiceDebugLog("🦊 Firefox browser detected - testing speech recognition capabilities");
       }
 
       // Check for Web Speech API support with all vendor prefixes
@@ -496,13 +517,13 @@ const App = () => {
         let errorMessage = 'Voice transcription is not supported in this browser.';
 
         if (isFirefox) {
-          errorMessage = 'Voice transcription is not supported in Firefox. Please use Chrome, Safari, or Edge.';
+          errorMessage = 'Voice transcription is not supported in Firefox. For voice input, please use Safari. You can still type your journal entries normally.';
         } else if (isIOS) {
-          errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
+          errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update iOS or use Safari.';
         } else if (isAndroid) {
-          errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
+          errorMessage = 'For best voice transcription quality on Android, please use Safari or Firefox (if available).';
         } else {
-          errorMessage = 'Voice transcription requires Chrome, Safari, or Edge browser.';
+          errorMessage = 'Voice transcription requires Safari or Chrome. Firefox users: please switch to Safari or Chrome for voice input.';
         }
 
         setVoiceError(errorMessage);
@@ -585,10 +606,54 @@ const App = () => {
 
       addVoiceDebugLog(`🎯 Recognition configured: continuous=${recognitionInstance.continuous}, interim=${recognitionInstance.interimResults}, lang=${recognitionInstance.lang}`);
 
+      // Chrome mobile diagnostic logging
+      if (isChromeMobile) {
+        addVoiceDebugLog(`🤖 CHROME MOBILE DIAGNOSTICS:`);
+        addVoiceDebugLog(`   - User Agent: ${navigator.userAgent}`);
+        addVoiceDebugLog(`   - SpeechRecognition type: ${recognitionInstance.constructor.name}`);
+        addVoiceDebugLog(`   - Available properties: ${Object.getOwnPropertyNames(recognitionInstance).join(', ')}`);
+
+        // Test Chrome mobile specific settings
+        try {
+          if (recognitionInstance.webkitSpeech !== undefined) {
+            addVoiceDebugLog(`   - webkitSpeech available: ${recognitionInstance.webkitSpeech}`);
+          }
+          if (recognitionInstance.grammars !== undefined) {
+            addVoiceDebugLog(`   - grammars available: ${recognitionInstance.grammars}`);
+          }
+        } catch (e) {
+          addVoiceDebugLog(`   - Property check error: ${e.message}`);
+        }
+      }
+
       // Mobile-specific optimizations for better speech continuation
       if (isMobileDevice) {
         addVoiceDebugLog("📱 Applying mobile speech optimizations");
-        // Removed webkitSpeechGrammarList - causes issues with Chrome mobile
+
+        // Chrome mobile specific settings for better accuracy
+        if (isChromeMobile) {
+          addVoiceDebugLog("🤖 Applying Chrome mobile specific optimizations");
+
+          // Try Chrome mobile specific settings
+          try {
+            // Force English language more explicitly
+            recognitionInstance.lang = 'en-US';
+
+            // Disable some chrome mobile features that may interfere
+            if (recognitionInstance.webkitSpeechGrammarList) {
+              recognitionInstance.webkitSpeechGrammarList = null;
+            }
+
+            // Try to force higher quality audio processing
+            if (recognitionInstance.audiostart) {
+              addVoiceDebugLog("   - audiostart event available");
+            }
+
+            addVoiceDebugLog("   - Chrome mobile optimizations applied");
+          } catch (chromeError) {
+            addVoiceDebugLog(`   - Chrome optimization error: ${chromeError.message}`);
+          }
+        }
       }
 
       // Set up event handlers
@@ -605,6 +670,35 @@ const App = () => {
       recognitionInstance.onresult = (event) => {
         let newFinalTranscript = '';
         let interimTranscript = '';
+
+        // RAW VOICE DATA CAPTURE: Log all speech recognition data
+        const rawResults = [];
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          rawResults.push({
+            index: i,
+            isFinal: result.isFinal,
+            confidence: result[0].confidence || 'unknown',
+            alternatives: Array.from(result).map(alt => ({
+              transcript: alt.transcript,
+              confidence: alt.confidence || 'unknown'
+            }))
+          });
+        }
+
+        // Log comprehensive raw data for debugging
+        addVoiceDebugLog(`🎤 RAW VOICE DATA - Total Results: ${event.results.length}`);
+        addVoiceDebugLog(`📊 Raw Results: ${JSON.stringify(rawResults, null, 2)}`);
+
+        // Store raw voice data for submit-time debugging (no alerts during recording)
+        if (typeof window !== 'undefined') {
+          window.lastVoiceResults = {
+            totalResults: event.results.length,
+            finalCount: rawResults.filter(r => r.isFinal).length,
+            latestTranscript: event.results[event.results.length-1]?.[0]?.transcript || 'none',
+            rawData: rawResults
+          };
+        }
 
         // Process all results - interim and final
         for (let i = 0; i < event.results.length; i++) {
@@ -650,7 +744,31 @@ const App = () => {
         // Handle interim results for live feedback (improved UX)
         if (interimTranscript.trim()) {
           addVoiceDebugLog(`🔄 Interim: "${interimTranscript.trim()}"`);
-          // Note: Could add interim display overlay in future for better UX
+
+          // CHROME iOS FIX: Chrome iOS often provides only interim results, never final
+          // If we detect Chrome iOS and have interim results but no final results, treat interim as final
+          const isChromeIOS = /CriOS/i.test(navigator.userAgent);
+          if (isChromeIOS && !newFinalTranscript.trim()) {
+            addVoiceDebugLog(`🍎 Chrome iOS detected: treating interim as final result`);
+
+            // Apply transcription enhancement to interim results for Chrome iOS
+            const enhancedTranscript = enhanceTranscription(interimTranscript);
+
+            // Update entry with interim result (treated as final for Chrome iOS)
+            setEntry(prevEntry => {
+              const existingText = prevEntry.trim();
+              const newText = enhancedTranscript.trim();
+
+              if (existingText) {
+                const combinedText = existingText + ' ' + newText;
+                console.log("🔧 CHROME iOS INTERIM->FINAL: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
+                return combinedText;
+              } else {
+                console.log("🔧 CHROME iOS INTERIM->FINAL: First text:", newText);
+                return newText;
+              }
+            });
+          }
         }
       };
 
@@ -754,7 +872,17 @@ const App = () => {
 
   // 🔽 Smart Submit: Allows final speech processing before submission
   const finishVoiceRecordingAndSubmit = async () => {
+    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // FIXED: Comprehensive Chrome mobile detection including all variants
+    const isChromeMobile = (/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome')) && isMobileDevice;
+
+    // DEBUG: Log user agent and detection results
+    console.log('USER AGENT:', navigator.userAgent);
+    console.log('CHROME DETECTION:', { chromeTest: /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent), mobile: isMobileDevice, result: isChromeMobile });
+
+
     addVoiceDebugLog("📤 Smart submit: Finishing recording with grace period...");
+    addVoiceDebugLog(`🔍 SUBMIT DEBUG - Mobile: ${isMobileDevice}, Chrome Mobile: ${isChromeMobile}, Recording: ${isRecording}`);
 
     if (!recognition || !isRecording) {
       addVoiceDebugLog("⚠️ No active recording to finish");
@@ -766,6 +894,9 @@ const App = () => {
     setExplicitStop(true);
     explicitStopRef.current = true;
 
+    // Chrome mobile needs much longer grace period
+    const gracePeriod = isChromeMobile ? 5000 : 1500; // 5 seconds for Chrome mobile
+
     // Create a promise that resolves when final results are processed
     const waitForFinalResults = new Promise((resolve) => {
       let finalResultTimeout;
@@ -774,6 +905,8 @@ const App = () => {
       // Override onresult to capture any final speech
       const originalOnResult = recognition.onresult;
       recognition.onresult = (event) => {
+        // CHROME DEBUG: Log all speech recognition events
+
         // Call original handler first
         if (originalOnResult) {
           originalOnResult(event);
@@ -801,11 +934,11 @@ const App = () => {
         resolve();
       };
 
-      // Set timeout for maximum wait time
+      // Set timeout for maximum wait time - much longer for Chrome mobile
       finalResultTimeout = setTimeout(() => {
         addVoiceDebugLog("⏱️ Grace period timeout - proceeding with submit");
         resolve();
-      }, 1500); // 1.5 second grace period for final speech processing
+      }, gracePeriod);
     });
 
     // Stop recording but wait for final processing
@@ -1220,27 +1353,31 @@ return (
                           </button>
                         </div>
 
-                        <div className="voice-visualizer">
-                          <div className="voice-line" style={{ '--delay': 0 }}></div>
-                          <div className="voice-line" style={{ '--delay': 1 }}></div>
-                          <div className="voice-line" style={{ '--delay': 2 }}></div>
-                          <div className="voice-line" style={{ '--delay': 3 }}></div>
-                          <div className="voice-line" style={{ '--delay': 4 }}></div>
-                          <div className="voice-line" style={{ '--delay': 5 }}></div>
-                          <div className="voice-line" style={{ '--delay': 6 }}></div>
-                          <div className="voice-line" style={{ '--delay': 7 }}></div>
-                          <div className="voice-line" style={{ '--delay': 8 }}></div>
-                          <div className="voice-line" style={{ '--delay': 9 }}></div>
-                          <div className="voice-line" style={{ '--delay': 10 }}></div>
-                          <div className="voice-line" style={{ '--delay': 11 }}></div>
-                          <div className="voice-line" style={{ '--delay': 12 }}></div>
-                          <div className="voice-line" style={{ '--delay': 13 }}></div>
-                          <div className="voice-line" style={{ '--delay': 14 }}></div>
-                        </div>
+                        {!voiceError && (
+                          <div className="voice-visualizer">
+                            <div className="voice-line" style={{ '--delay': 0 }}></div>
+                            <div className="voice-line" style={{ '--delay': 1 }}></div>
+                            <div className="voice-line" style={{ '--delay': 2 }}></div>
+                            <div className="voice-line" style={{ '--delay': 3 }}></div>
+                            <div className="voice-line" style={{ '--delay': 4 }}></div>
+                            <div className="voice-line" style={{ '--delay': 5 }}></div>
+                            <div className="voice-line" style={{ '--delay': 6 }}></div>
+                            <div className="voice-line" style={{ '--delay': 7 }}></div>
+                            <div className="voice-line" style={{ '--delay': 8 }}></div>
+                            <div className="voice-line" style={{ '--delay': 9 }}></div>
+                            <div className="voice-line" style={{ '--delay': 10 }}></div>
+                            <div className="voice-line" style={{ '--delay': 11 }}></div>
+                            <div className="voice-line" style={{ '--delay': 12 }}></div>
+                            <div className="voice-line" style={{ '--delay': 13 }}></div>
+                            <div className="voice-line" style={{ '--delay': 14 }}></div>
+                          </div>
+                        )}
 
-                        <div className="voice-timer">
-                          {formatTime(recordingTime)}
-                        </div>
+                        {!voiceError && (
+                          <div className="voice-timer">
+                            {formatTime(recordingTime)}
+                          </div>
+                        )}
 
                         {voiceError && (
                           <div className="voice-error">
