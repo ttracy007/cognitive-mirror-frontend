@@ -438,7 +438,12 @@ const App = () => {
     try {
       // Enhanced environment detection for HTTPS requirements
       const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
+      // FIXED: Comprehensive Chrome mobile detection including all variants
+      const isChromeMobile = (/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome')) && isMobileDevice;
+
+      // DEBUG: Add user agent logging for Chrome detection troubleshooting
+      addVoiceDebugLog(`🔍 User Agent: ${navigator.userAgent}`);
+      addVoiceDebugLog(`🔍 Chrome Detection: Chrome=${/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent)}, Mobile=${isMobileDevice}, Result=${isChromeMobile}`);
       const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const isProduction = location.hostname.includes('vercel.app') || location.hostname.includes('netlify.app');
       const isHTTPS = location.protocol === 'https:';
@@ -650,6 +655,32 @@ const App = () => {
         let newFinalTranscript = '';
         let interimTranscript = '';
 
+        // RAW VOICE DATA CAPTURE: Log all speech recognition data
+        const rawResults = [];
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          rawResults.push({
+            index: i,
+            isFinal: result.isFinal,
+            confidence: result[0].confidence || 'unknown',
+            alternatives: Array.from(result).map(alt => ({
+              transcript: alt.transcript,
+              confidence: alt.confidence || 'unknown'
+            }))
+          });
+        }
+
+        // Log comprehensive raw data for debugging
+        addVoiceDebugLog(`🎤 RAW VOICE DATA - Total Results: ${event.results.length}`);
+        addVoiceDebugLog(`📊 Raw Results: ${JSON.stringify(rawResults, null, 2)}`);
+
+        // CHROME DEBUGGING: Alert raw data on mobile Chrome
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isChrome = /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome');
+        if (isChrome && isMobile) {
+          alert(`RAW VOICE: ${event.results.length} results, Final count: ${rawResults.filter(r => r.isFinal).length}, Latest: "${event.results[event.results.length-1]?.[0]?.transcript || 'none'}"`);
+        }
+
         // Process all results - interim and final
         for (let i = 0; i < event.results.length; i++) {
           // Use best alternative if multiple available
@@ -799,7 +830,12 @@ const App = () => {
   // 🔽 Smart Submit: Allows final speech processing before submission
   const finishVoiceRecordingAndSubmit = async () => {
     const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isChromeMobile = /Chrome/i.test(navigator.userAgent) && isMobileDevice;
+    // FIXED: Comprehensive Chrome mobile detection including all variants
+    const isChromeMobile = (/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome')) && isMobileDevice;
+
+    // DEBUG: Log user agent and detection results
+    console.log('USER AGENT:', navigator.userAgent);
+    console.log('CHROME DETECTION:', { chromeTest: /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent), mobile: isMobileDevice, result: isChromeMobile });
 
     // CRITICAL: Visible alert for debugging submit issues
     alert(`SUBMIT DEBUG: Mobile=${isMobileDevice}, Chrome=${isChromeMobile}, Recording=${isRecording}, HasRecognition=${!!recognition}`);
