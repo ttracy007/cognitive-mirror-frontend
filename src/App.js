@@ -467,12 +467,10 @@ const App = () => {
 
       addVoiceDebugLog(`✅ HTTPS check passed - ${isHTTPS ? 'HTTPS' : 'localhost development'} environment`);
 
-      // Special handling for Firefox - show helpful message instead of attempting voice recognition
+      // Firefox detection for enhanced debugging
       const isFirefoxBrowser = /Firefox/i.test(navigator.userAgent);
       if (isFirefoxBrowser) {
-        addVoiceDebugLog("🦊 Firefox browser detected - showing helpful message");
-        setVoiceError('Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.');
-        return;
+        addVoiceDebugLog("🦊 Firefox browser detected - testing speech recognition capabilities");
       }
 
       // Check for Web Speech API support with all vendor prefixes
@@ -500,9 +498,7 @@ const App = () => {
 
         let errorMessage = 'Voice transcription is not supported in this browser.';
 
-        if (isFirefox) {
-          errorMessage = 'Voice transcription is not supported in Firefox. Please use Chrome, Safari, or Edge.';
-        } else if (isIOS) {
+        if (isIOS) {
           errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
         } else if (isAndroid) {
           errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
@@ -674,11 +670,14 @@ const App = () => {
         addVoiceDebugLog(`🎤 RAW VOICE DATA - Total Results: ${event.results.length}`);
         addVoiceDebugLog(`📊 Raw Results: ${JSON.stringify(rawResults, null, 2)}`);
 
-        // CHROME DEBUGGING: Alert raw data on mobile Chrome
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const isChrome = /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome');
-        if (isChrome && isMobile) {
-          alert(`RAW VOICE: ${event.results.length} results, Final count: ${rawResults.filter(r => r.isFinal).length}, Latest: "${event.results[event.results.length-1]?.[0]?.transcript || 'none'}"`);
+        // Store raw voice data for submit-time debugging (no alerts during recording)
+        if (typeof window !== 'undefined') {
+          window.lastVoiceResults = {
+            totalResults: event.results.length,
+            finalCount: rawResults.filter(r => r.isFinal).length,
+            latestTranscript: event.results[event.results.length-1]?.[0]?.transcript || 'none',
+            rawData: rawResults
+          };
         }
 
         // Process all results - interim and final
@@ -837,8 +836,26 @@ const App = () => {
     console.log('USER AGENT:', navigator.userAgent);
     console.log('CHROME DETECTION:', { chromeTest: /Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent), mobile: isMobileDevice, result: isChromeMobile });
 
-    // CRITICAL: Visible alert for debugging submit issues
-    alert(`SUBMIT DEBUG: Mobile=${isMobileDevice}, Chrome=${isChromeMobile}, Recording=${isRecording}, HasRecognition=${!!recognition}`);
+    // COMPREHENSIVE CHROME MOBILE DEBUG: All info in one alert
+    const voiceData = window.lastVoiceResults || { totalResults: 0, finalCount: 0, latestTranscript: 'none' };
+    const userAgent = navigator.userAgent;
+    const chromeTests = {
+      basic: /Chrome/i.test(userAgent),
+      criOS: /CriOS/i.test(userAgent),
+      crMo: /CrMo/i.test(userAgent),
+      crOS: /CrOS/i.test(userAgent),
+      includes: userAgent.includes('Chrome')
+    };
+
+    alert(`🔍 COMPREHENSIVE DEBUG:
+📱 Mobile: ${isMobileDevice}
+🤖 Chrome: ${isChromeMobile}
+🎤 Recording: ${isRecording}
+🔧 Recognition: ${!!recognition}
+📝 Voice Results: ${voiceData.totalResults} total, ${voiceData.finalCount} final
+💬 Latest: "${voiceData.latestTranscript}"
+🧪 Chrome Tests: ${Object.entries(chromeTests).map(([k,v]) => `${k}:${v}`).join(', ')}
+📋 User Agent: ${userAgent.substring(0, 100)}...`);
 
     addVoiceDebugLog("📤 Smart submit: Finishing recording with grace period...");
     addVoiceDebugLog(`🔍 SUBMIT DEBUG - Mobile: ${isMobileDevice}, Chrome Mobile: ${isChromeMobile}, Recording: ${isRecording}`);
