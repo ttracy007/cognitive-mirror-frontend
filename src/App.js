@@ -451,6 +451,14 @@ const App = () => {
       // FIXED: Comprehensive Chrome mobile detection including all variants
       const isChromeMobile = (/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent) || navigator.userAgent.includes('Chrome')) && isMobileDevice;
 
+      // Block Chrome mobile due to poor transcription quality (30% vs Safari's 80%)
+      if (isChromeMobile) {
+        addVoiceDebugLog("🚫 Chrome mobile detected - redirecting to Safari for better voice quality");
+        setShowVoiceModal(true);
+        setVoiceError('For best voice transcription quality on mobile, please use Safari. Chrome mobile has known accuracy issues.');
+        return;
+      }
+
       // DEBUG: Add user agent logging for Chrome detection troubleshooting
       addVoiceDebugLog(`🔍 User Agent: ${navigator.userAgent}`);
       addVoiceDebugLog(`🔍 Chrome Detection: Chrome=${/Chrome|CriOS|CrMo|CrOS/i.test(navigator.userAgent)}, Mobile=${isMobileDevice}, Result=${isChromeMobile}`);
@@ -511,9 +519,9 @@ const App = () => {
         if (isFirefox) {
           errorMessage = 'Voice transcription is not supported in Firefox. For voice input, please use Safari. You can still type your journal entries normally.';
         } else if (isIOS) {
-          errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
+          errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update iOS or use Safari.';
         } else if (isAndroid) {
-          errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
+          errorMessage = 'For best voice transcription quality on Android, please use Safari or Firefox (if available).';
         } else {
           errorMessage = 'Voice transcription requires Safari or Chrome. Firefox users: please switch to Safari or Chrome for voice input.';
         }
