@@ -100,8 +100,14 @@ const App = () => {
 
     let enhanced = text.trim();
 
+    // Remove filler words early (before punctuation processing)
+    enhanced = enhanced.replace(/\b(um|uh|like|you know|uhm|ah|er|well)\b\s*/gi, '');
+
     // Clean up extra spaces
     enhanced = enhanced.replace(/\s+/g, ' ');
+
+    // Apply mental health context corrections
+    enhanced = applyMentalHealthCorrections(enhanced);
 
     // Add periods at the end if missing
     if (!/[.!?]$/.test(enhanced)) {
@@ -110,6 +116,10 @@ const App = () => {
 
     // Capitalize first letter
     enhanced = enhanced.charAt(0).toUpperCase() + enhanced.slice(1);
+
+    // Capitalize after punctuation
+    enhanced = enhanced.replace(/([.!?])\s*([a-z])/g, (match, punct, letter) =>
+      punct + ' ' + letter.toUpperCase());
 
     // Add periods before new sentences that start with capital letters (but aren't already punctuated)
     enhanced = enhanced.replace(/([a-z])\s+([A-Z][a-z])/g, '$1. $2');
@@ -121,7 +131,8 @@ const App = () => {
     enhanced = enhanced.replace(/\bi've\b/g, "I've");
     enhanced = enhanced.replace(/\bi'd\b/g, "I'd");
 
-    // Add question marks for obvious questions (only at sentence start)
+    // Add question marks for obvious questions
+    enhanced = enhanced.replace(/\b(what|where|when|who|why|how)\b[^?]*$/gi, match => match + '?');
     enhanced = enhanced.replace(/^(\bwhat|\bhow|\bwhy|\bwhen|\bwhere|\bwho|\bare|\bdo|\bdoes|\bcan|\bcould|\bwould|\bshould)\b([^.!?]*?)(\.|$)/gi, (match, start, middle, end) => {
       if (middle.length > 0 && !middle.includes('.') && !middle.includes('!')) {
         return start + middle + '?';
@@ -129,7 +140,40 @@ const App = () => {
       return match;
     });
 
+    // Final cleanup
+    enhanced = enhanced.replace(/\s+/g, ' ').trim();
+
     return enhanced;
+  };
+
+  // Mental health context corrections
+  const applyMentalHealthCorrections = (text) => {
+    const corrections = {
+      'anxious': ['ankshus', 'anshus'],
+      'depression': ['depreshun'],
+      'therapy': ['therapee'],
+      'mindfulness': ['mindfullness'],
+      'meditation': ['meditashun'],
+      'overwhelmed': ['ovawhelmed'],
+      'emotions': ['emoshuns'],
+      'feelings': ['feelins'],
+      'grateful': ['gratefull'],
+      'breathing': ['breathin'],
+      'stressed': ['strest'],
+      'triggered': ['trigerd'],
+      'boundaries': ['boundrys'],
+      'self-care': ['selfcare', 'self care']
+    };
+
+    let corrected = text;
+    Object.entries(corrections).forEach(([correct, variants]) => {
+      variants.forEach(variant => {
+        const regex = new RegExp(`\\b${variant}\\b`, 'gi');
+        corrected = corrected.replace(regex, correct);
+      });
+    });
+
+    return corrected;
   };
 
   // 🔽 Responsive state for mobile detection
@@ -523,13 +567,23 @@ const App = () => {
         addVoiceDebugLog("✅ Using cached microphone permission");
       }
 
-      // Initialize speech recognition
+      // Initialize speech recognition with optimized settings
       addVoiceDebugLog("🚀 Creating Speech Recognition instance...");
       const recognitionInstance = new SpeechRecognition();
+
+      // Optimal configuration for accuracy and responsiveness
       recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = isMobileDevice; // Enable interim results on mobile for faster feedback
+      recognitionInstance.interimResults = true; // Enable everywhere for better UX
       recognitionInstance.lang = 'en-US';
-      recognitionInstance.maxAlternatives = 1;
+      recognitionInstance.maxAlternatives = 3; // Get multiple options for better accuracy
+
+      // Enhanced accuracy settings
+      if (recognitionInstance.serviceURI !== undefined) {
+        // Available in some browsers for better accuracy
+        recognitionInstance.serviceURI = 'builtin:speech/dictation';
+      }
+
+      addVoiceDebugLog(`🎯 Recognition configured: continuous=${recognitionInstance.continuous}, interim=${recognitionInstance.interimResults}, lang=${recognitionInstance.lang}`);
 
       // Mobile-specific optimizations for better speech continuation
       if (isMobileDevice) {
@@ -549,23 +603,35 @@ const App = () => {
       };
 
       recognitionInstance.onresult = (event) => {
-        // Only process NEW final results since last processed index
-        let newTranscript = '';
+        let newFinalTranscript = '';
+        let interimTranscript = '';
 
-        for (let i = lastProcessedResultRef.current; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            newTranscript += event.results[i][0].transcript + ' ';
-            lastProcessedResultRef.current = i + 1; // Update processed index
+        // Process all results - interim and final
+        for (let i = 0; i < event.results.length; i++) {
+          // Use best alternative if multiple available
+          const result = event.results[i];
+          const transcript = result[0].transcript;
+
+          if (result.isFinal) {
+            // Only process new final results
+            if (i >= lastProcessedResultRef.current) {
+              newFinalTranscript += transcript + ' ';
+              lastProcessedResultRef.current = i + 1; // Update processed index
+            }
+          } else {
+            // Collect interim results for real-time feedback
+            interimTranscript += transcript;
           }
         }
 
-        if (newTranscript.trim()) {
-          addVoiceDebugLog(`📝 New transcription: "${newTranscript.trim()}"`);
+        // Handle final results
+        if (newFinalTranscript.trim()) {
+          addVoiceDebugLog(`📝 Final transcription: "${newFinalTranscript.trim()}"`);
 
-          // Apply transcription enhancement to new results only
-          const enhancedTranscript = enhanceTranscription(newTranscript);
+          // Apply transcription enhancement to final results only
+          const enhancedTranscript = enhanceTranscription(newFinalTranscript);
 
-          // Append new text to existing entry
+          // Append enhanced text to existing entry
           setEntry(prevEntry => {
             const existingText = prevEntry.trim();
             const newText = enhancedTranscript.trim();
@@ -579,6 +645,12 @@ const App = () => {
               return newText;
             }
           });
+        }
+
+        // Handle interim results for live feedback (improved UX)
+        if (interimTranscript.trim()) {
+          addVoiceDebugLog(`🔄 Interim: "${interimTranscript.trim()}"`);
+          // Note: Could add interim display overlay in future for better UX
         }
       };
 
@@ -600,18 +672,20 @@ const App = () => {
 
       recognitionInstance.onend = () => {
         // Mobile speech recognition often ends automatically after silence
-        // For mobile: restart recognition to maintain continuous capture
-        // EXCEPTION: Disable auto-restart for Chrome mobile to prevent chirping/short-circuit
-        if (isMobileDevice && !isChromeMobile && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+        // Auto-restart improves accuracy by maintaining continuous capture
+        if (isMobileDevice && isRecordingRef.current && !voiceError && !explicitStopRef.current) {
           addVoiceDebugLog("📱 Mobile auto-restart: Recognition ended, restarting for continuous capture");
           try {
-            // Longer delay to prevent AirPods feedback loop and rapid restart issues
+            // Smart delay based on browser - Chrome mobile needs longer delay
+            const restartDelay = isChromeMobile ? 1000 : 500; // Chrome mobile: 1s, Safari: 0.5s
+
             setTimeout(() => {
               if (isRecordingRef.current && !voiceError && !explicitStopRef.current) {
+                addVoiceDebugLog(`🔄 Auto-restarting after ${restartDelay}ms delay...`);
                 // Keep result tracking continuous across restarts
                 recognitionInstance.start();
               }
-            }, 500); // Increased from 100ms to 500ms to prevent audio feedback
+            }, restartDelay);
           } catch (error) {
             addVoiceDebugLog(`❌ Auto-restart failed: ${error.message}`);
             setIsRecording(false);
@@ -620,8 +694,8 @@ const App = () => {
             setRecordingTime(0);
           }
         } else {
-          // Desktop, Chrome mobile, or intentional stop
-          addVoiceDebugLog(`${isChromeMobile ? "🤖 Chrome mobile" : "🖥️ Desktop/Other"} recognition ended - stopping recording to prevent audio issues`);
+          // Desktop or intentional stop
+          addVoiceDebugLog(`🖥️ Desktop/intentional stop - ending recording`);
           setIsRecording(false);
           isRecordingRef.current = false;
           setShowVoiceModal(false);
@@ -676,6 +750,85 @@ const App = () => {
     setRecordingTime(0);
     // Don't keep the transcribed text on cancel
     setEntry('');
+  };
+
+  // 🔽 Smart Submit: Allows final speech processing before submission
+  const finishVoiceRecordingAndSubmit = async () => {
+    addVoiceDebugLog("📤 Smart submit: Finishing recording with grace period...");
+
+    if (!recognition || !isRecording) {
+      addVoiceDebugLog("⚠️ No active recording to finish");
+      handleSubmit();
+      return;
+    }
+
+    // Signal that we're finishing (prevents auto-restart)
+    setExplicitStop(true);
+    explicitStopRef.current = true;
+
+    // Create a promise that resolves when final results are processed
+    const waitForFinalResults = new Promise((resolve) => {
+      let finalResultTimeout;
+      let hasReceivedFinalResult = false;
+
+      // Override onresult to capture any final speech
+      const originalOnResult = recognition.onresult;
+      recognition.onresult = (event) => {
+        // Call original handler first
+        if (originalOnResult) {
+          originalOnResult(event);
+        }
+
+        // Check for final results
+        for (let i = 0; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            hasReceivedFinalResult = true;
+            addVoiceDebugLog("✅ Final result captured during grace period");
+
+            // Clear timeout and resolve after brief processing delay
+            clearTimeout(finalResultTimeout);
+            setTimeout(resolve, 100); // Brief delay for text processing
+            return;
+          }
+        }
+      };
+
+      // Override onend to handle completion
+      const originalOnEnd = recognition.onend;
+      recognition.onend = () => {
+        addVoiceDebugLog("🎤 Recognition ended during smart submit");
+        clearTimeout(finalResultTimeout);
+        resolve();
+      };
+
+      // Set timeout for maximum wait time
+      finalResultTimeout = setTimeout(() => {
+        addVoiceDebugLog("⏱️ Grace period timeout - proceeding with submit");
+        resolve();
+      }, 1500); // 1.5 second grace period for final speech processing
+    });
+
+    // Stop recording but wait for final processing
+    try {
+      recognition.stop();
+      addVoiceDebugLog("⏳ Waiting for final speech processing...");
+
+      // Wait for final results or timeout
+      await waitForFinalResults;
+
+      addVoiceDebugLog("✅ Final processing complete - submitting");
+    } catch (error) {
+      addVoiceDebugLog(`❌ Error during smart submit: ${error.message}`);
+    }
+
+    // Clean up recording state
+    setIsRecording(false);
+    isRecordingRef.current = false;
+    setShowVoiceModal(false);
+    setRecordingTime(0);
+
+    // Now submit the entry
+    handleSubmit();
   };
 
   // Timer for recording duration
@@ -1059,8 +1212,7 @@ return (
                           <button
                             className="voice-modal-send"
                             onClick={() => {
-                              stopVoiceRecording();
-                              handleSubmit();
+                              finishVoiceRecordingAndSubmit();
                             }}
                             aria-label="Finish recording and submit"
                             type="button">
