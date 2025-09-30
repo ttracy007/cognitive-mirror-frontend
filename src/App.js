@@ -193,9 +193,9 @@ const App = () => {
         setVoiceSupported(false);
         console.log('🔇 Voice input disabled: Browser not supported');
       } else if (isFirefox) {
-        // Firefox: Show voice button but with helpful messaging
+        // Firefox: Show voice button but inform user of browser limitations
         setVoiceSupported(true);
-        console.log('🔇 Firefox detected: Voice button available with helpful messaging');
+        console.log('🦊 Firefox detected: Voice button shown with browser alternative guidance');
       }
     };
 
@@ -498,12 +498,14 @@ const App = () => {
 
         let errorMessage = 'Voice transcription is not supported in this browser.';
 
-        if (isIOS) {
+        if (isFirefox) {
+          errorMessage = 'Voice transcription is not supported in Firefox. For voice input, please use Chrome, Safari, or Edge browser. You can still type your journal entries normally.';
+        } else if (isIOS) {
           errorMessage = 'Voice transcription requires iOS 14.5+ with Safari. Please update or try Chrome.';
         } else if (isAndroid) {
           errorMessage = 'Voice transcription requires Chrome on Android. Please try Chrome browser.';
         } else {
-          errorMessage = 'Voice transcription requires Chrome, Safari, or Edge browser.';
+          errorMessage = 'Voice transcription requires Chrome, Safari, or Edge browser. Firefox users: please switch to one of these browsers for voice input.';
         }
 
         setVoiceError(errorMessage);
