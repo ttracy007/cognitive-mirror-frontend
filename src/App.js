@@ -64,7 +64,7 @@ const App = () => {
   const [tooltipVisible, setTooltipVisible] = useState(null); // 'pattern' | 'therapist' | 'mood' | null
   const [styleVariant, setStyleVariant] = useState("D")
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeStep, setWelcomeStep] =useState(1);
+  const [welcomeStep, setWelcomeStep] = useState(1);
   const [username, setUsername] = useState('');
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const handleCloseMoodTracker = () => setShowMoodTracker(false);
@@ -77,6 +77,7 @@ const App = () => {
   const [voiceError, setVoiceError] = useState('');
   const [voiceDebugLogs, setVoiceDebugLogs] = useState([]);
   const [explicitStop, setExplicitStop] = useState(false); // Track if user explicitly stopped recording
+  const [permissionStatus, setPermissionStatus] = useState(null); // 'granted', 'denied', 'prompt', or null
 
   // Refs to avoid React closure issues in recognition handlers
   const isRecordingRef = useRef(false);
@@ -386,7 +387,7 @@ const App = () => {
 
   // 🔽 Function 5b: Voice Recording Functions
   const startVoiceRecording = async () => {
-    console.log("🔧 DEBUGGING: Voice recording started - new implementation active");
+    console.log("🔧 DEBUGGING: Voice recording started - optimized permission handling active");
     addVoiceDebugLog("🎙️ Starting voice recording...");
     setExplicitStop(false); // Reset the explicit stop flag for new recording
     explicitStopRef.current = false;
@@ -465,47 +466,61 @@ const App = () => {
       }
       addVoiceDebugLog("✅ Speech Recognition supported");
 
-      // Request microphone permission with enhanced mobile compatibility
-      addVoiceDebugLog("🎤 Requesting microphone permission...");
-      try {
-        let stream;
-
-        // Modern browsers with MediaDevices API
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          addVoiceDebugLog("🔧 Using modern MediaDevices API");
-          stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true
-            }
-          });
-        }
-        // Legacy getUserMedia with proper binding
-        else if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
-          const getUserMedia = navigator.getUserMedia ||
-                              navigator.webkitGetUserMedia ||
-                              navigator.mozGetUserMedia ||
-                              navigator.msGetUserMedia;
-
-          addVoiceDebugLog("🔧 Using legacy getUserMedia with proper binding");
-          stream = await new Promise((resolve, reject) => {
-            getUserMedia.call(navigator, { audio: true }, resolve, reject);
-          });
-        }
-        else {
-          throw new Error('getUserMedia not supported in this browser');
-        }
-
-        addVoiceDebugLog("✅ Microphone permission granted");
-        // Clean up the stream immediately
-        if (stream && stream.getTracks) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-      } catch (permissionError) {
-        addVoiceDebugLog(`❌ Microphone error: ${permissionError.message || permissionError.name || 'Permission denied'}`);
-        setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings and try again.');
+      // 🔽 OPTIMIZED PERMISSION HANDLING - Check cached status first
+      if (permissionStatus === 'denied') {
+        addVoiceDebugLog("❌ Permission previously denied - showing cached message");
+        setVoiceError('Microphone access was denied. Please enable microphone permissions in your browser settings and refresh the page to try voice input again.');
         return;
+      }
+
+      // Only request permission if we haven't cached a granted status
+      if (permissionStatus !== 'granted') {
+        addVoiceDebugLog("🎤 Requesting microphone permission (not cached)...");
+        try {
+          let stream;
+
+          // Modern browsers with MediaDevices API
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            addVoiceDebugLog("🔧 Using modern MediaDevices API");
+            stream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+              }
+            });
+          }
+          // Legacy getUserMedia with proper binding
+          else if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia) {
+            const getUserMedia = navigator.getUserMedia ||
+                                navigator.webkitGetUserMedia ||
+                                navigator.mozGetUserMedia ||
+                                navigator.msGetUserMedia;
+
+            addVoiceDebugLog("🔧 Using legacy getUserMedia with proper binding");
+            stream = await new Promise((resolve, reject) => {
+              getUserMedia.call(navigator, { audio: true }, resolve, reject);
+            });
+          }
+          else {
+            throw new Error('getUserMedia not supported in this browser');
+          }
+
+          addVoiceDebugLog("✅ Microphone permission granted and cached");
+          setPermissionStatus('granted'); // Cache the granted status
+
+          // Clean up the stream immediately
+          if (stream && stream.getTracks) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+        } catch (permissionError) {
+          addVoiceDebugLog(`❌ Microphone error: ${permissionError.message || permissionError.name || 'Permission denied'}`);
+          setPermissionStatus('denied'); // Cache the denied status
+          setVoiceError('Microphone access is required for voice journaling. Please enable microphone permissions in your browser settings and refresh the page to try again.');
+          return;
+        }
+      } else {
+        addVoiceDebugLog("✅ Using cached microphone permission");
       }
 
       // Initialize speech recognition
@@ -1010,10 +1025,21 @@ return (
                     <button
                         className="cm-btn cm-btn--voice cm-btn--split"
                         onClick={startVoiceRecording}
-                        aria-label="Voice transcription"
+                        aria-label={permissionStatus === 'denied'
+                          ? 'Voice transcription - Permission needed'
+                          : permissionStatus === 'granted'
+                          ? 'Voice transcription - Ready'
+                          : 'Voice transcription - Will request permission'
+                        }
                         type="button"
-                        disabled={isProcessing || isRecording}>
-                      🎙️ Voice
+                        disabled={isProcessing || isRecording}
+                        title={permissionStatus === 'denied'
+                          ? 'Microphone access denied. Enable permissions in browser settings and refresh.'
+                          : permissionStatus === 'granted'
+                          ? 'Voice transcription ready - click to start recording'
+                          : 'Click to enable voice transcription (will request microphone permission)'
+                        }>
+                      🎙️ {permissionStatus === 'denied' ? '🚫' : permissionStatus === 'granted' ? '✅' : ''} Voice
                     </button>
                   </div>
 
