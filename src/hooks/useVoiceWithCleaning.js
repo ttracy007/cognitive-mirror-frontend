@@ -243,6 +243,32 @@ const useVoiceWithCleaning = (options = {}) => {
     return text;
   }, []);
 
+  // Reset function to clear all state between recording sessions
+  const resetRecording = useCallback(() => {
+    console.log('🔄 Resetting voice recording state');
+
+    // Stop any active recording first
+    if (recognitionRef.current && isRecording) {
+      try {
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.warn('Error stopping recognition during reset:', error);
+      }
+      recognitionRef.current = null;
+    }
+
+    // Clear all transcript state
+    setTranscript('');
+    setRawTranscript('');
+    finalTranscriptRef.current = '';
+
+    // Reset recording state
+    setIsRecording(false);
+    setError('');
+
+    console.log('✅ Voice recording state reset complete');
+  }, [isRecording]);
+
   return {
     // Current state
     transcript,         // Cleaned transcript
@@ -256,6 +282,7 @@ const useVoiceWithCleaning = (options = {}) => {
     stopRecording,      // Stop voice recording
     updateTranscript,   // Manually update transcript
     cleanText,          // Clean any text manually
+    resetRecording,     // Reset all state for new session
 
     // Utility
     cleaner: cleanerRef.current  // Access to cleaner instance

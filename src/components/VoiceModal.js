@@ -16,7 +16,8 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
     error,
     startRecording,
     stopRecording,
-    updateTranscript
+    updateTranscript,
+    resetRecording
   } = useVoiceWithCleaning();
 
   // Local state for user edits
@@ -25,10 +26,23 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
 
   // Update edited transcript when cleaned transcript changes
   useEffect(() => {
-    setEditedTranscript(transcript);
-  }, [transcript]);
+    if (transcript !== editedTranscript) {
+      console.log(`📝 Transcript updated: "${transcript}"`);
+      setEditedTranscript(transcript);
+    }
+  }, [transcript, editedTranscript]);
 
-  // Timer for recording duration
+  // Reset everything when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🎙️ Voice modal opened - resetting state');
+      resetRecording();
+      setEditedTranscript('');
+      setRecordingTime(0);
+    }
+  }, [isOpen, resetRecording]);
+
+  // Timer for recording duration - reset when recording stops
   useEffect(() => {
     let interval = null;
     if (isRecording) {
@@ -36,6 +50,7 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
         setRecordingTime(time => time + 1);
       }, 1000);
     } else {
+      // Always reset timer when not recording
       setRecordingTime(0);
     }
     return () => clearInterval(interval);
@@ -50,7 +65,7 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
 
   // Handle start recording
   const handleStartRecording = () => {
-    setEditedTranscript('');
+    console.log('🎤 Starting new recording session');
     setRecordingTime(0);
     startRecording();
   };
@@ -62,9 +77,12 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
 
   // Handle cancel
   const handleCancel = () => {
+    console.log('❌ Canceling recording session');
     if (isRecording) {
       stopRecording();
     }
+    // Reset everything and close
+    resetRecording();
     setEditedTranscript('');
     setRecordingTime(0);
     onClose();
@@ -73,7 +91,11 @@ const VoiceModal = ({ isOpen, onClose, onSubmit }) => {
   // Handle submit
   const handleSubmit = () => {
     if (editedTranscript.trim()) {
+      console.log('✅ Submitting recording session');
       onSubmit(editedTranscript.trim());
+
+      // Reset everything after successful submit
+      resetRecording();
       setEditedTranscript('');
       setRecordingTime(0);
       onClose();
