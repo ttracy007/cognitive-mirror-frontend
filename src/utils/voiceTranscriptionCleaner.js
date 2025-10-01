@@ -21,6 +21,21 @@ class VoiceTranscriptionCleaner {
       {
         pattern: /\b(I|we|they|he|she|you)\s+(feel|think|know|believe)\s+(like|that)\s+\1\s+\2/gi,
         replacement: '$1 $2'
+      },
+      // "but And" → "but" (fix conjunction errors)
+      {
+        pattern: /\bbut\s+And\b/gi,
+        replacement: 'but'
+      },
+      // "and But" → "and" (fix conjunction errors)
+      {
+        pattern: /\band\s+But\b/gi,
+        replacement: 'and'
+      },
+      // "or And" → "or" (fix conjunction errors)
+      {
+        pattern: /\bor\s+And\b/gi,
+        replacement: 'or'
       }
     ];
 
@@ -143,6 +158,19 @@ class VoiceTranscriptionCleaner {
    */
   cleanPunctuation(text) {
     let result = text;
+
+    // Add missing commas before common phrases that need them
+    result = result.replace(/\b(but|and|or)\s+(I\s+need|it's\s+just|you're\s+looking)/gi, '$1, $2');
+
+    // Add commas after "I get it" and similar phrases
+    result = result.replace(/\b(I\s+get\s+it)\s+([A-Z])/gi, '$1, $2');
+
+    // Add comma after "me to do" when followed by new clause
+    result = result.replace(/\b(want\s+me\s+to\s+do)\s+([a-z])/gi, '$1, $2');
+
+    // Break up run-on sentences with periods after complete thoughts
+    result = result.replace(/\b(empowerment)\s+(but\s+)/gi, '$1. $2');
+    result = result.replace(/\b(myself)\s+(it's\s+just)/gi, '$1. $2');
 
     // Fix mixed ending punctuation - prioritize question marks and exclamations
     result = result.replace(/\.+\?+$/g, '?');

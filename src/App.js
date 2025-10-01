@@ -10,7 +10,7 @@ import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 import MoodModal from './components/MoodModal';
 import LatestResponse from './components/LatestResponse';
-import VoiceModal from './components/VoiceModal'; 
+import VoiceRecorder from './components/VoiceRecorder'; 
 
 const App = () => {
 
@@ -258,7 +258,6 @@ const App = () => {
 
     // Stop voice recording if active
     if (isRecording) {
-      console.log("🔧 SUBMIT: Stopping voice recording before submission");
       stopVoiceRecording();
     }
 
@@ -733,10 +732,8 @@ const App = () => {
 
             if (existingText) {
               const combinedText = existingText + ' ' + newText;
-              console.log("🔧 TRANSCRIPTION: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
               return combinedText;
             } else {
-              console.log("🔧 TRANSCRIPTION: First text:", newText);
               return newText;
             }
           });
@@ -762,10 +759,8 @@ const App = () => {
 
               if (existingText) {
                 const combinedText = existingText + ' ' + newText;
-                console.log("🔧 CHROME iOS INTERIM->FINAL: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
                 return combinedText;
               } else {
-                console.log("🔧 CHROME iOS INTERIM->FINAL: First text:", newText);
                 return newText;
               }
             });
@@ -835,7 +830,6 @@ const App = () => {
   };
 
   const stopVoiceRecording = () => {
-    console.log("🔧 VOICE: Stopping recording completely");
     setExplicitStop(true);
     explicitStopRef.current = true; // Prevent auto-restart
 
@@ -853,7 +847,6 @@ const App = () => {
     setRecognition(null);
     setVoiceError('');
 
-    console.log("🔧 VOICE: Recording stopped and cleaned up");
   };
 
   const cancelVoiceRecording = () => {
@@ -1415,6 +1408,18 @@ return (
                 {toneDescription}
               </div>
             </div>
+
+            {/* Voice Recorder section */}
+            <div className="toolbar-section voice-recorder-section">
+              <VoiceRecorder
+                isOpen={showVoiceModal}
+                onClose={() => setShowVoiceModal(false)}
+                onComplete={(transcript) => {
+                  setEntry(transcript);
+                  setShowVoiceModal(false);
+                }}
+              />
+            </div>
           </div>
           {/* END toolbar */}
         </div>
@@ -1486,15 +1491,6 @@ return (
           />
         )}
 
-        {/* Voice Modal */}
-        <VoiceModal
-          isOpen={showVoiceModal}
-          onClose={() => setShowVoiceModal(false)}
-          onSubmit={(transcript) => {
-            setEntry(transcript);
-            setShowVoiceModal(false);
-          }}
-        />
       </div>
     )}
   </>
