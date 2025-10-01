@@ -1,0 +1,332 @@
+/**
+ * VoiceModal CSS
+ * Styles for the clean voice recording modal
+ */
+
+.voice-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.voice-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.voice-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.voice-modal-header h3 {
+  margin: 0;
+  color: #374151;
+  font-size: 1.25rem;
+}
+
+.voice-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.voice-modal-close:hover {
+  color: #374151;
+  background-color: #f3f4f6;
+}
+
+.voice-modal-content {
+  margin-bottom: 1.5rem;
+}
+
+/* Error states */
+.voice-not-supported,
+.voice-error {
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.voice-not-supported p,
+.voice-error p {
+  margin: 0;
+}
+
+/* Recording controls */
+.voice-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.voice-record-button,
+.voice-stop-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.voice-record-button {
+  background: #3b82f6;
+  color: white;
+}
+
+.voice-record-button:hover {
+  background: #2563eb;
+}
+
+.voice-stop-button {
+  background: #dc2626;
+  color: white;
+}
+
+.voice-stop-button:hover {
+  background: #b91c1c;
+}
+
+/* Recording status */
+.voice-recording-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.recording-dot {
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.voice-timer {
+  font-family: monospace;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Voice visualizer */
+.voice-visualizer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  height: 60px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.voice-line {
+  width: 4px;
+  height: 10px;
+  background: #3b82f6;
+  border-radius: 2px;
+  animation: wave 1.5s ease-in-out infinite;
+  animation-delay: calc(var(--delay) * 0.1s);
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 10px;
+    background: #93c5fd;
+  }
+  50% {
+    height: 40px;
+    background: #3b82f6;
+  }
+}
+
+/* Transcript area */
+.voice-transcript-area {
+  margin-bottom: 1rem;
+}
+
+.voice-transcript-area label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.voice-transcript-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.voice-transcript-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.voice-transcript-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Debug info */
+.voice-debug {
+  margin-top: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.voice-debug summary {
+  padding: 0.5rem;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.voice-debug-content {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  border-top: 1px solid #e5e7eb;
+}
+
+.voice-debug-content p {
+  margin: 0.25rem 0;
+  word-break: break-word;
+}
+
+/* Action buttons */
+.voice-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.voice-cancel-button,
+.voice-submit-button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.voice-cancel-button {
+  background: white;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.voice-cancel-button:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.voice-submit-button {
+  background: #10b981;
+  color: white;
+}
+
+.voice-submit-button:hover:not(:disabled) {
+  background: #059669;
+}
+
+.voice-submit-button:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .voice-modal {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .voice-modal-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .voice-controls {
+    margin-bottom: 0.75rem;
+  }
+
+  .voice-record-button,
+  .voice-stop-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .voice-transcript-input {
+    min-height: 100px;
+  }
+
+  .voice-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .voice-cancel-button,
+  .voice-submit-button {
+    width: 100%;
+    padding: 0.75rem;
+  }
+}
