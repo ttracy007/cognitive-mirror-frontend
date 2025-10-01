@@ -9,7 +9,8 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 import MoodModal from './components/MoodModal';
-import LatestResponse from './components/LatestResponse'; 
+import LatestResponse from './components/LatestResponse';
+import VoiceRecorder from './components/VoiceRecorder'; 
 
 const App = () => {
 
@@ -257,7 +258,6 @@ const App = () => {
 
     // Stop voice recording if active
     if (isRecording) {
-      console.log("🔧 SUBMIT: Stopping voice recording before submission");
       stopVoiceRecording();
     }
 
@@ -732,10 +732,8 @@ const App = () => {
 
             if (existingText) {
               const combinedText = existingText + ' ' + newText;
-              console.log("🔧 TRANSCRIPTION: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
               return combinedText;
             } else {
-              console.log("🔧 TRANSCRIPTION: First text:", newText);
               return newText;
             }
           });
@@ -761,10 +759,8 @@ const App = () => {
 
               if (existingText) {
                 const combinedText = existingText + ' ' + newText;
-                console.log("🔧 CHROME iOS INTERIM->FINAL: Adding new - existing:", existingText, "new:", newText, "result:", combinedText);
                 return combinedText;
               } else {
-                console.log("🔧 CHROME iOS INTERIM->FINAL: First text:", newText);
                 return newText;
               }
             });
@@ -834,7 +830,6 @@ const App = () => {
   };
 
   const stopVoiceRecording = () => {
-    console.log("🔧 VOICE: Stopping recording completely");
     setExplicitStop(true);
     explicitStopRef.current = true; // Prevent auto-restart
 
@@ -852,7 +847,6 @@ const App = () => {
     setRecognition(null);
     setVoiceError('');
 
-    console.log("🔧 VOICE: Recording stopped and cleaned up");
   };
 
   const cancelVoiceRecording = () => {
@@ -1311,15 +1305,10 @@ return (
 
                     <button
                         className="cm-btn cm-btn--voice cm-btn--split"
-                        onClick={startVoiceRecording}
-                        aria-label={permissionStatus === 'denied'
-                          ? 'Voice transcription - Permission needed'
-                          : permissionStatus === 'granted'
-                          ? 'Voice transcription - Ready'
-                          : 'Voice transcription - Will request permission'
-                        }
+                        onClick={() => setShowVoiceModal(true)}
+                        aria-label="Voice transcription"
                         type="button"
-                        disabled={isProcessing || isRecording}
+                        disabled={isProcessing}
                         title={permissionStatus === 'denied'
                           ? 'Microphone access denied. Enable permissions in browser settings and refresh.'
                           : permissionStatus === 'granted'
@@ -1330,63 +1319,6 @@ return (
                     </button>
                   </div>
 
-                  {/* Voice Recording Modal - positioned within input container */}
-                  {showVoiceModal && (
-                    <div className="voice-modal-inline">
-                      <div className="voice-modal">
-                        <div className="voice-modal-header">
-                          <button
-                            className="voice-modal-cancel"
-                            onClick={cancelVoiceRecording}
-                            aria-label="Cancel recording"
-                            type="button">
-                            ✕
-                          </button>
-                          <button
-                            className="voice-modal-send"
-                            onClick={() => {
-                              finishVoiceRecordingAndSubmit();
-                            }}
-                            aria-label="Finish recording and submit"
-                            type="button">
-                            ↑
-                          </button>
-                        </div>
-
-                        {!voiceError && (
-                          <div className="voice-visualizer">
-                            <div className="voice-line" style={{ '--delay': 0 }}></div>
-                            <div className="voice-line" style={{ '--delay': 1 }}></div>
-                            <div className="voice-line" style={{ '--delay': 2 }}></div>
-                            <div className="voice-line" style={{ '--delay': 3 }}></div>
-                            <div className="voice-line" style={{ '--delay': 4 }}></div>
-                            <div className="voice-line" style={{ '--delay': 5 }}></div>
-                            <div className="voice-line" style={{ '--delay': 6 }}></div>
-                            <div className="voice-line" style={{ '--delay': 7 }}></div>
-                            <div className="voice-line" style={{ '--delay': 8 }}></div>
-                            <div className="voice-line" style={{ '--delay': 9 }}></div>
-                            <div className="voice-line" style={{ '--delay': 10 }}></div>
-                            <div className="voice-line" style={{ '--delay': 11 }}></div>
-                            <div className="voice-line" style={{ '--delay': 12 }}></div>
-                            <div className="voice-line" style={{ '--delay': 13 }}></div>
-                            <div className="voice-line" style={{ '--delay': 14 }}></div>
-                          </div>
-                        )}
-
-                        {!voiceError && (
-                          <div className="voice-timer">
-                            {formatTime(recordingTime)}
-                          </div>
-                        )}
-
-                        {voiceError && (
-                          <div className="voice-error">
-                            {voiceError}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </>
               ) : (
                 <button
@@ -1476,6 +1408,18 @@ return (
                 {toneDescription}
               </div>
             </div>
+
+            {/* Voice Recorder section */}
+            <div className="toolbar-section voice-recorder-section">
+              <VoiceRecorder
+                isOpen={showVoiceModal}
+                onClose={() => setShowVoiceModal(false)}
+                onComplete={(transcript) => {
+                  setEntry(transcript);
+                  setShowVoiceModal(false);
+                }}
+              />
+            </div>
           </div>
           {/* END toolbar */}
         </div>
@@ -1546,6 +1490,7 @@ return (
             onClose={handleCloseMoodTracker}
           />
         )}
+
       </div>
     )}
   </>
