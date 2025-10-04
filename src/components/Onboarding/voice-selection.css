@@ -1,0 +1,207 @@
+.voice-selection-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.voice-intro {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.voice-intro-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.voice-intro-text strong {
+  color: #4a90e2;
+  font-weight: 600;
+}
+
+.voice-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.voice-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: white;
+}
+
+.voice-card:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.voice-card.selected {
+  border-color: #4a90e2;
+  background: #f0f7ff;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.voice-header h3 {
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem 0;
+  color: #333;
+}
+
+.voice-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  font-style: italic;
+  margin: 0 0 1rem 0;
+}
+
+.voice-response {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-left: 3px solid #4a90e2;
+  border-radius: 4px;
+}
+
+.voice-response p {
+  margin: 0;
+  line-height: 1.6;
+  color: #333;
+  font-size: 1rem;
+}
+
+.voice-when {
+  margin-top: 1rem;
+}
+
+.voice-when strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.voice-when ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.voice-when li {
+  margin-bottom: 0.25rem;
+  color: #666;
+}
+
+.voice-selected-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #4a90e2;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.voice-actions {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.voice-choice-prompt {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.voice-action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.voice-button {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 180px;
+}
+
+.voice-button.primary {
+  background: #4a90e2;
+  color: white;
+}
+
+.voice-button.primary:hover {
+  background: #357abd;
+}
+
+.voice-button.secondary {
+  background: transparent;
+  color: #4a90e2;
+  border: 2px solid #4a90e2;
+}
+
+.voice-button.secondary:hover {
+  background: #f0f7ff;
+}
+
+.voice-loading,
+.voice-error {
+  text-align: center;
+  padding: 3rem;
+}
+
+.voice-loading p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.voice-error p {
+  font-size: 1.1rem;
+  color: #c33;
+  margin-bottom: 1rem;
+}
+
+.voice-error button {
+  padding: 0.875rem 2rem;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .voice-selection-container {
+    padding: 1rem;
+  }
+
+  .voice-card {
+    padding: 1rem;
+  }
+
+  .voice-action-buttons {
+    flex-direction: column;
+  }
+
+  .voice-button {
+    width: 100%;
+  }
+}

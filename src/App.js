@@ -10,7 +10,8 @@ import LoginPage from './LoginPage';
 import JournalTimeline from './components/JournalTimeline';
 import MoodModal from './components/MoodModal';
 import LatestResponse from './components/LatestResponse';
-import VoiceRecorder from './components/VoiceRecorder'; 
+import VoiceRecorder from './components/VoiceRecorder';
+import OnboardingContainer from './components/Onboarding/OnboardingContainer'; 
 
 const App = () => {
 
@@ -39,6 +40,7 @@ const App = () => {
 
   // 🔽 Existing states (no change to their order beyond moving forcedTone here)
   const [showLogin, setShowLogin] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -251,6 +253,38 @@ const App = () => {
       })();
       return () => stop();
     }, []);
+
+  // 🔽 Function 4a: Check Onboarding Status (runs after session is established)
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
+        const response = await fetch(`${backendUrl}/api/onboarding/profile/${session.user.id}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          if (!data.profile || !data.has_completed) {
+            // User hasn't completed onboarding - force onboarding screen
+            setShowOnboarding(true);
+          } else {
+            // User has completed onboarding - allow main app
+            setShowOnboarding(false);
+          }
+        } else {
+          // On error, check if user exists in database
+          console.warn('Failed to check onboarding status, defaulting to onboarding');
+          setShowOnboarding(true); // Better to show onboarding than lose a new user
+        }
+      } catch (error) {
+        console.warn('Error checking onboarding status:', error);
+        setShowOnboarding(true); // Better to show onboarding than lose a new user
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [session]);
 
  // 🔽 Function 5: Submit New Journal Entry (username/session–safe)
   const handleSubmit = async () => {
@@ -1024,11 +1058,45 @@ const App = () => {
   if (!session) {
     return (
       <LoginPage
-        onAuthSuccess={(session, username) => {
+        onAuthSuccess={async (session, username) => {
           setSession(session);
           setUsername(username);
           UsernameStore.set(username); // <--persist
+
+          // Check if user has completed onboarding
+          try {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
+            const response = await fetch(`${backendUrl}/api/onboarding/profile/${session.user.id}`);
+
+            if (response.ok) {
+              const data = await response.json();
+              if (!data.profile || !data.has_completed) {
+                // User hasn't completed onboarding - show onboarding flow
+                setShowOnboarding(true);
+              } else {
+                // User has completed onboarding - go directly to main app
+                setShowOnboarding(false);
+              }
+            } else {
+              // Error checking onboarding status - default to main app
+              console.warn('Failed to check onboarding status, proceeding to main app');
+              setShowOnboarding(false);
+            }
+          } catch (error) {
+            console.warn('Error checking onboarding status:', error);
+            // Default to main app on error
+            setShowOnboarding(false);
+          }
         }}
+      />
+    );
+  }
+
+  // Show onboarding if user is authenticated but hasn't completed onboarding
+  if (showOnboarding) {
+    return (
+      <OnboardingContainer
+        onComplete={() => setShowOnboarding(false)}
       />
     );
   }
