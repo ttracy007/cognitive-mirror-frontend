@@ -1258,6 +1258,22 @@ return (
           >
             Log Out
           </button>
+
+          {/* Testing button for onboarding */}
+          {process.env.NODE_ENV === 'development' && (
+            <button
+              className="logout-btn"
+              onClick={() => setShowOnboarding(true)}
+              style={{
+                marginLeft: '10px',
+                backgroundColor: '#4a90e2',
+                border: 'none'
+              }}
+              title="Test the refined onboarding flow"
+            >
+              🧪 Test Onboarding
+            </button>
+          )}
         </div>
         </div>
 
