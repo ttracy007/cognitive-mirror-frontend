@@ -7,7 +7,7 @@ import { ONBOARDING_QUESTIONS, OPENING_FRAME, CLOSING_FRAME, MID_POINT_CHECK } f
 import './onboarding.css';
 
 const OnboardingContainer = ({ onComplete }) => {
-  const [currentStep, setCurrentStep] = useState('opening'); // 'opening' | 'questions' | 'midpoint' | 'voice-selection' | 'closing'
+  const [currentStep, setCurrentStep] = useState('opening'); // 'opening' | 'questions' | 'midpoint' | 'voice-selection' | 'refined-voice-selection' | 'closing'
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
   const [userId, setUserId] = useState(null);
@@ -157,9 +157,10 @@ const OnboardingContainer = ({ onComplete }) => {
       return;
     }
 
-    // Check if we finished all questions
+    // Check if we finished all questions (Q10)
     if (nextIndex >= ONBOARDING_QUESTIONS.length) {
-      handleSubmit();
+      // Show refined voice selection with complete Q1-Q10 data
+      setCurrentStep('refined-voice-selection');
       return;
     }
 
@@ -190,10 +191,9 @@ const OnboardingContainer = ({ onComplete }) => {
       // Continue with remaining questions (Q6-Q10)
       setCurrentStep('questions');
       setCurrentQuestionIndex(5);
-    } else if (flowChoice === 'dive-in') {
-      // Skip to final question Q10
-      setCurrentStep('questions');
-      setCurrentQuestionIndex(9);
+    } else if (flowChoice === 'journal-now') {
+      // Start journaling immediately - submit onboarding
+      handleSubmit();
     }
   };
 
@@ -312,6 +312,21 @@ const OnboardingContainer = ({ onComplete }) => {
           responses={responses}
           detectedPriority={detectedPriority}
           onVoiceSelected={handleVoiceSelected}
+        />
+      </div>
+    );
+  }
+
+  // Render refined voice selection (after Q6-Q10)
+  if (currentStep === 'refined-voice-selection') {
+    return (
+      <div className="onboarding-container">
+        <VoiceSelection
+          userContext={detectedPriority?.context}
+          responses={responses}
+          detectedPriority={detectedPriority}
+          onVoiceSelected={handleVoiceSelected}
+          isRefined={true}
         />
       </div>
     );

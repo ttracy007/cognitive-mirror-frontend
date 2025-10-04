@@ -139,6 +139,18 @@
   font-weight: 500;
   transition: all 0.2s;
   min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-subtitle {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.8;
+  line-height: 1.3;
+  margin-top: 0.25rem;
 }
 
 .voice-button.primary {
@@ -204,4 +216,46 @@
   .voice-button {
     width: 100%;
   }
+}
+
+/* Enhanced styles for refined voice selection */
+.voice-selection-container.refined {
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.voice-choice-prompt.refined {
+  background: #f0f7ff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+  margin-bottom: 1.5rem;
+}
+
+/* Improved button hover states with subtitles */
+.voice-button:hover .button-subtitle {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.voice-button.primary .button-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.voice-button.secondary .button-subtitle {
+  color: rgba(74, 144, 226, 0.8);
+}
+
+/* Tooltip styling for better accessibility */
+.voice-button[title] {
+  position: relative;
+}
+
+/* Enhanced loading state for refined previews */
+.voice-loading.refined p {
+  background: #f0f7ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
 }
