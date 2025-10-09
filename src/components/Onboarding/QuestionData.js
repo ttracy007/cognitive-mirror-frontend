@@ -1,105 +1,40 @@
-// src/components/Onboarding/QuestionData.js
-import { selectTier1Questions, detectPatterns } from '../../data/tier1QuestionBucket.js';
-import { getTier2Questions, generateTier2Questions } from '../../data/tier2QuestionBucket.js';
-import { getTier3Questions, detectPriorityFromAllTiers } from '../../data/tier3QuestionBucket.js';
+// Cognitive Mirror - Question Data (Backend Proxy)
 
+// Opening frame - shown before onboarding begins
 export const OPENING_FRAME = {
-  title: "Let's Get to Know You",
-  message: "Hey there. Before we dive in, I'd love to get to know you a bit. Think of this as a conversation with a friend who's genuinely curious about how you're doing. No judgment, no pressure—just honest reflection. Sound good?"
+  title: "Three Questions, Three Layers",
+  message: "We're going to go deep together—but in stages. First, I'll ask you some quick questions to understand your patterns. Then we'll dig into what's really going on. Finally, you'll tell me what matters most. Sound good?"
 };
 
+// Closing frame - shown after voice selection
 export const CLOSING_FRAME = {
-  title: "You're All Set",
-  message: "Thanks for sharing all that. I'll remember what matters most to you, and we can keep coming back to it as things shift. You're not locked into anything—this is just a starting point. Ready to dive in?"
+  title: "Ready to Begin",
+  message: "I've got a clear picture now. You've chosen your voice, and we're ready to start this journey together. Remember—this is your space, and you can change direction anytime."
 };
 
-// Add proxy function to get questions from backend
+// Proxy function - fetches questions from backend
 export async function getQuestionsForTier(tier, userId) {
-  if (tier === 1 && userId) {
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const response = await fetch(
-        `${backendUrl}/api/onboarding/v1/tier${tier}/questions/${userId}`
-      );
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+  try {
+    const response = await fetch(
+      `${backendUrl}/api/onboarding/v1/tier${tier}/questions/${userId}`
+    );
 
-      const data = await response.json();
-
-      if (data.success && data.questions) {
-        return data.questions;
-      } else {
-        throw new Error(data.error || 'Failed to load questions');
-      }
-    } catch (error) {
-      console.error(`[Tier ${tier}] Failed to fetch questions from backend:`, error);
-      // Fallback to static questions
-      return getQuestionsForTierStatic(tier);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  } else {
-    // For Tier 2, 3 or when no userId, use static questions
-    return getQuestionsForTierStatic(tier);
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch questions');
+    }
+
+    return data.questions;
+
+  } catch (error) {
+    console.error(`Error fetching Tier ${tier} questions:`, error);
+    throw error;
   }
 }
-
-// Generate tier 1 questions (multiple choice, 8-10 questions)
-function getTier1Questions() {
-  const selectedQuestions = selectTier1Questions();
-  return selectedQuestions.map((q, index) => ({
-    ...q,
-    number: index + 1,
-    type: 'multiple_choice'
-  }));
-}
-
-// Get tier questions from modular buckets
-export const TIER2_QUESTIONS = getTier2Questions();
-export const TIER3_QUESTIONS = getTier3Questions();
-
-// Static function to get questions for current tier (fallback)
-export function getQuestionsForTierStatic(tier) {
-  switch (tier) {
-    case 1:
-      return getTier1Questions();
-    case 2:
-      return TIER2_QUESTIONS;
-    case 3:
-      return TIER3_QUESTIONS;
-    default:
-      return getTier1Questions();
-  }
-}
-
-// Generate questions based on user's Tier 1 responses
-export function generateOnboardingQuestions(tier1Responses = null) {
-  const tier1Questions = selectTier1Questions();
-
-  // If we have Tier 1 responses, generate adaptive Tier 2
-  if (tier1Responses) {
-    const detectedPatterns = detectPatterns(tier1Responses);
-    const tier2Questions = generateTier2Questions(tier1Responses, detectedPatterns);
-
-    return {
-      tier1: tier1Questions,
-      tier2: tier2Questions,
-      tier3: getTier3Questions(),
-      patterns: detectedPatterns  // Include for backend
-    };
-  }
-
-  // If no Tier 1 responses yet, just return Tier 1
-  return {
-    tier1: tier1Questions,
-    tier2: null,
-    tier3: null,
-    patterns: null
-  };
-}
-
-// Enhanced priority detection using all tiers
-export { detectPriorityFromAllTiers };
-
-// Legacy export for backward compatibility
-export const ONBOARDING_QUESTIONS = getTier1Questions();

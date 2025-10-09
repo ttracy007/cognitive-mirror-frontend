@@ -3,7 +3,7 @@ import { supabase } from '../../supabaseClient'; // Adjust path as needed
 import OnboardingQuestion from './OnboardingQuestion';
 import OnboardingProgress from './OnboardingProgress';
 import VoiceSelection from './VoiceSelection';
-import { getQuestionsForTier, getQuestionsForTierStatic, generateOnboardingQuestions, OPENING_FRAME, CLOSING_FRAME } from './QuestionData';
+import { getQuestionsForTier, OPENING_FRAME, CLOSING_FRAME } from './QuestionData';
 import { detectPatterns } from '../../data/tier1QuestionBucket';
 import { generateTier2Questions } from '../../data/tier2QuestionBucket';
 import { detectGoldenKey, shouldTriggerFollowUp, analyzeResponse } from '../../utils/goldenKeyDetection';
@@ -40,29 +40,24 @@ const OnboardingContainer = ({ onComplete }) => {
 
   // Load questions when tier changes
   useEffect(() => {
-    if (currentTier === 1 && userId) {
-      // Fetch Tier 1 questions from backend
-      fetchTier1Questions();
-    } else if (currentTier === 2) {
-      // Use adaptive Tier 2 questions if we have Tier 1 responses
-      if (tier1Responses && Object.keys(tier1Responses).length > 0) {
-        const patterns = detectPatterns(tier1Responses);
-        setDetectedPatterns(patterns);
-        const adaptiveQuestions = generateTier2Questions(tier1Responses, patterns);
-        setCurrentTierQuestions(adaptiveQuestions);
-        console.log('Generated adaptive Tier 2 questions:', adaptiveQuestions);
-        console.log('Detected patterns:', patterns);
-      } else {
-        // Fallback to static questions if no Tier 1 responses
-        const questions = getQuestionsForTierStatic(2);
-        setCurrentTierQuestions(questions);
-      }
-    } else {
-      // Tier 3 and others use static questions
-      const questions = getQuestionsForTierStatic(currentTier);
-      setCurrentTierQuestions(questions);
+    if (currentTier && userId) {
+      // Fetch questions from backend for all tiers
+      fetchQuestionsForCurrentTier();
     }
-  }, [currentTier, tier1Responses, userId]);
+  }, [currentTier, userId]);
+
+  // Fetch questions for current tier from backend
+  const fetchQuestionsForCurrentTier = async () => {
+    try {
+      setError(null);
+      const questions = await getQuestionsForTier(currentTier, userId);
+      setCurrentTierQuestions(questions);
+      console.log(`[Tier ${currentTier}] Loaded questions from backend:`, questions.length, 'questions');
+    } catch (error) {
+      console.error(`[Tier ${currentTier}] Failed to fetch questions:`, error);
+      setError(`Failed to load Tier ${currentTier} questions: ${error.message}`);
+    }
+  };
 
   // Load saved responses from localStorage on mount (only after userId is set)
   useEffect(() => {
@@ -198,37 +193,6 @@ const OnboardingContainer = ({ onComplete }) => {
     }
   }, [tier1Responses, userId]);
 
-  // Fetch Tier 1 questions from backend
-  const fetchTier1Questions = async () => {
-    try {
-      setError(null);
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const response = await fetch(
-        `${backendUrl}/api/onboarding/v1/tier1/questions/${userId}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.questions) {
-        setCurrentTierQuestions(data.questions);
-        console.log('[Tier 1] Loaded questions from backend:', data.questions.length, 'questions');
-      } else {
-        throw new Error(data.error || 'Failed to load questions');
-      }
-    } catch (error) {
-      console.error('[Tier 1] Failed to fetch questions:', error);
-      setError(`Failed to load questions: ${error.message}`);
-
-      // Fallback to static questions
-      console.log('[Tier 1] Falling back to static questions');
-      const questions = getQuestionsForTierStatic(1);
-      setCurrentTierQuestions(questions);
-    }
-  };
 
   // Clear all onboarding data from localStorage
   const clearOnboardingData = () => {
@@ -378,11 +342,11 @@ const OnboardingContainer = ({ onComplete }) => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     } else if (currentTier > 1) {
-      // Go back to previous tier's last question
+      // Go back to previous tier
       const prevTier = currentTier - 1;
       setCurrentTier(prevTier);
-      const prevTierQuestions = getQuestionsForTierStatic(prevTier);
-      setCurrentQuestionIndex(prevTierQuestions.length - 1);
+      // Questions will be loaded by useEffect, set index to 0 for now
+      setCurrentQuestionIndex(0);
     }
   };
 
@@ -776,9 +740,10 @@ const OnboardingContainer = ({ onComplete }) => {
   const currentResponse = responses[currentQuestion.id];
 
   // Calculate total progress across all tiers
-  const tier1Count = getQuestionsForTierStatic(1).length;
-  const tier2Count = getQuestionsForTierStatic(2).length;
-  const tier3Count = getQuestionsForTierStatic(3).length;
+  // Use estimated counts since we can't synchronously get backend counts
+  const tier1Count = 7; // Framework questions
+  const tier2Count = 5; // Estimated tier 2 questions
+  const tier3Count = 3; // Estimated tier 3 questions
   const totalQuestions = tier1Count + tier2Count + tier3Count;
 
   let completedQuestions = 0;
