@@ -27,16 +27,6 @@
   margin-bottom: 2rem;
 }
 
-.onboarding-frame.midpoint p {
-  text-align: left;
-}
-
-.midpoint-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
 
 /* Progress Bar */
 .onboarding-progress {
