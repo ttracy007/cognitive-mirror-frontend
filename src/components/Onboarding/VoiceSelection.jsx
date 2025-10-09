@@ -6,6 +6,8 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVoice, setSelectedVoice] = useState(null);
+  const [adaptiveContext, setAdaptiveContext] = useState(userContext);
+  const [inlineResponse, setInlineResponse] = useState('');
 
   useEffect(() => {
     fetchVoicePreviews();
@@ -14,22 +16,35 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
   const fetchVoicePreviews = async () => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const endpoint = isRefined ? '/api/voice-previews/generate-refined' : '/api/voice-previews/generate';
+      const endpoint = '/api/onboarding/v1/voice-previews/generate';
+
+      // Generate a proper UUID for the request
+      const tempUserId = crypto.randomUUID();
 
       const response = await fetch(`${backendUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: 'temp', // Not critical for preview generation
-          responses,
-          detected_priority: detectedPriority
+          user_id: tempUserId,
+          responses: responses || {},
+          detected_priority: detectedPriority || { priority: 'general_wellness', context: 'exploring general mental wellness' }
         })
       });
 
       if (!response.ok) throw new Error('Failed to generate previews');
 
       const data = await response.json();
-      setVoiceResponses(data.voice_responses);
+
+      // Use the voice_responses from the original API format
+      if (data.voice_responses) {
+        setVoiceResponses(data.voice_responses);
+      }
+
+      // Use adaptive context from API response if available
+      if (data.user_context) {
+        setAdaptiveContext(data.user_context);
+      }
+
       setLoading(false);
     } catch (err) {
       console.error('Voice preview error:', err);
@@ -42,17 +57,16 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
     setSelectedVoice(voice);
   };
 
-  const handleContinue = () => {
-    if (selectedVoice) {
-      onVoiceSelected(selectedVoice, 'continue');
-    }
-  };
 
   const handleJournalNow = () => {
     if (selectedVoice) {
-      onVoiceSelected(selectedVoice, 'journal-now');
+      // Get the selected voice preview text
+      const selectedPreview = voiceResponses?.[selectedVoice];
+      onVoiceSelected(selectedVoice, 'journal-now', selectedPreview, inlineResponse);
     }
   };
+
+  // Additional voice functionality removed - not available in Phase 2 backend
 
   if (loading) {
     return (
@@ -69,7 +83,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
       <div className="voice-selection-container">
         <div className="voice-error">
           <p>Unable to load voice previews. Please continue with the questionnaire.</p>
-          <button onClick={() => onVoiceSelected(null, 'continue')}>
+          <button onClick={() => onVoiceSelected('clara', 'journal-now', null, null)}>
             Continue
           </button>
         </div>
@@ -84,7 +98,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
           <>
             <p className="voice-intro-text">
               Thanks for sharing more about yourself. Based on your complete responses, I now have a deeper understanding
-              that you're <strong>{userContext}</strong>.
+              that you're <strong>{adaptiveContext}</strong>.
             </p>
             <p className="voice-intro-text">
               Here are your three voices again, but this time with insights that draw from everything you've shared.
@@ -94,7 +108,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
         ) : (
           <>
             <p className="voice-intro-text">
-              I'm hearing a few things from what you've shared—sounds like you're <strong>{userContext}</strong>.
+              I'm hearing a few things from what you've shared—sounds like you're <strong>{adaptiveContext}</strong>.
               Here's the thing: you don't have to navigate this alone, and you're not stuck with just one perspective.
             </p>
             <p className="voice-intro-text">
@@ -179,47 +193,41 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
         </div>
       </div>
 
-      {selectedVoice && (
+      {/* Action buttons when voice is selected OR skip option */}
+      {selectedVoice ? (
         <div className="voice-actions">
-          {isRefined ? (
-            <>
-              <p className="voice-choice-prompt">
-                Perfect! You've completed the full questionnaire and selected your voice. Ready to start journaling?
-              </p>
-              <div className="voice-action-buttons">
-                <button
-                  className="voice-button primary"
-                  onClick={handleJournalNow}
-                >
-                  Start Journaling
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="voice-choice-prompt">
-                Great choice. Here are your options:
-              </p>
-              <div className="voice-action-buttons">
-                <button
-                  className="voice-button secondary"
-                  onClick={handleContinue}
-                  title="Answer 5 more questions for deeper, more personalized voice insights"
-                >
-                  Continue Questions
-                  <span className="button-subtitle">Get deeper insights (5 more questions)</span>
-                </button>
-                <button
-                  className="voice-button primary"
-                  onClick={handleJournalNow}
-                  title="Start journaling now with current insights"
-                >
-                  Journal Now
-                  <span className="button-subtitle">Start with what we know</span>
-                </button>
-              </div>
-            </>
-          )}
+          <p className="voice-choice-prompt">
+            Perfect! Ready to start journaling with your selected voice?
+          </p>
+
+          <div className="inline-response-section">
+            <textarea
+              className="inline-response-textarea"
+              rows={4}
+              placeholder="Want to respond to this insight? (Optional - you can also start fresh)"
+              value={inlineResponse}
+              onChange={(e) => setInlineResponse(e.target.value)}
+            />
+          </div>
+
+          <div className="voice-action-buttons">
+            <button
+              className="voice-button primary"
+              onClick={handleJournalNow}
+            >
+              Start Journaling
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="skip-section">
+          <button
+            className="skip-button"
+            onClick={() => onVoiceSelected('clara', 'journal-now', null, null)}
+          >
+            Start Journaling
+          </button>
+          <p className="skip-text">You can always change your voice later in settings</p>
         </div>
       )}
     </div>

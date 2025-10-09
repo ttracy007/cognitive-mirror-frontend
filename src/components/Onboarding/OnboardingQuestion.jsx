@@ -193,6 +193,22 @@ const OnboardingQuestion = ({ question, response, onResponseChange }) => {
     </div>
   );
 
+  const renderMultipleChoice = () => (
+    <div className="question-input multiple-choice">
+      <div className="multiple-choice-options">
+        {question.options.map(opt => (
+          <button
+            key={opt.value}
+            className={`option-button ${response === opt.value ? 'selected' : ''}`}
+            onClick={() => onResponseChange(opt.value)}
+          >
+            {opt.text}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderTextArea = () => (
     <div className="question-input text-area">
       <div className="textarea-with-voice">
@@ -224,6 +240,7 @@ const OnboardingQuestion = ({ question, response, onResponseChange }) => {
       {question.type === 'select_with_notes' && renderSelectWithNotes()}
       {question.type === 'boolean_with_notes' && renderBooleanWithNotes()}
       {question.type === 'tags_with_notes' && renderTagsWithNotes()}
+      {question.type === 'multiple_choice' && renderMultipleChoice()}
       {question.type === 'text_area' && renderTextArea()}
 
       <VoiceRecorder
