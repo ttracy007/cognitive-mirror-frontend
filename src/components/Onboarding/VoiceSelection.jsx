@@ -8,6 +8,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [adaptiveContext, setAdaptiveContext] = useState(userContext);
   const [inlineResponse, setInlineResponse] = useState('');
+  const [showInlineInput, setShowInlineInput] = useState(false);
 
   useEffect(() => {
     fetchVoicePreviews();
@@ -201,12 +202,16 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, onVoiceSelec
           </p>
 
           <div className="inline-response-section">
+            <p className="inline-prompt">
+              Want to respond to {selectedVoice === 'tony_d' ? 'Tony D' : selectedVoice === 'clara' ? 'Clara' : 'Marcus'}?
+              <span className="inline-optional">(Optional - you can skip and start fresh)</span>
+            </p>
             <textarea
-              className="inline-response-textarea"
-              rows={4}
-              placeholder="Want to respond to this insight? (Optional - you can also start fresh)"
+              className="inline-response-input"
+              placeholder={`Respond to ${selectedVoice === 'tony_d' ? 'Tony D' : selectedVoice === 'clara' ? 'Clara' : 'Marcus'}'s insight, or click "Start Journaling" to begin fresh...`}
               value={inlineResponse}
               onChange={(e) => setInlineResponse(e.target.value)}
+              rows={4}
             />
           </div>
 

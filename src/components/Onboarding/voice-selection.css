@@ -299,3 +299,40 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+/* Inline Response Section - PROMPT 3.3 Specifications */
+.inline-response-section {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.inline-prompt {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.inline-optional {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.inline-response-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.inline-response-input:focus {
+  outline: none;
+  border-color: #4A90E2;
+}
