@@ -232,6 +232,77 @@ const OnboardingQuestion = ({ question, response, onResponseChange }) => {
     </div>
   );
 
+  const renderNumberInput = () => (
+    <div className="question-input number-input">
+      <input
+        type="number"
+        className="age-input"
+        placeholder={question.placeholder}
+        value={response || ''}
+        onChange={(e) => onResponseChange(e.target.value)}
+        required={question.required}
+        min="1"
+        max="120"
+      />
+    </div>
+  );
+
+  const renderNestedChoice = () => {
+    const selectedOption = response?.value || '';
+    const followUpResponse = response?.followUp || '';
+
+    const handleOptionSelect = (optionValue) => {
+      onResponseChange({
+        value: optionValue,
+        followUp: ''
+      });
+    };
+
+    const handleFollowUpSelect = (followUpValue) => {
+      onResponseChange({
+        value: selectedOption,
+        followUp: followUpValue
+      });
+    };
+
+    return (
+      <div className="question-input nested-choice">
+        <div className="nested-choice-options">
+          {question.options.map(opt => (
+            <button
+              key={opt.value}
+              className={`option-button ${selectedOption === opt.value ? 'selected' : ''}`}
+              onClick={() => handleOptionSelect(opt.value)}
+            >
+              {opt.text}
+            </button>
+          ))}
+        </div>
+
+        {selectedOption && question.follow_ups && question.follow_ups[selectedOption] && (
+          <div className="follow-up-question">
+            <h3 className="follow-up-text">{question.follow_ups[selectedOption].question}</h3>
+            <div className="follow-up-options">
+              {question.follow_ups[selectedOption].options.map(opt => (
+                <button
+                  key={opt.value}
+                  className={`option-button ${followUpResponse === opt.value ? 'selected' : ''}`}
+                  onClick={() => handleFollowUpSelect(opt.value)}
+                >
+                  {opt.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (!question || !question.question) {
+    return <div>Loading question...</div>;
+  }
+
   return (
     <div className="onboarding-question">
       <h2 className="question-text">{question.question}</h2>
@@ -241,7 +312,11 @@ const OnboardingQuestion = ({ question, response, onResponseChange }) => {
       {question.type === 'boolean_with_notes' && renderBooleanWithNotes()}
       {question.type === 'tags_with_notes' && renderTagsWithNotes()}
       {question.type === 'multiple_choice' && renderMultipleChoice()}
+      {question.type === 'single_choice' && renderMultipleChoice()}
+      {question.type === 'number_input' && renderNumberInput()}
+      {question.type === 'nested_choice' && renderNestedChoice()}
       {question.type === 'text_area' && renderTextArea()}
+      {question.type === 'text_input' && renderTextArea()}
 
       <VoiceRecorder
         isOpen={activeVoiceInput !== null}

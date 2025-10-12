@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient'; // Adjust path as needed
 import OnboardingQuestion from './OnboardingQuestion';
+import Tier2Container from './Tier2/Tier2Container';
 import OnboardingProgress from './OnboardingProgress';
 import VoiceSelection from './VoiceSelection';
 import { getQuestionsForTier, OPENING_FRAME, CLOSING_FRAME } from './QuestionData';
@@ -320,7 +321,7 @@ const OnboardingContainer = ({ onComplete }) => {
     const nextIndex = currentQuestionIndex + 1;
 
     // Check if we finished current tier questions
-    if (nextIndex >= currentTierQuestions.length) {
+    if (nextIndex >= (currentTierQuestions?.length || 0)) {
       // Submit current tier and move to next tier or finish
       if (currentTier === 1) {
         // Submit tier 1 - this will advance to tier 2
@@ -339,15 +340,7 @@ const OnboardingContainer = ({ onComplete }) => {
   };
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    } else if (currentTier > 1) {
-      // Go back to previous tier
-      const prevTier = currentTier - 1;
-      setCurrentTier(prevTier);
-      // Questions will be loaded by useEffect, set index to 0 for now
-      setCurrentQuestionIndex(0);
-    }
+    setCurrentQuestionIndex(prev => Math.max(0, prev - 1));  // ✅ Go back one question, never below 0
   };
 
 
@@ -497,7 +490,7 @@ const OnboardingContainer = ({ onComplete }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
+          userId: userId,
           responses: tier1Responses,
           detected_patterns: detectedPatterns,
           skipped_at: null, // TODO: Add tier1SkippedAt state if needed
@@ -550,8 +543,9 @@ const OnboardingContainer = ({ onComplete }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
-          responses: tier2Responses  // Backend will detect golden keys automatically
+          userId: userId,                    // ✅ Fixed: backend expects "userId"
+          domainResponses: tier2Responses,   // ✅ Fixed: backend expects "domainResponses"
+          goldenKeys: []                     // ✅ Added: backend expects "goldenKeys"
         })
       });
 
@@ -596,13 +590,41 @@ const OnboardingContainer = ({ onComplete }) => {
           return obj;
         }, {});
 
+      // Debug logging for Tier 3 submission
+      console.log('[Tier 3] Debug submission data:');
+      console.log('  userId:', userId, 'type:', typeof userId);
+      console.log('  responses object:', responses);
+      console.log('  tier3Responses:', tier3Responses);
+      console.log('  tier3Responses.q1_priority:', tier3Responses.q1_priority);
+      console.log('  responses.q1_priority:', responses.q1_priority);
+
+      // Try different ways to get the priority text
+      const priorityText = tier3Responses.q1_priority || responses.q1_priority || responses['q1_priority'];
+      console.log('  priorityText final:', priorityText);
+
+      if (!userId) {
+        console.error('[Tier 3] ERROR: userId is missing');
+        setError('User ID is missing - please refresh and try again');
+        return;
+      }
+
+      if (!priorityText) {
+        console.error('[Tier 3] ERROR: priority text is missing');
+        setError('Priority text is missing - please enter your answer first');
+        return;
+      }
+
+      const payload = {
+        userId: userId,
+        priority: priorityText
+      };
+
+      console.log('[Tier 3] Final payload:', JSON.stringify(payload, null, 2));
+
       const response = await fetch(`${backendUrl}/api/onboarding/v1/tier3/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userId,
-          responses: tier3Responses  // Should include q27_stated_priority
-        })
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -729,20 +751,20 @@ const OnboardingContainer = ({ onComplete }) => {
     );
   }
 
-  // Don't render if questions haven't loaded yet
-  if (currentTierQuestions.length === 0) {
+  // Don't render if questions haven't loaded yet (except for Tier 2 which handles its own loading)
+  if ((!currentTierQuestions || currentTierQuestions.length === 0) && currentTier !== 2) {
     return <div className="onboarding-container">Loading...</div>;
   }
 
   // Render questions
-  const currentQuestion = currentTierQuestions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === currentTierQuestions.length - 1 && currentTier === 3;
-  const currentResponse = responses[currentQuestion.id];
+  const currentQuestion = currentTier === 2 ? null : currentTierQuestions?.[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === (currentTierQuestions?.length || 0) - 1 && currentTier === 3;
+  const currentResponse = currentQuestion ? responses[currentQuestion.id] : null;
 
   // Calculate total progress across all tiers
   // Use estimated counts since we can't synchronously get backend counts
   const tier1Count = 7; // Framework questions
-  const tier2Count = 5; // Estimated tier 2 questions
+  const tier2Count = 4; // Golden Key Excavation domains
   const tier3Count = 3; // Estimated tier 3 questions
   const totalQuestions = tier1Count + tier2Count + tier3Count;
 
@@ -750,7 +772,8 @@ const OnboardingContainer = ({ onComplete }) => {
   if (currentTier === 1) {
     completedQuestions = currentQuestionIndex + 1;
   } else if (currentTier === 2) {
-    completedQuestions = tier1Count + currentQuestionIndex + 1;
+    // Tier 2 progress is handled internally by Tier2Container
+    completedQuestions = tier1Count + 2; // Show some progress for Tier 2
   } else if (currentTier === 3) {
     completedQuestions = tier1Count + tier2Count + currentQuestionIndex + 1;
   }
@@ -767,11 +790,29 @@ const OnboardingContainer = ({ onComplete }) => {
       </div>
 
       <div className="onboarding-content">
-        <OnboardingQuestion
-          question={currentQuestion}
-          response={currentResponse}
-          onResponseChange={(response) => handleQuestionResponse(currentQuestion.id, response)}
-        />
+        {currentTier === 2 ? (
+          <Tier2Container
+            userId={userId}
+            onComplete={() => {
+              // Tier 2 completed, move to Tier 3
+              setCurrentTier(3);
+              setCurrentQuestionIndex(0);
+              console.log('[Onboarding] Tier 2 completed, advancing to Tier 3');
+            }}
+            onBack={() => {
+              // Go back to Tier 1
+              setCurrentTier(1);
+              setCurrentQuestionIndex(tier1Questions.length - 1); // Go to last question of Tier 1
+              console.log('[Onboarding] Going back from Tier 2 to Tier 1');
+            }}
+          />
+        ) : (
+          <OnboardingQuestion
+            question={currentQuestion}
+            response={currentResponse}
+            onResponseChange={(response) => handleQuestionResponse(currentQuestion.id, response)}
+          />
+        )}
 
         {error && (
           <div className="onboarding-error">
@@ -800,15 +841,7 @@ const OnboardingContainer = ({ onComplete }) => {
             </button>
           )}
 
-          <button
-            className="onboarding-button primary"
-            onClick={handleNext}
-            disabled={isSubmitting || (currentQuestion.required && !currentResponse)}
-          >
-            {isSubmitting ? 'Submitting...' : isLastQuestion ? 'Finish' : 'Next'}
-          </button>
-
-          {/* Dev mode reset button */}
+          {/* Dev mode reset button - moved to center */}
           {process.env.NODE_ENV === 'development' && (
             <button
               className="onboarding-button reset"
@@ -818,6 +851,14 @@ const OnboardingContainer = ({ onComplete }) => {
               🔄 Reset
             </button>
           )}
+
+          <button
+            className="onboarding-button primary"
+            onClick={handleNext}
+            disabled={isSubmitting || (currentQuestion?.required && !currentResponse)}
+          >
+            {isSubmitting ? 'Submitting...' : isLastQuestion ? 'Finish' : 'Next'}
+          </button>
         </div>
       </div>
     </div>
