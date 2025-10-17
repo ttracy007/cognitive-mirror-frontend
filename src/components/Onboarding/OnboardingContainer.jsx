@@ -388,12 +388,11 @@ const OnboardingContainer = ({ onComplete }) => {
     }));
     console.log(`[Tier 3] Response updated: ${field} = ${value}`);
 
-    // Auto-advance to advice style stage after priority is confirmed or overridden
+    // Auto-advance to advice style stage only when radio button is confirmed
     if (field === 'priority_confirmation' && value === 'confirmed') {
       setTimeout(() => setCurrentStep('tier3-advice-style'), 500);
-    } else if (field === 'priority_override_text' && value.trim().length > 10) {
-      setTimeout(() => setCurrentStep('tier3-advice-style'), 500);
     }
+    // Note: Removed auto-advance for priority_override_text to allow full text input
   };
 
   const handleNext = () => {
@@ -888,20 +887,34 @@ const OnboardingContainer = ({ onComplete }) => {
               </div>
 
               {tier3Responses.priority_confirmation === 'override' && (
-                <textarea
-                  placeholder="What's most on your mind right now?"
-                  value={tier3Responses.priority_override_text || ''}
-                  onChange={(e) => handleTier3Response('priority_override_text', e.target.value)}
-                  style={{
-                    width: '100%',
-                    minHeight: '100px',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '16px',
-                    marginTop: '10px'
-                  }}
-                />
+                <div>
+                  <textarea
+                    placeholder="What's most on your mind right now?"
+                    value={tier3Responses.priority_override_text || ''}
+                    onChange={(e) => handleTier3Response('priority_override_text', e.target.value)}
+                    style={{
+                      width: '100%',
+                      minHeight: '100px',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      fontSize: '16px',
+                      marginTop: '10px'
+                    }}
+                  />
+
+                  {/* Show Continue button when user has entered some text */}
+                  {tier3Responses.priority_override_text && tier3Responses.priority_override_text.trim().length > 5 && (
+                    <div className="onboarding-navigation" style={{ marginTop: '20px' }}>
+                      <button
+                        className="onboarding-button primary"
+                        onClick={() => setCurrentStep('tier3-advice-style')}
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           ) : (
