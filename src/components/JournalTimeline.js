@@ -121,7 +121,7 @@ useEffect(() => {
     // Explicit fresh query with cache busting
     const { data, error } = await supabase
       .from('journals')
-      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker, user_id')
+      .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp, debug_marker, user_id, entry_type')
       .eq('user_id', userId)
       .order('timestamp', { ascending: false })
       .limit(50);
@@ -131,6 +131,21 @@ useEffect(() => {
       setLoading(false);
       return;
     }
+
+    // Enhanced logging for voice preview debugging
+    const voicePreviews = (data || []).filter(entry => entry.entry_type === 'voice_preview');
+    console.log('🎤 VOICE PREVIEW ENTRIES FETCHED:', {
+      totalEntries: data?.length || 0,
+      voicePreviewCount: voicePreviews.length,
+      voicePreviewIds: voicePreviews.map(vp => vp.id.substring(0,8)),
+      allEntryTypes: [...new Set((data || []).map(e => e.entry_type))],
+      firstVoicePreview: voicePreviews[0] ? {
+        id: voicePreviews[0].id.substring(0,8),
+        tone_mode: voicePreviews[0].tone_mode,
+        timestamp: voicePreviews[0].timestamp,
+        has_response_text: !!voicePreviews[0].response_text
+      } : 'none'
+    });
 
     console.log('🔄 BEFORE setJournalEntries - current state:', {
       oldCount: journalEntries.length,
@@ -143,13 +158,25 @@ useEffect(() => {
     // Filter out the entry currently shown in Latest Response to avoid duplication
     let filteredData = data || [];
     if (excludeLatestResponse) {
-      filteredData = filteredData.filter(entry => 
-        entry.entry_text?.trim() !== excludeLatestResponse.trim()
-      );
+      filteredData = filteredData.filter(entry => {
+        // Handle voice preview entries which have entry_text: null
+        const entryText = entry.entry_text?.trim() || '';
+        const excludeText = excludeLatestResponse.trim();
+
+        // Voice preview entries should NOT be filtered out based on entry_text comparison
+        // since they have entry_text: null and we want to show them in the timeline
+        if (entry.entry_type === 'voice_preview') {
+          console.log('🎤 KEEPING voice preview entry in timeline:', entry.id.substring(0,8));
+          return true; // Always include voice previews
+        }
+
+        return entryText !== excludeText;
+      });
       console.log('🚫 FILTERING Latest Response from timeline:', {
         excludeText: excludeLatestResponse.substring(0, 50) + '...',
         beforeCount: data?.length || 0,
-        afterCount: filteredData.length
+        afterCount: filteredData.length,
+        voicePreviewsKept: filteredData.filter(e => e.entry_type === 'voice_preview').length
       });
     }
     

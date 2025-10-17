@@ -300,6 +300,29 @@
   word-wrap: break-word;
 }
 
+/* Single Voice Display - Enhanced for Tony D only */
+.voice-card.single-voice {
+  border: 2px solid #4a90e2;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15);
+  margin-bottom: 2rem;
+}
+
+.voice-card.single-voice .voice-response {
+  background: #ffffff;
+  border-left: 4px solid #4a90e2;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.voice-card.single-voice .voice-response p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #2c3e50;
+}
+
 /* Inline Response Section - PROMPT 3.3 Specifications */
 .inline-response-section {
   margin: 20px 0;

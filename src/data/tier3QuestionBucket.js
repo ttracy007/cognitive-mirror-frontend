@@ -22,6 +22,20 @@ const tier3Questions = [
     placeholder: "What do you believe about yourself that might be getting in the way?",
     required: true,
     reveals: ['limiting_beliefs', 'self_concept', 'internal_barriers']
+  },
+  {
+    id: 'advice_style',
+    category: 'voice_preference',
+    number: 3,
+    question: "When you're receiving advice, do you prefer:",
+    type: 'multiple_choice',
+    required: true,
+    options: [
+      { value: 'tony', text: 'A swift kick in the ass' },
+      { value: 'clara', text: 'A soft touch that\'s mindful of your feelings' },
+      { value: 'marcus', text: 'Marcus Aurelius' }
+    ],
+    reveals: ['advice_preference', 'communication_style', 'voice_selection']
   }
 ];
 

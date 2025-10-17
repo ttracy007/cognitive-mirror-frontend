@@ -7,6 +7,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
   const [currentDomain, setCurrentDomain] = useState(null);
   const [domainResponses, setDomainResponses] = useState({});
   const [goldenKeys, setGoldenKeys] = useState([]);
+  const [completedDomains, setCompletedDomains] = useState(new Set()); // Track completed/skipped domains
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -52,6 +53,9 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
       [domainKey]: responses
     }));
 
+    // Mark domain as completed
+    setCompletedDomains(prev => new Set([...prev, domainKey]));
+
     // Store golden key if provided and meets criteria
     if (goldenKey && goldenKey.text && goldenKey.word_count >= 40) {
       setGoldenKeys(prev => [...prev, goldenKey]);
@@ -76,6 +80,21 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
   const handleSkipDomain = (fromDomain, skipTo) => {
     console.log(`[Tier 2] Skipping from ${fromDomain} to ${skipTo}`);
 
+    // Mark the current domain as completed (via skip)
+    setCompletedDomains(prev => new Set([...prev, fromDomain]));
+
+    // Add skipped domain to domainResponses to satisfy backend validation
+    setDomainResponses(prev => ({
+      ...prev,
+      [fromDomain]: {
+        [`${fromDomain}_skipped`]: true,
+        skip_reason: skipTo,
+        completion_type: 'skipped'
+      }
+    }));
+
+    console.log(`[Tier 2] Domain ${fromDomain} marked as completed (skipped)`);
+
     // Convert skip_to_domain2 format to actual domain key
     const domainMap = {
       'skip_to_domain2': 'domain2_rumination',
@@ -88,11 +107,23 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
     const nextDomain = domainMap[skipTo] || skipTo;
 
     if (nextDomain === 'tier3_transition') {
-      // Skip straight to Tier 3
-      console.log('[Tier 2] Skipping to Tier 3');
+      // Skip straight to Tier 3 - all domains complete
+      console.log('[Tier 2] Skipping to Tier 3 - submitting Tier 2');
       submitTier2();
     } else {
+      console.log(`[Tier 2] Skipping to domain: ${nextDomain}`);
       setCurrentDomain(nextDomain);
+    }
+  };
+
+  const handleResetForTesting = () => {
+    if (window.confirm('Reset Tier 2 progress? This will clear all domain answers and golden keys.')) {
+      // Clear Tier 2 specific data
+      setDomainResponses({});
+      setGoldenKeys([]);
+      setCompletedDomains(new Set());
+      setCurrentDomain('domain1_sleep');
+      console.log('[Tier 2] Reset completed - returning to first domain');
     }
   };
 
@@ -141,7 +172,8 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
 
       if (data.success) {
         console.log('[Tier 2] Submission successful:', data);
-        onComplete();
+        // Pass the collected golden keys to parent
+        onComplete(goldenKeys);
       } else {
         console.error('[Tier 2] Submission failed:', data);
         setError(`Tier 2 submission failed: ${data.error || 'Unknown error'}`);
@@ -199,13 +231,50 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
         userId={userId}
         onComplete={handleDomainComplete}
         onSkip={handleSkipDomain}
-        onBack={onBack}
+        onBack={() => {
+          // Handle going back from current domain
+          const domainOrder = ['domain1_sleep', 'domain2_rumination', 'domain3_work', 'domain4_relationships'];
+          const currentIndex = domainOrder.indexOf(currentDomain);
+
+          if (currentIndex > 0) {
+            // Go back to previous domain
+            const previousDomain = domainOrder[currentIndex - 1];
+            console.log(`[Tier 2] Going back from ${currentDomain} to ${previousDomain}`);
+            setCurrentDomain(previousDomain);
+          } else {
+            // At first domain - go back to Tier 1
+            console.log('[Tier 2] At first domain - going back to Tier 1');
+            onBack();
+          }
+        }}
         allResponses={domainResponses}
       />
 
       <div className="tier2-progress">
         <span>Domain: {domains[currentDomain]?.name || currentDomain}</span>
+        <span>Domains Completed: {completedDomains.size}/4</span>
         <span>Golden Keys Found: {goldenKeys.length}</span>
+
+        {/* Dev mode reset button for Tier 2 */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            className="tier2-reset-button"
+            onClick={handleResetForTesting}
+            title="Reset Tier 2 progress (dev only)"
+            style={{
+              marginLeft: '20px',
+              padding: '8px 16px',
+              backgroundColor: '#e74c3c',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}
+          >
+            🔄 Reset T2
+          </button>
+        )}
       </div>
     </div>
   );

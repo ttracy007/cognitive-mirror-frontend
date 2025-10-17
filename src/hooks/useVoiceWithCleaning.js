@@ -31,7 +31,6 @@ const useVoiceWithCleaning = (options = {}) => {
 
       if (!SpeechRecognition) {
         setIsSupported(false);
-        console.log('🔇 Speech Recognition not supported in this browser');
         return;
       }
 

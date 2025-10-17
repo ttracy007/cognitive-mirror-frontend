@@ -3,7 +3,7 @@ import ScaleInput from './ScaleInput';
 import GoldenKeyInput from './GoldenKeyInput';
 import SingleChoiceInput from './SingleChoiceInput';
 
-const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
+const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
   const [goldenKeyText, setGoldenKeyText] = useState('');
@@ -19,14 +19,8 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
     setNavigationHistory([0]); // Reset navigation history to start with first question
   }, [domainKey]); // ✅ Only run when domain changes
 
-  const handleAnswer = useCallback((questionId, value, additionalData = {}) => {
-    // Simple state update without localStorage
-    setResponses(prev => ({
-      ...prev,
-      [questionId]: value,
-      ...additionalData
-    }));
-
+  // Function to handle navigation logic
+  const processQuestionLogic = useCallback((questionId, value) => {
     const currentQuestion = questions[currentQuestionIndex];
 
     // Check for skip logic on scale questions (only for single values, not arrays)
@@ -108,6 +102,20 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
     setCurrentQuestionIndex(nextIndex);
     setNavigationHistory(prev => [...prev, nextIndex]); // Add to navigation history
   }, [domainKey, questions, currentQuestionIndex, onSkip]);
+
+  const handleAnswer = useCallback((questionId, value, additionalData = {}) => {
+    // Simple state update without localStorage
+    const newResponses = {
+      ...responses,
+      [questionId]: value,
+      ...additionalData
+    };
+    setResponses(newResponses);
+
+    // Auto-navigate immediately when answer is given (restored behavior)
+    console.log(`[DomainRenderer] Answer recorded for ${questionId}:`, value, '- processing navigation logic');
+    processQuestionLogic(questionId, value);
+  }, [responses, processQuestionLogic]);
 
   // Early return if domain is undefined or null - AFTER all hooks
   if (!domain) {
@@ -256,26 +264,44 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
     return responses[currentQuestion.id] || null;
   };
 
+  // Check if we have a response for the current question
+  const hasCurrentResponse = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) return false;
+    const response = responses[currentQuestion.id];
+    return response !== undefined && response !== null && response !== '';
+  };
+
   // Method to handle footer Next button click
   const handleFooterNext = () => {
     const currentQuestion = questions[currentQuestionIndex];
     const currentResponse = getCurrentResponse();
 
     if (currentResponse) {
-      handleAnswer(currentQuestion.id, currentResponse, {});
+      // Process question logic and navigation
+      processQuestionLogic(currentQuestion.id, currentResponse);
     }
   };
 
   // Method to handle footer Back button click
   const handleBack = () => {
     if (navigationHistory.length > 1) {
-      // Remove current question from history and go to previous
+      // Go back within current domain
       const newHistory = navigationHistory.slice(0, -1);
       const previousQuestionIndex = newHistory[newHistory.length - 1];
 
       setNavigationHistory(newHistory);
       setCurrentQuestionIndex(previousQuestionIndex);
+    } else if (currentQuestionIndex === 0 && onBack) {
+      // At first question of domain - go back to previous domain/tier
+      console.log('[DomainRenderer] Going back to previous domain/tier');
+      onBack();
     }
+  };
+
+  // Check if back button should be enabled - always enabled in Tier 2
+  const canGoBack = () => {
+    return navigationHistory.length > 1 || (currentQuestionIndex === 0 && onBack);
   };
 
   // Check if we've gone past all questions
@@ -318,6 +344,7 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
             question={currentQuestion.question}
             scale={currentQuestion.scale}
             onAnswer={(value) => handleAnswer(currentQuestion.id, value)}
+            defaultValue={responses[currentQuestion.id]}
           />
         )}
 
@@ -348,34 +375,34 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
       <div className="question-footer" style={{ marginTop: '30px', textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button
           onClick={handleBack}
-          disabled={navigationHistory.length <= 1}
+          disabled={!canGoBack()}
           className="footer-back-button"
           style={{
             padding: '12px 24px',
-            backgroundColor: navigationHistory.length > 1 ? '#6c757d' : '#bdc3c7',
+            backgroundColor: canGoBack() ? '#6c757d' : '#bdc3c7',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
             fontSize: '16px',
             fontWeight: '500',
-            cursor: navigationHistory.length > 1 ? 'pointer' : 'not-allowed'
+            cursor: canGoBack() ? 'pointer' : 'not-allowed'
           }}
         >
           Back
         </button>
         <button
           onClick={handleFooterNext}
-          disabled={!getCurrentResponse()}
+          disabled={!hasCurrentResponse()}
           className="footer-next-button"
           style={{
             padding: '12px 24px',
-            backgroundColor: getCurrentResponse() ? '#4A90E2' : '#bdc3c7',
+            backgroundColor: hasCurrentResponse() ? '#4A90E2' : '#bdc3c7',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
             fontSize: '16px',
             fontWeight: '500',
-            cursor: getCurrentResponse() ? 'pointer' : 'not-allowed'
+            cursor: hasCurrentResponse() ? 'pointer' : 'not-allowed'
           }}
         >
           Next
@@ -393,7 +420,10 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip }) => {
             questionType: currentQuestion?.type,
             condition: currentQuestion?.condition,
             shouldShow: currentQuestion ? shouldShowQuestion(currentQuestion) : 'N/A',
-            canGoBack: navigationHistory.length > 1
+            canGoBack: canGoBack(),
+            hasResponse: hasCurrentResponse(),
+            nextButtonEnabled: hasCurrentResponse(),
+            backButtonEnabled: canGoBack()
           }, null, 2)}</pre>
         </details>
       </div>

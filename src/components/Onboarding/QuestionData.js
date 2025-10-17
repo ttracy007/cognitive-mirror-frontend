@@ -35,11 +35,9 @@ export async function getQuestionsForTier(tier, userId) {
       throw new Error(data.error || 'Failed to fetch questions');
     }
 
-    // Tier 2 returns domains, Tier 3 returns single question, Tier 1 returns questions array
+    // Tier 2 returns domains, Tier 3 returns questions array, Tier 1 returns questions array
     if (tier === 2) {
       return data.domains;
-    } else if (tier === 3) {
-      return data.question ? [data.question] : []; // Convert single question to array
     } else {
       return data.questions || [];
     }

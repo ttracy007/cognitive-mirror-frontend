@@ -15,6 +15,7 @@ import OnboardingContainer from './components/Onboarding/OnboardingContainer';
 
 const App = () => {
 
+
   // --- Tone descriptions map ---
   const toneDescriptions = {
     therapist: "🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.",
@@ -41,6 +42,7 @@ const App = () => {
   // 🔽 Existing states (no change to their order beyond moving forcedTone here)
   const [showLogin, setShowLogin] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isTestingOnboarding, setIsTestingOnboarding] = useState(false);
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
@@ -260,25 +262,55 @@ const App = () => {
       if (!session?.user?.id) return;
 
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-        const response = await fetch(`${backendUrl}/api/onboarding/profile/${session.user.id}`);
+        console.log('[App] Checking onboarding status for user:', session.user.id);
 
-        if (response.ok) {
-          const data = await response.json();
-          if (!data.profile || !data.has_completed) {
-            // User hasn't completed onboarding - force onboarding screen
-            setShowOnboarding(true);
-          } else {
-            // User has completed onboarding - allow main app
-            setShowOnboarding(false);
-          }
-        } else {
-          // On error, check if user exists in database
-          console.warn('Failed to check onboarding status, defaulting to onboarding');
-          setShowOnboarding(true); // Better to show onboarding than lose a new user
+        const { data: profile, error } = await supabase
+          .from('user_onboarding_profile')
+          .select('selected_voice, voice_selected_at, tier3_completed, tier3_completed_at')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.warn('[App] Error fetching profile:', error);
+          setShowOnboarding(true);
+          return;
         }
+
+        console.log('[App] Profile data:', {
+          hasProfile: !!profile,
+          selectedVoice: profile?.selected_voice,
+          voiceSelectedAt: profile?.voice_selected_at,
+          tier3Completed: profile?.tier3_completed,
+          tier3CompletedAt: profile?.tier3_completed_at
+        });
+
+        // PRIORITY 1: Voice selected → Timeline (onboarding complete)
+        if (profile?.selected_voice && profile?.voice_selected_at) {
+          console.log('[App] ✅ Voice already selected → Timeline');
+          setShowOnboarding(false);
+          return;
+        }
+
+        // PRIORITY 2: Tier 3 done, no voice → Voice selection
+        if (profile?.tier3_completed && !profile?.selected_voice) {
+          console.log('[App] ⚡ Tier 3 complete, no voice → Continue to voice selection');
+          setShowOnboarding(true); // OnboardingContainer will handle voice selection flow
+          return;
+        }
+
+        // PRIORITY 3: Profile exists but incomplete → Continue onboarding
+        if (profile) {
+          console.log('[App] 🔄 Profile exists but incomplete → Continue onboarding');
+          setShowOnboarding(true);
+          return;
+        }
+
+        // PRIORITY 4: No profile → Start onboarding
+        console.log('[App] 🆕 No profile found → Start onboarding');
+        setShowOnboarding(true);
+
       } catch (error) {
-        console.warn('Error checking onboarding status:', error);
+        console.warn('[App] Error checking onboarding status:', error);
         setShowOnboarding(true); // Better to show onboarding than lose a new user
       }
     };
@@ -1065,27 +1097,20 @@ const App = () => {
 
           // Check if user has completed onboarding
           try {
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-            const response = await fetch(`${backendUrl}/api/onboarding/profile/${session.user.id}`);
+            // TODO: Backend doesn't have /api/onboarding/profile endpoint yet
+            // For now, default to showing onboarding in dev mode
+            const isDev = process.env.REACT_APP_ENV === 'dev';
 
-            if (response.ok) {
-              const data = await response.json();
-              if (!data.profile || !data.has_completed) {
-                // User hasn't completed onboarding - show onboarding flow
-                setShowOnboarding(true);
-              } else {
-                // User has completed onboarding - go directly to main app
-                setShowOnboarding(false);
-              }
+            if (isDev || isTestingOnboarding) {
+              console.log('Auth success: showing onboarding in dev mode');
+              setShowOnboarding(true);
             } else {
-              // Error checking onboarding status - default to main app
-              console.warn('Failed to check onboarding status, proceeding to main app');
+              // In production, we'd check the profile endpoint here
               setShowOnboarding(false);
             }
           } catch (error) {
-            console.warn('Error checking onboarding status:', error);
-            // Default to main app on error
-            setShowOnboarding(false);
+            console.warn('Error in auth success onboarding check:', error);
+            setShowOnboarding(true);
           }
         }}
       />
@@ -1096,7 +1121,99 @@ const App = () => {
   if (showOnboarding) {
     return (
       <OnboardingContainer
-        onComplete={() => setShowOnboarding(false)}
+        onComplete={async (onboardingData) => {
+          console.log('[App] Onboarding completed with data:', onboardingData);
+
+          // Try to fetch stored voice preview from backend if we have a userId
+          if (onboardingData && onboardingData.userId) {
+            try {
+              const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
+              const response = await fetch(`${backendUrl}/api/onboarding/v1/voice-previews/stored/${onboardingData.userId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                console.log('[App] Retrieved stored voice preview:', data);
+
+                // Map onboarding voice to app voice format
+                const voiceMapping = {
+                  'marcus_aurelius': 'marcus',
+                  'clara': 'therapist',
+                  'tony_d': 'frank'
+                };
+                const mappedVoice = voiceMapping[data.selected_voice] || 'therapist';
+                console.log('[App] Setting voice from stored data:', data.selected_voice, '→', mappedVoice);
+
+                // Set the selected voice
+                setForcedTone(mappedVoice);
+                setToneDescription(toneDescriptions[mappedVoice] || toneDescriptions["therapist"]);
+
+                // Add stored voice preview to timeline
+                if (data.voice_preview && data.voice_preview.text) {
+                  console.log('[App] Adding stored voice preview to timeline:', data.voice_preview.text);
+
+                  // Set as latest response to show immediately
+                  setLatestResponse({
+                    text: data.voice_preview.text,
+                    tone: mappedVoice,
+                    toneName: toneName(mappedVoice),
+                    timestamp: data.voice_preview.timestamp || new Date().toISOString()
+                  });
+                  setShowLatestResponse(true);
+
+                  // Also trigger a timeline refresh to show the entry
+                  setRefreshTrigger(prev => prev + 1);
+                }
+              } else {
+                console.warn('[App] No stored voice preview found for user');
+              }
+            } catch (error) {
+              console.error('[App] Failed to fetch stored voice preview:', error);
+            }
+          }
+
+          // Handle legacy onboarding data if provided (fallback)
+          else if (onboardingData && onboardingData.selectedVoice) {
+            console.log('[App] Using legacy onboarding data');
+            // Map onboarding voice to app voice format
+            const voiceMapping = {
+              'marcus': 'marcus',
+              'clara': 'therapist',
+              'tony': 'frank'
+            };
+
+            const mappedVoice = voiceMapping[onboardingData.selectedVoice] || 'therapist';
+            console.log('[App] Setting voice from onboarding:', onboardingData.selectedVoice, '→', mappedVoice);
+
+            // Set the selected voice
+            setForcedTone(mappedVoice);
+            setToneDescription(toneDescriptions[mappedVoice] || toneDescriptions["therapist"]);
+
+            // If we have a voice preview, add it as the first timeline entry
+            if (onboardingData.voicePreview && onboardingData.voicePreview.text) {
+              console.log('[App] Adding voice preview to timeline:', onboardingData.voicePreview.text);
+
+              // Set as latest response to show immediately
+              setLatestResponse({
+                text: onboardingData.voicePreview.text,
+                tone: mappedVoice,
+                toneName: toneName(mappedVoice),
+                timestamp: new Date().toISOString()
+              });
+              setShowLatestResponse(true);
+
+              // Also trigger a timeline refresh to show the entry
+              setRefreshTrigger(prev => prev + 1);
+            }
+          }
+
+          setShowOnboarding(false);
+          setIsTestingOnboarding(false); // Reset testing flag
+        }}
       />
     );
   }
@@ -1263,7 +1380,30 @@ return (
           {process.env.NODE_ENV === 'development' && (
             <button
               className="logout-btn"
-              onClick={() => setShowOnboarding(true)}
+              onClick={() => {
+                // Clear any local onboarding state
+                const userId = session?.user?.id;
+                if (userId) {
+                  localStorage.removeItem(`onboarding_responses_${userId}`);
+                  localStorage.removeItem(`onboarding_step_${userId}`);
+                  localStorage.removeItem(`onboarding_question_index_${userId}`);
+                  localStorage.removeItem(`onboarding_selected_voice_${userId}`);
+                  localStorage.removeItem(`onboarding_detected_priority_${userId}`);
+                  localStorage.removeItem(`onboarding_detected_patterns_${userId}`);
+                  localStorage.removeItem(`onboarding_golden_keys_${userId}`);
+                  localStorage.removeItem(`onboarding_tier1_responses_${userId}`);
+                }
+                // Also clear old non-user-specific keys
+                localStorage.removeItem('onboarding_responses');
+                localStorage.removeItem('onboarding_step');
+                localStorage.removeItem('onboarding_question_index');
+                localStorage.removeItem('onboarding_selected_voice');
+                localStorage.removeItem('onboarding_detected_priority');
+
+                // Set testing mode and show onboarding
+                setIsTestingOnboarding(true);
+                setShowOnboarding(true);
+              }}
               style={{
                 marginLeft: '10px',
                 backgroundColor: '#4a90e2',
@@ -1272,6 +1412,45 @@ return (
               title="Test the refined onboarding flow"
             >
               🧪 Test Onboarding
+            </button>
+          )}
+
+          {/* Reset Onboarding button (dev mode only) */}
+          {process.env.NODE_ENV === 'development' && (
+            <button
+              className="logout-btn"
+              onClick={() => {
+                if (window.confirm('This will reset your onboarding progress. Your profile data will be kept in the database. Continue?')) {
+                  // Clear local onboarding state
+                  const userId = session?.user?.id;
+                  if (userId) {
+                    localStorage.removeItem(`onboarding_responses_${userId}`);
+                    localStorage.removeItem(`onboarding_step_${userId}`);
+                    localStorage.removeItem(`onboarding_question_index_${userId}`);
+                    localStorage.removeItem(`onboarding_selected_voice_${userId}`);
+                    localStorage.removeItem(`onboarding_detected_priority_${userId}`);
+                    localStorage.removeItem(`onboarding_detected_patterns_${userId}`);
+                    localStorage.removeItem(`onboarding_golden_keys_${userId}`);
+                    localStorage.removeItem(`onboarding_tier1_responses_${userId}`);
+                  }
+                  // Also clear old non-user-specific keys
+                  localStorage.removeItem('onboarding_responses');
+                  localStorage.removeItem('onboarding_step');
+                  localStorage.removeItem('onboarding_question_index');
+                  localStorage.removeItem('onboarding_selected_voice');
+                  localStorage.removeItem('onboarding_detected_priority');
+
+                  alert('Onboarding state reset! Click "Test Onboarding" to restart.');
+                }
+              }}
+              style={{
+                marginLeft: '10px',
+                backgroundColor: '#e74c3c',
+                border: 'none'
+              }}
+              title="Reset onboarding state (keeps profile data)"
+            >
+              🔄 Reset Onboarding
             </button>
           )}
         </div>

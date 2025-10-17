@@ -1,0 +1,91 @@
+.voice-preview-display {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.preview-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.preview-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.voice-description {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  font-style: italic;
+  color: #555;
+}
+
+.confirmation-section {
+  text-align: center;
+}
+
+.confirmation-question {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-yes, .btn-no {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-yes {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-yes:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.btn-no {
+  background: #f44336;
+  color: white;
+}
+
+.btn-no:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .voice-preview-display {
+    padding: 1rem;
+  }
+
+  .confirmation-buttons {
+    flex-direction: column;
+  }
+
+  .btn-yes, .btn-no {
+    width: 100%;
+  }
+}

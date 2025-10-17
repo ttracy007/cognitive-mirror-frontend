@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ScaleInput = ({ question, scale, onAnswer, defaultValue }) => {
   const [selectedValue, setSelectedValue] = useState(defaultValue);
+
+  // Reset selection when defaultValue changes (e.g., domain change or question reset)
+  useEffect(() => {
+    setSelectedValue(defaultValue);
+  }, [defaultValue]);
 
   const handleSelect = (value) => {
     setSelectedValue(value);

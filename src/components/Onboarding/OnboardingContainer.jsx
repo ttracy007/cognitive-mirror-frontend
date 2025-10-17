@@ -4,6 +4,8 @@ import OnboardingQuestion from './OnboardingQuestion';
 import Tier2Container from './Tier2/Tier2Container';
 import OnboardingProgress from './OnboardingProgress';
 import VoiceSelection from './VoiceSelection';
+import VoiceSelectionFlow from './VoiceSelectionFlow';
+import PriorityConfirmation from './PriorityConfirmation';
 import { getQuestionsForTier, OPENING_FRAME, CLOSING_FRAME } from './QuestionData';
 import { detectPatterns } from '../../data/tier1QuestionBucket';
 import { generateTier2Questions } from '../../data/tier2QuestionBucket';
@@ -11,7 +13,7 @@ import { detectGoldenKey, shouldTriggerFollowUp, analyzeResponse } from '../../u
 import './onboarding.css';
 
 const OnboardingContainer = ({ onComplete }) => {
-  const [currentStep, setCurrentStep] = useState('opening'); // 'opening' | 'questions' | 'voice-selection' | 'closing'
+  const [currentStep, setCurrentStep] = useState('opening'); // 'opening' | 'questions' | 'tier3-priority' | 'tier3-advice-style' | 'voice-selection' | 'closing'
   const [currentTier, setCurrentTier] = useState(1); // 1, 2, or 3
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
@@ -24,6 +26,12 @@ const OnboardingContainer = ({ onComplete }) => {
   const [detectedPatterns, setDetectedPatterns] = useState(null);
   const [goldenKeys, setGoldenKeys] = useState([]);
   const [tier1Responses, setTier1Responses] = useState({});
+  const [voicePreviews, setVoicePreviews] = useState(null);
+  const [adviceStyle, setAdviceStyle] = useState(null);
+  const [tier3Questions, setTier3Questions] = useState(null);
+  const [synthesizedPriority, setSynthesizedPriority] = useState(null);
+  const [tier3Responses, setTier3Responses] = useState({});
+  const [loadingTier3, setLoadingTier3] = useState(false);
 
   useEffect(() => {
     // Get user_id from Supabase auth
@@ -194,6 +202,62 @@ const OnboardingContainer = ({ onComplete }) => {
     }
   }, [tier1Responses, userId]);
 
+  // Fetch Tier 3 questions when currentTier === 3
+  useEffect(() => {
+    if (currentTier === 3 && userId) {
+      setLoadingTier3(true);
+      setError(null);
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
+      console.log('[Tier 3] Fetching questions for userId:', userId);
+      console.log('[Tier 3] Request URL:', `${backendUrl}/api/onboarding/v1/tier3/questions/${userId}`);
+
+      fetch(`${backendUrl}/api/onboarding/v1/tier3/questions/${userId}`)
+        .then(res => {
+          console.log('[Tier 3] Response status:', res.status);
+          console.log('[Tier 3] Response headers:', Object.fromEntries(res.headers.entries()));
+          return res.json();
+        })
+        .then(data => {
+          console.log('[Tier 3] Full response data:', data);
+          console.log('[Tier 3] Questions array:', data.questions);
+          console.log('[Tier 3] First question:', data.questions?.[0]);
+
+          if (data.success && data.questions) {
+            setTier3Questions(data.questions);
+
+            // Extract synthesized priority from first question
+            const priorityQuestion = data.questions.find(q => q.id === 'priority_confirmation');
+            console.log('[Tier 3] Priority question found:', priorityQuestion);
+            console.log('[Tier 3] Synthesized statement:', priorityQuestion?.synthesized_statement);
+            console.log('[Tier 3] DEBUGGING: All question IDs:', data.questions.map(q => q.id));
+
+            if (priorityQuestion?.synthesized_statement) {
+              setSynthesizedPriority({
+                statement: priorityQuestion.synthesized_statement,
+                confidence: priorityQuestion.synthesis_confidence
+              });
+              console.log('[Tier 3] Priority synthesis set successfully');
+            } else {
+              console.warn('[Tier 3] No synthesized statement found in priority question');
+            }
+            console.log('[Tier 3] Loaded questions from backend:', data.questions.length, 'questions');
+          } else {
+            console.error('[Tier 3] Invalid response structure:', data);
+            console.error('[Tier 3] Failed to load questions:', data.error);
+            setError(`Failed to load Tier 3 questions: ${data.error || 'Unknown error'}`);
+          }
+          setLoadingTier3(false);
+        })
+        .catch(err => {
+          console.error('[Tier 3] Fetch error:', err);
+          console.error('[Tier 3] Network error loading questions:', err);
+          setError(`Failed to load Tier 3 questions: ${err.message}`);
+          setLoadingTier3(false);
+        });
+    }
+  }, [currentTier, userId]);
+
 
   // Clear all onboarding data from localStorage
   const clearOnboardingData = () => {
@@ -317,6 +381,21 @@ const OnboardingContainer = ({ onComplete }) => {
     }
   };
 
+  const handleTier3Response = (field, value) => {
+    setTier3Responses(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    console.log(`[Tier 3] Response updated: ${field} = ${value}`);
+
+    // Auto-advance to advice style stage after priority is confirmed or overridden
+    if (field === 'priority_confirmation' && value === 'confirmed') {
+      setTimeout(() => setCurrentStep('tier3-advice-style'), 500);
+    } else if (field === 'priority_override_text' && value.trim().length > 10) {
+      setTimeout(() => setCurrentStep('tier3-advice-style'), 500);
+    }
+  };
+
   const handleNext = () => {
     const nextIndex = currentQuestionIndex + 1;
 
@@ -327,8 +406,9 @@ const OnboardingContainer = ({ onComplete }) => {
         // Submit tier 1 - this will advance to tier 2
         submitTier1();
       } else if (currentTier === 2) {
-        // Submit tier 2 - this will advance to tier 3
-        submitTier2();
+        // Tier 2 is handled by Tier2Container - should not reach here
+        console.warn('[OnboardingContainer] Tier 2 completion should be handled by Tier2Container');
+        return;
       } else if (currentTier === 3) {
         // Submit tier 3 - this will generate voice previews and move to voice selection
         submitTier3();
@@ -350,6 +430,35 @@ const OnboardingContainer = ({ onComplete }) => {
     if (flowChoice === 'journal-now') {
       // Start journaling immediately with the selected voice and preview
       handleSubmitAndStartJournal(voice, voicePreview, inlineResponse);
+    }
+  };
+
+  // New handler for progressive voice selection flow
+  const handleVoiceConfirmed = async (voiceType, voicePreview) => {
+    try {
+      setSelectedVoice(voiceType);
+      setIsSubmitting(true);
+
+      console.log(`[Voice Confirmed] User selected: ${voiceType}`);
+      console.log(`[Voice Confirmed] Preview content:`, voicePreview);
+
+      // Save voice selection (placeholder for now)
+      // TODO: Implement actual backend save if needed
+
+      // Start journaling with the confirmed voice and preview
+      onComplete({
+        selectedVoice: voiceType,
+        voicePreview: voicePreview,
+        startJournalImmediately: true,
+        responses: responses,
+        detectedPriority: detectedPriority,
+        adviceStyle: adviceStyle
+      });
+
+    } catch (error) {
+      console.error('Error confirming voice selection:', error);
+      setError('Failed to save your voice selection. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -445,6 +554,24 @@ const OnboardingContainer = ({ onComplete }) => {
 
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
+
+      // Extract voice preview text with proper fallback handling
+      const voicePreviewText = voicePreviews?.[selectedVoice]?.text ||
+                              voicePreviews?.[selectedVoice] ||
+                              '';
+
+      // Validate we have content to send
+      if (!voicePreviewText || voicePreviewText.trim().length === 0) {
+        throw new Error('No voice preview text available. Please regenerate voice previews.');
+      }
+
+      console.log('[Voice Selection] Submitting:', {
+        userId,
+        selectedVoice,
+        textLength: voicePreviewText.length,
+        hasAllPreviews: !!voicePreviews
+      });
+
       const response = await fetch(`${backendUrl}/api/onboarding/v1/voice-previews/select`, {
         method: 'POST',
         headers: {
@@ -452,7 +579,9 @@ const OnboardingContainer = ({ onComplete }) => {
         },
         body: JSON.stringify({
           user_id: userId,
-          selected_voice: selectedVoice
+          selected_voice: selectedVoice,
+          voice_preview_text: voicePreviewText,
+          voice_previews: voicePreviews // Send all previews for storage
         })
       });
 
@@ -462,14 +591,55 @@ const OnboardingContainer = ({ onComplete }) => {
       }
 
       const data = await response.json();
-      console.log('Voice selection saved successfully:', data);
+      console.log('✅ Voice selection response:', data);
+
+      // Check if journal entry was created successfully
+      if (data.warning) {
+        console.warn('⚠️ Backend warning:', data.warning);
+        console.warn('⚠️ Journal error details:', data.journal_error);
+
+        // Show warning to user but allow them to continue
+        setError(`Voice saved, but timeline entry may be missing: ${data.journal_error || 'Unknown error'}`);
+
+        // Optional: You could add a "Continue Anyway" button here
+        // For now, we'll just show the warning and proceed after 3 seconds
+        setTimeout(() => {
+          clearOnboardingData();
+          setCurrentStep('closing');
+        }, 3000);
+
+        return; // Exit early to show the warning
+      }
+
+      // Verify journal was created
+      if (!data.journal_created) {
+        console.warn('⚠️ Journal entry was not created (no error but journal_created: false)');
+        setError('Voice saved to profile, but timeline entry is missing. You may not see this in your journal history.');
+
+        // Still proceed but show warning
+        setTimeout(() => {
+          clearOnboardingData();
+          setCurrentStep('closing');
+        }, 3000);
+
+        return;
+      }
+
+      // SUCCESS: Both profile and journal entry created
+      console.log('✅ Voice selection complete:', {
+        voice: data.selected_voice,
+        journalId: data.journal_entry_id,
+        timestamp: data.stored_at
+      });
 
       // Clear localStorage after successful submission
       clearOnboardingData();
 
+      // Proceed to closing frame
       setCurrentStep('closing');
+
     } catch (err) {
-      console.error('Voice selection error:', err);
+      console.error('❌ Voice selection error:', err);
       setError(`Failed to save voice selection: ${err.message}. Please try again.`);
     } finally {
       setIsSubmitting(false);
@@ -525,115 +695,54 @@ const OnboardingContainer = ({ onComplete }) => {
   };
 
   const submitTier2 = async () => {
+    console.warn('[DEPRECATED] OnboardingContainer.submitTier2() should not be called - Tier2Container handles its own submission');
+    // This function is deprecated - Tier2Container now handles its own submission
+    // and calls onComplete() when done, which advances to Tier 3
+  };
+
+  const submitTier3 = async () => {
+    console.log('[Tier 3] Submitting:', tier3Responses);
+
     try {
       setIsSubmitting(true);
       setError(null);
 
+      // Validate priority
+      const hasPriorityConfirmation = tier3Responses.priority_confirmation === 'confirmed';
+      const hasOverride = tier3Responses.priority_confirmation === 'override' && tier3Responses.priority_override_text;
+
+      if (!hasPriorityConfirmation && !hasOverride) {
+        setError('Please confirm the priority or provide your own');
+        return;
+      }
+
+      // Validate advice style
+      if (!tier3Responses.advice_style) {
+        setError('Please select an advice style');
+        return;
+      }
+
+      // Submit to backend
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-
-      // Extract tier2 responses from main responses object
-      const tier2Responses = Object.keys(responses)
-        .filter(key => key.startsWith('tier2_') || (parseInt(key) >= 8 && parseInt(key) <= 20)) // Adjust range as needed
-        .reduce((obj, key) => {
-          obj[key] = responses[key];
-          return obj;
-        }, {});
-
-      const response = await fetch(`${backendUrl}/api/onboarding/v1/tier2/submit`, {
+      const response = await fetch(`${backendUrl}/api/onboarding/v1/tier3/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: userId,                    // ✅ Fixed: backend expects "userId"
-          domainResponses: tier2Responses,   // ✅ Fixed: backend expects "domainResponses"
-          goldenKeys: []                     // ✅ Added: backend expects "goldenKeys"
+          userId: userId,
+          responses: tier3Responses
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
-        console.log('[Tier 2] Submitted successfully', data);
-        console.log('[Tier 2] Golden keys detected:', data.golden_keys_detected);
+        console.log('[Tier 3] Submission successful');
 
-        // Store golden keys info if needed
-        if (data.golden_keys) {
-          setGoldenKeys(data.golden_keys);
-        }
+        // Store advice style for voice selection flow
+        setAdviceStyle(tier3Responses.advice_style);
 
-        // Proceed to tier3
-        setCurrentTier(3);
-        setCurrentQuestionIndex(0);
-      } else {
-        console.error('[Tier 2] Submission failed:', data);
-        setError(`Tier 2 submission failed: ${data.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('[Tier 2] Network error:', error);
-      setError(`Tier 2 network error: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const submitTier3 = async () => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-
-      // Extract tier3 responses from main responses object
-      const tier3Responses = Object.keys(responses)
-        .filter(key => key.startsWith('tier3_') || parseInt(key) >= 21) // Adjust range as needed
-        .reduce((obj, key) => {
-          obj[key] = responses[key];
-          return obj;
-        }, {});
-
-      // Debug logging for Tier 3 submission
-      console.log('[Tier 3] Debug submission data:');
-      console.log('  userId:', userId, 'type:', typeof userId);
-      console.log('  responses object:', responses);
-      console.log('  tier3Responses:', tier3Responses);
-      console.log('  tier3Responses.q1_priority:', tier3Responses.q1_priority);
-      console.log('  responses.q1_priority:', responses.q1_priority);
-
-      // Try different ways to get the priority text
-      const priorityText = tier3Responses.q1_priority || responses.q1_priority || responses['q1_priority'];
-      console.log('  priorityText final:', priorityText);
-
-      if (!userId) {
-        console.error('[Tier 3] ERROR: userId is missing');
-        setError('User ID is missing - please refresh and try again');
-        return;
-      }
-
-      if (!priorityText) {
-        console.error('[Tier 3] ERROR: priority text is missing');
-        setError('Priority text is missing - please enter your answer first');
-        return;
-      }
-
-      const payload = {
-        userId: userId,
-        priority: priorityText
-      };
-
-      console.log('[Tier 3] Final payload:', JSON.stringify(payload, null, 2));
-
-      const response = await fetch(`${backendUrl}/api/onboarding/v1/tier3/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.onboarding_complete) {
-        console.log('[Tier 3] Onboarding complete', data);
-
-        // Proceed to voice preview generation
-        await generateVoicePreviews();
+        // Move to voice selection
+        setCurrentStep('voice-selection');
       } else {
         console.error('[Tier 3] Submission failed:', data);
         setError(`Tier 3 submission failed: ${data.error || 'Unknown error'}`);
@@ -665,12 +774,13 @@ const OnboardingContainer = ({ onComplete }) => {
       if (data.success) {
         console.log('[Voice Previews] Generated successfully', data);
 
-        // Store voice previews for display
-        // TODO: Add setVoicePreviews state if not already present
-        if (data.previews) {
-          console.log('[Voice Previews] Available voices:', Object.keys(data.previews));
-        }
+        // Backend returns all three voices under data.previews, but we only use tony_d for single voice display
+        const previews = {
+          tony_d: data.previews?.tony_d
+        };
 
+        setVoicePreviews(previews);
+        console.log('[Voice Previews] Available voices:', Object.keys(previews));
         setCurrentStep('voice-selection');
       } else {
         console.error('[Voice Previews] Generation failed:', data);
@@ -694,7 +804,7 @@ const OnboardingContainer = ({ onComplete }) => {
 
     // Call the parent callback to return to main app
     if (onComplete) {
-      onComplete();
+      onComplete({ userId });
     }
   };
 
@@ -717,16 +827,163 @@ const OnboardingContainer = ({ onComplete }) => {
   }
 
 
-  // Render voice selection
+  // Render Tier 3 priority confirmation
+  if (currentStep === 'tier3-priority') {
+    return (
+      <div className="onboarding-container">
+        <OnboardingProgress
+          current={14}
+          total={14}
+        />
+
+        <div className="tier-indicator">
+          <p>Tier 3 of 3 - Priority Confirmation</p>
+        </div>
+
+        <div className="onboarding-content">
+          {loadingTier3 ? (
+            <div className="loading-state">
+              <p>Loading your personalized questions...</p>
+            </div>
+          ) : synthesizedPriority ? (
+            <div className="priority-confirmation">
+              <h3>Priority Confirmation</h3>
+              <p>Based on what you've shared, it sounds like you're most preoccupied with:</p>
+              <div className="synthesized-statement" style={{
+                background: '#f5f5f5',
+                padding: '15px',
+                borderRadius: '8px',
+                margin: '15px 0',
+                fontStyle: 'italic',
+                border: '1px solid #ddd'
+              }}>
+                "{synthesizedPriority.statement}"
+              </div>
+              <p>Is this what's most occupying your thoughts right now?</p>
+
+              <div className="radio-group" style={{ margin: '20px 0' }}>
+                <label style={{ display: 'block', margin: '10px 0' }}>
+                  <input
+                    type="radio"
+                    name="priority_confirmation"
+                    value="confirmed"
+                    checked={tier3Responses.priority_confirmation === 'confirmed'}
+                    onChange={(e) => handleTier3Response('priority_confirmation', 'confirmed')}
+                    style={{ marginRight: '10px' }}
+                  />
+                  Yes, that's it
+                </label>
+
+                <label style={{ display: 'block', margin: '10px 0' }}>
+                  <input
+                    type="radio"
+                    name="priority_confirmation"
+                    value="override"
+                    checked={tier3Responses.priority_confirmation === 'override'}
+                    onChange={(e) => handleTier3Response('priority_confirmation', 'override')}
+                    style={{ marginRight: '10px' }}
+                  />
+                  No, it's something else:
+                </label>
+              </div>
+
+              {tier3Responses.priority_confirmation === 'override' && (
+                <textarea
+                  placeholder="What's most on your mind right now?"
+                  value={tier3Responses.priority_override_text || ''}
+                  onChange={(e) => handleTier3Response('priority_override_text', e.target.value)}
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '16px',
+                    marginTop: '10px'
+                  }}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="error-state">
+              <p>Failed to load questions. Please try again.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render Tier 3 advice style selection
+  if (currentStep === 'tier3-advice-style') {
+    return (
+      <div className="onboarding-container">
+        <OnboardingProgress
+          current={14}
+          total={14}
+        />
+
+        <div className="tier-indicator">
+          <p>Tier 3 of 3 - Advice Style</p>
+        </div>
+
+        <div className="onboarding-content">
+          {tier3Questions && tier3Questions.find(q => q.id === 'advice_style') ? (
+            <div className="advice-style">
+              <h3>Advice Style Preference</h3>
+              <p>When you're receiving advice, do you prefer:</p>
+              <div className="radio-group" style={{ margin: '20px 0' }}>
+                {tier3Questions && tier3Questions.find(q => q.id === 'advice_style')?.options?.map(option => (
+                  <label key={option.value} style={{ display: 'block', margin: '10px 0' }}>
+                    <input
+                      type="radio"
+                      name="advice_style"
+                      value={option.value}
+                      checked={tier3Responses.advice_style === option.value}
+                      onChange={(e) => handleTier3Response('advice_style', option.value)}
+                      style={{ marginRight: '10px' }}
+                    />
+                    {option.text}
+                  </label>
+                ))}
+              </div>
+
+              <div className="onboarding-navigation" style={{ marginTop: '30px' }}>
+                <button
+                  className="onboarding-button secondary"
+                  onClick={() => setCurrentStep('tier3-priority')}
+                >
+                  Back
+                </button>
+
+                <button
+                  className="onboarding-button primary"
+                  onClick={submitTier3}
+                  disabled={isSubmitting || !tier3Responses.advice_style}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Continue to Voice Selection'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="error-state">
+              <p>Loading advice style options...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render progressive voice selection
   if (currentStep === 'voice-selection') {
     return (
       <div className="onboarding-container">
-        <VoiceSelection
-          userContext={detectedPriority?.context}
+        <VoiceSelectionFlow
+          userId={userId}
+          initialVoiceChoice={adviceStyle}
           responses={responses}
-          detectedPriority={detectedPriority}
-          onVoiceSelected={handleVoiceSelected}
-          isRefined={true}
+          onVoiceConfirmed={handleVoiceConfirmed}
         />
       </div>
     );
@@ -793,11 +1050,17 @@ const OnboardingContainer = ({ onComplete }) => {
         {currentTier === 2 ? (
           <Tier2Container
             userId={userId}
-            onComplete={() => {
+            onComplete={(tier2GoldenKeys = []) => {
               // Tier 2 completed, move to Tier 3
+              // Store the golden keys from Tier 2
+              if (tier2GoldenKeys && tier2GoldenKeys.length > 0) {
+                setGoldenKeys(prev => [...prev, ...tier2GoldenKeys]);
+                console.log('[Onboarding] Tier 2 golden keys received:', tier2GoldenKeys.length);
+              }
               setCurrentTier(3);
               setCurrentQuestionIndex(0);
-              console.log('[Onboarding] Tier 2 completed, advancing to Tier 3');
+              setCurrentStep('tier3-priority'); // Go to priority confirmation stage
+              console.log('[Onboarding] Tier 2 completed, advancing to Tier 3 priority confirmation');
             }}
             onBack={() => {
               // Go back to Tier 1
@@ -807,6 +1070,7 @@ const OnboardingContainer = ({ onComplete }) => {
             }}
           />
         ) : (
+          // Tier 1: Regular questions
           <OnboardingQuestion
             question={currentQuestion}
             response={currentResponse}
@@ -830,36 +1094,48 @@ const OnboardingContainer = ({ onComplete }) => {
           </div>
         )}
 
-        <div className="onboarding-navigation">
-          {(currentQuestionIndex > 0 || currentTier > 1) && (
-            <button
-              className="onboarding-button secondary"
-              onClick={handlePrevious}
-              disabled={isSubmitting}
-            >
-              Back
-            </button>
-          )}
+        {/* Only show OnboardingContainer navigation for Tier 1 and 3 - Tier 2 has its own navigation */}
+        {currentTier !== 2 && (
+          <div className="onboarding-navigation">
+            {(currentQuestionIndex > 0 || currentTier > 1) && (
+              <button
+                className="onboarding-button secondary"
+                onClick={handlePrevious}
+                disabled={isSubmitting}
+              >
+                Back
+              </button>
+            )}
 
-          {/* Dev mode reset button - moved to center */}
-          {process.env.NODE_ENV === 'development' && (
-            <button
-              className="onboarding-button reset"
-              onClick={handleResetForTesting}
-              title="Reset onboarding (dev only)"
-            >
-              🔄 Reset
-            </button>
-          )}
+            {/* Dev mode reset button - only show for Tier 1 and 3 */}
+            {process.env.NODE_ENV === 'development' && (
+              <button
+                className="onboarding-button reset"
+                onClick={handleResetForTesting}
+                title="Reset onboarding (dev only)"
+              >
+                🔄 Reset
+              </button>
+            )}
 
-          <button
-            className="onboarding-button primary"
-            onClick={handleNext}
-            disabled={isSubmitting || (currentQuestion?.required && !currentResponse)}
-          >
-            {isSubmitting ? 'Submitting...' : isLastQuestion ? 'Finish' : 'Next'}
-          </button>
-        </div>
+            <button
+              className="onboarding-button primary"
+              onClick={currentTier === 3 ? submitTier3 : handleNext}
+              disabled={
+                isSubmitting ||
+                (currentTier === 3 ? (
+                  !tier3Responses.priority_confirmation ||
+                  (tier3Responses.priority_confirmation === 'override' && !tier3Responses.priority_override_text) ||
+                  !tier3Responses.advice_style
+                ) : (currentQuestion?.required && !currentResponse))
+              }
+            >
+              {isSubmitting ? 'Submitting...' :
+               currentTier === 3 ? 'Continue to Voice Selection' :
+               isLastQuestion ? 'Finish' : 'Next'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
