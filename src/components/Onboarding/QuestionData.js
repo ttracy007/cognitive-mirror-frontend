@@ -1,4 +1,5 @@
 // Cognitive Mirror - Question Data (Backend Proxy)
+import { API_ENDPOINTS } from '../../shared/onboarding-constants';
 
 // Opening frame - shown before onboarding begins
 export const OPENING_FRAME = {
@@ -19,9 +20,18 @@ export async function getQuestionsForTier(tier, userId) {
   try {
     // Tier 1 doesn't need userId in URL
     // Tier 2 and Tier 3 need userId for conditional logic
-    const url = (tier === 2 || tier === 3)
-      ? `${backendUrl}/api/onboarding/v1/tier${tier}/questions/${userId}`
-      : `${backendUrl}/api/onboarding/v1/tier${tier}/questions`;
+    let endpoint;
+    if (tier === 1) {
+      endpoint = API_ENDPOINTS.TIER1_QUESTIONS;
+    } else if (tier === 2) {
+      endpoint = `${API_ENDPOINTS.TIER2_QUESTIONS}/${userId}`;
+    } else if (tier === 3) {
+      endpoint = `${API_ENDPOINTS.TIER3_QUESTIONS}/${userId}`;
+    } else {
+      throw new Error(`Invalid tier: ${tier}`);
+    }
+
+    const url = `${backendUrl}${endpoint}`;
 
     const response = await fetch(url);
 

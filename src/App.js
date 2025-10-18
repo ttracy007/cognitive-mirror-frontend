@@ -1,6 +1,6 @@
-// 🔼 Imports and Setup      
-import React, { useEffect, useState, useRef } from 'react'; 
-import SummaryViewer from './SummaryViewer'; 
+// 🔼 Imports and Setup
+import React, { useEffect, useState, useRef } from 'react';
+import SummaryViewer from './SummaryViewer';
 import PatternInsightViewer from './PatternInsightViewer';
 import { supabase, UsernameStore, getBootSession, subscribeAuth } from './supabaseClient';
 import './App.css';
@@ -11,33 +11,36 @@ import JournalTimeline from './components/JournalTimeline';
 import MoodModal from './components/MoodModal';
 import LatestResponse from './components/LatestResponse';
 import VoiceRecorder from './components/VoiceRecorder';
-import OnboardingContainer from './components/Onboarding/OnboardingContainer'; 
+import OnboardingContainer from './components/Onboarding/OnboardingContainer';
+import {
+  VOICE_IDS,
+  VOICE_NAMES,
+  VOICE_DESCRIPTIONS,
+  VOICE_MAPPING,
+  VOICE_STYLES,
+  API_ENDPOINTS,
+  FIELD_NAMES,
+  getVoiceStyle,
+  getVoiceName,
+  getVoiceDescription,
+  mapVoiceForApp
+} from './shared/onboarding-constants'; 
 
 const App = () => {
 
 
-  // --- Tone descriptions map ---
-  const toneDescriptions = {
-    therapist: "🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.",
-    marcus: "🧘 Marcus – Speaks like the Stoic philosopher himself. Will quote Meditations.",
-    frank: "💪🍷 Tony – A frank, no-bullshit friend who tells you what you need to hear.",
-    movies: "🎬 Movies – A movie buff who only speaks through movie metaphors.",
-    verena: "🌸 Verena – A clarity-driven life coach unphased by self-pity."
-  };
-
-  // Default to Clara
-  const [forcedTone, setForcedTone] = useState("therapist");
+  // Default to Clara (therapist)
+  const [forcedTone, setForcedTone] = useState(VOICE_IDS.THERAPIST);
   // Keep a visible description bound to the current selection
-  const [toneDescription, setToneDescription] = useState(toneDescriptions["therapist"]);
+  const [toneDescription, setToneDescription] = useState(getVoiceDescription(VOICE_IDS.THERAPIST));
 
   const handleToneChange = (e) => {
     const val = e.target.value;
     setForcedTone(val);
-    setToneDescription(toneDescriptions[val] || "");
+    setToneDescription(getVoiceDescription(val));
   };
 
-  const toneName = (t) =>
-  ({ therapist: 'Clara', marcus: 'Marcus', frank: 'Tony', movies: 'Movies', verena: 'Verena' }[t] || 'Mirror');
+  const toneName = (t) => getVoiceName(t);
 
   // 🔽 Existing states (no change to their order beyond moving forcedTone here)
   const [showLogin, setShowLogin] = useState(false);
@@ -46,7 +49,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [entry, setEntry] = useState('');
   const [history, setHistory] = useState([]);
-  const [tooltip, setTooltip] = useState("🩺 Clara – A warm, grounded therapist who sees the pattern beneath the panic.");
+  const [tooltip, setTooltip] = useState(getVoiceDescription(VOICE_IDS.THERAPIST));
   const [latestEntryId, setLatestEntryId] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const [showPatternInsight, setShowPatternInsight] = useState(false);
@@ -267,7 +270,7 @@ const App = () => {
         const { data: profile, error } = await supabase
           .from('user_onboarding_profile')
           .select('selected_voice, voice_selected_at, tier3_completed, tier3_completed_at')
-          .eq('user_id', session.user.id)
+          .eq(FIELD_NAMES.USER_ID, session.user.id)
           .single();
 
         if (error && error.code !== 'PGRST116') {
@@ -278,21 +281,21 @@ const App = () => {
 
         console.log('[App] Profile data:', {
           hasProfile: !!profile,
-          selectedVoice: profile?.selected_voice,
+          selectedVoice: profile?.[FIELD_NAMES.SELECTED_VOICE],
           voiceSelectedAt: profile?.voice_selected_at,
           tier3Completed: profile?.tier3_completed,
           tier3CompletedAt: profile?.tier3_completed_at
         });
 
         // PRIORITY 1: Voice selected → Timeline (onboarding complete)
-        if (profile?.selected_voice && profile?.voice_selected_at) {
+        if (profile?.[FIELD_NAMES.SELECTED_VOICE] && profile?.voice_selected_at) {
           console.log('[App] ✅ Voice already selected → Timeline');
           setShowOnboarding(false);
           return;
         }
 
         // PRIORITY 2: Tier 3 done, no voice → Voice selection
-        if (profile?.tier3_completed && !profile?.selected_voice) {
+        if (profile?.tier3_completed && !profile?.[FIELD_NAMES.SELECTED_VOICE]) {
           console.log('[App] ⚡ Tier 3 complete, no voice → Continue to voice selection');
           setShowOnboarding(true); // OnboardingContainer will handle voice selection flow
           return;
@@ -404,9 +407,9 @@ const App = () => {
       
       const requestBody = {
         entry_text: entry,
-        tone_mode: forcedTone,
+        [FIELD_NAMES.TONE_MODE]: forcedTone,
         username: u,
-        user_id: userId,
+        [FIELD_NAMES.USER_ID]: userId,
       };
       
       setDebugInfo(`📦 Request body: ${JSON.stringify(requestBody, null, 2)}`);
@@ -1058,7 +1061,7 @@ const App = () => {
     const { data, error } = await supabase
       .from('journals')
       .select('id, entry_text, response_text, primary_theme, secondary_theme, tone_mode, timestamp')
-      .eq('user_id', user.id)
+      .eq(FIELD_NAMES.USER_ID, user.id)
       .order('timestamp', { ascending: false });
       
     if (error) {
@@ -1128,7 +1131,7 @@ const App = () => {
           if (onboardingData && onboardingData.userId) {
             try {
               const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-              const response = await fetch(`${backendUrl}/api/onboarding/v1/voice-previews/stored/${onboardingData.userId}`, {
+              const response = await fetch(`${backendUrl}${API_ENDPOINTS.VOICE_PREVIEWS_STORED}/${onboardingData.userId}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -1140,17 +1143,12 @@ const App = () => {
                 console.log('[App] Retrieved stored voice preview:', data);
 
                 // Map onboarding voice to app voice format
-                const voiceMapping = {
-                  'marcus': 'marcus',
-                  'clara': 'therapist',
-                  'tony': 'frank'
-                };
-                const mappedVoice = voiceMapping[data.selected_voice] || 'therapist';
-                console.log('[App] Setting voice from stored data:', data.selected_voice, '→', mappedVoice);
+                const mappedVoice = mapVoiceForApp(data[FIELD_NAMES.SELECTED_VOICE]);
+                console.log('[App] Setting voice from stored data:', data[FIELD_NAMES.SELECTED_VOICE], '→', mappedVoice);
 
                 // Set the selected voice
                 setForcedTone(mappedVoice);
-                setToneDescription(toneDescriptions[mappedVoice] || toneDescriptions["therapist"]);
+                setToneDescription(getVoiceDescription(mappedVoice));
 
                 // Add stored voice preview to timeline
                 if (data.voice_preview && data.voice_preview.text) {
@@ -1180,18 +1178,12 @@ const App = () => {
           else if (onboardingData && onboardingData.selectedVoice) {
             console.log('[App] Using legacy onboarding data');
             // Map onboarding voice to app voice format
-            const voiceMapping = {
-              'marcus': 'marcus',
-              'clara': 'therapist',
-              'tony': 'frank'
-            };
-
-            const mappedVoice = voiceMapping[onboardingData.selectedVoice] || 'therapist';
+            const mappedVoice = mapVoiceForApp(onboardingData.selectedVoice);
             console.log('[App] Setting voice from onboarding:', onboardingData.selectedVoice, '→', mappedVoice);
 
             // Set the selected voice
             setForcedTone(mappedVoice);
-            setToneDescription(toneDescriptions[mappedVoice] || toneDescriptions["therapist"]);
+            setToneDescription(getVoiceDescription(mappedVoice));
 
             // If we have a voice preview, add it as the first timeline entry
             if (onboardingData.voicePreview && onboardingData.voicePreview.text) {
@@ -1221,54 +1213,9 @@ const App = () => {
 // 🔽 Function 7: Generate Handoff Summaries  
 
   // 🔽 Tone Display Utility
-  const displayTone = (mode) => {
-    const t = mode?.trim().toLowerCase();
-    return t === 'frank' ? '🔴 Frank Friend' : '🟢 Marcus Aurelius';
-  };
+  const displayTone = (mode) => getVoiceName(mode);
 
-  const getToneStyle = (mode) => {
-    const tone = mode?.trim().toLowerCase();
-    switch (tone) {
-      case 'frank':
-      case 'frank friend':
-        return {
-          backgroundColor: '#fff1f1',
-          borderColor: '#cc0000',
-          label: '🔴 Tony',
-        };
-      case 'marcus':
-      case 'marcus aurelius':
-        return {
-          backgroundColor: '#f0fdf4',
-          borderColor: '#2e7d32',
-          label: '🟢 Marcus Aurelius',
-        };
-      case 'therapist':
-        return {
-          backgroundColor: '#fef6ff',
-          borderColor: '#b755e5',
-          label: '🟣 Clara',
-        };
-      case 'movies':
-        return {
-          backgroundColor: '#fdfaf6',
-          borderColor: '#ff8c00',
-          label: '🎬 Movie Metaphors Man',
-        };
-      case 'verena':
-          return {
-            backgroundColor: '#ffeaf0',
-            borderColor: '#ec407a',
-            label: '🌸 Verena',
-        };  
-      default:
-        return {
-          backgroundColor: '#eeeeee',
-          borderColor: '#999999',
-          label: '❓ Unknown',
-        };
-    }
-  };
+  const getToneStyle = (mode) => getVoiceStyle(mode);
 
     // Centralize tooltip copy in one place
     const TOOLTIP_TEXT = {
@@ -1654,11 +1601,11 @@ return (
                 onChange={handleToneChange}
                 aria-label="Select voice"
               >
-                <option value="therapist">Clara</option>
-                <option value="marcus">Marcus</option>
-                <option value="frank">Tony</option>
-                <option value="movies">Movies</option>
-                <option value="verena">Verena</option>
+                <option value={VOICE_IDS.THERAPIST}>Clara</option>
+                <option value={VOICE_IDS.MARCUS}>Marcus</option>
+                <option value={VOICE_IDS.FRANK}>Tony</option>
+                <option value={VOICE_IDS.MOVIES}>Movies</option>
+                <option value={VOICE_IDS.VERENA}>Verena</option>
               </select>
               <div className="voice-description" aria-live="polite">
                 {toneDescription}

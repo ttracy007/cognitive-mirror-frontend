@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import VoicePreviewDisplay from './VoicePreviewDisplay';
 import AlternativeVoicesSelector from './AlternativeVoicesSelector';
+import { VOICE_IDS, VOICE_NAMES, VOICE_DESCRIPTIONS, API_ENDPOINTS, FIELD_NAMES } from '../../shared/onboarding-constants';
 import './VoiceSelectionFlow.css';
 
 const VoiceSelectionFlow = ({
@@ -19,22 +20,22 @@ const VoiceSelectionFlow = ({
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [error, setError] = useState(null);
 
-  // Voice data including descriptions (using existing descriptions from App.js)
+  // Voice data using shared constants
   const voiceData = {
-    tony: {
-      id: 'tony',
-      name: 'Tony D',
-      description: 'A frank, no-bullshit friend who\'s always honest and supportive, helping you cut through the crap and break free from the loops that keep you stuck.'
+    [VOICE_IDS.TONY]: {
+      id: VOICE_IDS.TONY,
+      name: VOICE_NAMES[VOICE_IDS.TONY],
+      description: VOICE_DESCRIPTIONS[VOICE_IDS.TONY]
     },
-    clara: {
-      id: 'clara',
-      name: 'Clara',
-      description: 'A warm, grounded therapist who sees the pattern beneath the panic.'
+    [VOICE_IDS.CLARA]: {
+      id: VOICE_IDS.CLARA,
+      name: VOICE_NAMES[VOICE_IDS.CLARA],
+      description: VOICE_DESCRIPTIONS[VOICE_IDS.CLARA]
     },
-    marcus: {
-      id: 'marcus',
-      name: 'Marcus',
-      description: 'Speaks like the Stoic philosopher himself—calm, sparse, and deeply rooted in principle. If inspired he may quote from his own journal, Meditations.'
+    [VOICE_IDS.MARCUS]: {
+      id: VOICE_IDS.MARCUS,
+      name: VOICE_NAMES[VOICE_IDS.MARCUS],
+      description: VOICE_DESCRIPTIONS[VOICE_IDS.MARCUS]
     }
   };
 
@@ -63,12 +64,12 @@ const VoiceSelectionFlow = ({
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       const response = await fetch(
-        `${backendUrl}/api/onboarding/v1/voice-previews/generate`,
+        `${backendUrl}${API_ENDPOINTS.VOICE_PREVIEWS_GENERATE}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: userId,
+            [FIELD_NAMES.USER_ID]: userId,
             voices: [voiceType]
           }),
           signal: controller.signal

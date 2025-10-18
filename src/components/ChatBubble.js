@@ -1,13 +1,14 @@
-// ChatBubble.js    
+// ChatBubble.js
 import dayjs from 'dayjs';
 import FeedbackBar from './FeedbackBar';
+import { getVoiceStyle, VOICE_IDS, FIELD_NAMES } from '../shared/onboarding-constants';
 
 export default function ChatBubble({ entry, isMostRecent = false, styleVariant = "A" }) {
   const isUser = entry.tone_mode === 'user'
-  const userId = entry.user_id; 
+  const userId = entry[FIELD_NAMES.USER_ID];
   const showFeedback = !isUser && !!entry.response_text;
   const isInsight = entry.entry_type === 'insight';
-  const style = getToneStyle(entry.tone_mode || 'frank');
+  const style = getVoiceStyle(entry[FIELD_NAMES.TONE_MODE] || VOICE_IDS.FRANK);
   const isUserEntry = !entry.response_text && !isInsight;
 
   // Removed console spam for debugging
@@ -122,21 +123,3 @@ return (
 );
 }
 
-function getToneStyle(tone) {
-  switch (tone.toLowerCase()) {
-    case 'tony':
-    case 'frank':
-      return { backgroundColor: '#fff3e0', borderColor: '#fb8c00', label: 'Tony' };
-    case 'marcus':
-      return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus' };
-    case 'clara':
-    case 'therapist':
-      return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Clara' };
-    case 'movies':
-      return { backgroundColor: '#fce4ec', borderColor: '#c2185b', label: 'Movie Metaphor™' };
-    case 'verena':
-      return { backgroundColor: '#ffeaf0', borderColor: '#ec407a', label: '🌸 Verena' };
-    default:
-      return { backgroundColor: '#f0f0f0', borderColor: '#ccc', label: 'Mirror' };
-  }
-}

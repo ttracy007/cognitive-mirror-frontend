@@ -1,18 +1,16 @@
 import React from 'react';
+import { VOICE_IDS, VOICE_NAMES } from '../../shared/onboarding-constants';
 import './VoicePreviewDisplay.css';
 
 const VoicePreviewDisplay = ({
-  voiceType,      // 'tony', 'clara', or 'marcus'
+  voiceType,      // VOICE_IDS.TONY, VOICE_IDS.CLARA, or VOICE_IDS.MARCUS
   previewText,    // The 150-200 word preview from backend
   description,    // "Choose Tony D when..." text
   onAccept,       // Callback for Yes button
   onReject        // Callback for No button
 }) => {
-  const voiceNames = {
-    tony: 'Tony D',
-    clara: 'Clara',
-    marcus: 'Marcus'
-  };
+  // Use shared voice names from constants
+  const voiceNames = VOICE_NAMES;
 
   // Extract text from preview object if needed
   const displayText = typeof previewText === 'object' && previewText.text
@@ -31,7 +29,7 @@ const VoicePreviewDisplay = ({
 
       <div className="confirmation-section">
         <p className="confirmation-question">
-          Do you like {voiceNames[voiceType]}?
+          Do you like {VOICE_NAMES[voiceType]}?
         </p>
         <div className="confirmation-buttons">
           <button

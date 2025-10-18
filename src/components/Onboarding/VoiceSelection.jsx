@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_ENDPOINTS, FIELD_NAMES, VOICE_IDS } from '../../shared/onboarding-constants';
 import './voice-selection.css';
 
 const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreviews, onVoiceSelected, isRefined = false, userId }) => {
@@ -24,7 +25,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
   const fetchVoicePreviews = async () => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const endpoint = '/api/onboarding/v1/voice-previews/generate';
+      const endpoint = API_ENDPOINTS.VOICE_PREVIEWS_GENERATE;
 
       // Use the actual user ID from onboarding flow
       if (!userId) {
@@ -35,7 +36,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId
+          [FIELD_NAMES.USER_ID]: userId
         })
       });
 
@@ -46,7 +47,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
       // Handle new single voice API format
       if (data.success && data.preview) {
         const voiceData = {
-          tony_d: data.preview
+          [VOICE_IDS.TONY_D]: data.preview
         };
         setVoiceResponses(voiceData);
       } else {
@@ -96,7 +97,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
       <div className="voice-selection-container">
         <div className="voice-error">
           <p>Unable to load voice previews. Please continue with the questionnaire.</p>
-          <button onClick={() => onVoiceSelected('tony_d', 'journal-now', null, null)}>
+          <button onClick={() => onVoiceSelected(VOICE_IDS.TONY_D, 'journal-now', null, null)}>
             Continue
           </button>
         </div>
@@ -121,7 +122,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
             <p className="voice-subtitle">Personalized therapeutic insights</p>
           </div>
           <div className="voice-response">
-            <p>{voiceResponses?.tony_d || 'Loading your personalized response...'}</p>
+            <p>{voiceResponses?.[VOICE_IDS.TONY_D] || 'Loading your personalized response...'}</p>
           </div>
         </div>
       </div>
@@ -145,7 +146,7 @@ const VoiceSelection = ({ userContext, responses, detectedPriority, voicePreview
         <div className="voice-action-buttons">
           <button
             className="voice-button primary"
-            onClick={() => onVoiceSelected('tony_d', 'journal-now', voiceResponses?.tony_d, inlineResponse)}
+            onClick={() => onVoiceSelected(VOICE_IDS.TONY_D, 'journal-now', voiceResponses?.[VOICE_IDS.TONY_D], inlineResponse)}
           >
             Start Journaling
           </button>

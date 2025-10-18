@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DomainRenderer from './DomainRenderer';
+import { TIER2_DOMAINS, API_ENDPOINTS, FIELD_NAMES } from '../../../shared/onboarding-constants';
 import './Tier2.css';
 
 const Tier2Container = ({ userId, onComplete, onBack }) => {
@@ -21,7 +22,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
     try {
       setError(null);
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const response = await fetch(`${backendUrl}/api/onboarding/v1/tier2/questions/${userId}`);
+      const response = await fetch(`${backendUrl}${API_ENDPOINTS.TIER2_QUESTIONS}/${userId}`);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: Failed to fetch Tier 2 domains`);
@@ -31,7 +32,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
 
       if (data.success && data.domains) {
         setDomains(data.domains);
-        setCurrentDomain('domain1_sleep');
+        setCurrentDomain(TIER2_DOMAINS.SLEEP);
         console.log('[Tier 2] Loaded domains from backend:', Object.keys(data.domains));
       } else {
         throw new Error(data.error || 'Failed to load Tier 2 domains');
@@ -63,7 +64,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
     }
 
     // Move to next domain
-    const domainOrder = ['domain1_sleep', 'domain2_rumination', 'domain3_work', 'domain4_relationships'];
+    const domainOrder = [TIER2_DOMAINS.SLEEP, TIER2_DOMAINS.RUMINATION, TIER2_DOMAINS.WORK, TIER2_DOMAINS.RELATIONSHIPS];
     const currentIndex = domainOrder.indexOf(domainKey);
 
     if (currentIndex < domainOrder.length - 1) {
@@ -97,9 +98,9 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
 
     // Convert skip_to_domain2 format to actual domain key
     const domainMap = {
-      'skip_to_domain2': 'domain2_rumination',
-      'skip_to_domain3': 'domain3_work',
-      'skip_to_domain4': 'domain4_relationships',
+      'skip_to_domain2': TIER2_DOMAINS.RUMINATION,
+      'skip_to_domain3': TIER2_DOMAINS.WORK,
+      'skip_to_domain4': TIER2_DOMAINS.RELATIONSHIPS,
       'skip_to_q5': 'tier3_transition',
       'skip_to_tier3': 'tier3_transition'
     };
@@ -122,7 +123,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
       setDomainResponses({});
       setGoldenKeys([]);
       setCompletedDomains(new Set());
-      setCurrentDomain('domain1_sleep');
+      setCurrentDomain(TIER2_DOMAINS.SLEEP);
       console.log('[Tier 2] Reset completed - returning to first domain');
     }
   };
@@ -154,15 +155,15 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
       });
 
       const payload = {
-        userId,
-        domainResponses,
-        goldenKeys
+        [FIELD_NAMES.USER_ID]: userId,
+        [FIELD_NAMES.TIER2_RESPONSES]: domainResponses,
+        [FIELD_NAMES.TIER2_GOLDEN_KEYS]: goldenKeys
       };
 
       console.log('[Tier 2] Full payload:', JSON.stringify(payload, null, 2));
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:10000';
-      const response = await fetch(`${backendUrl}/api/onboarding/v1/tier2/submit`, {
+      const response = await fetch(`${backendUrl}${API_ENDPOINTS.TIER2_SUBMIT}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -233,7 +234,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
         onSkip={handleSkipDomain}
         onBack={() => {
           // Handle going back from current domain
-          const domainOrder = ['domain1_sleep', 'domain2_rumination', 'domain3_work', 'domain4_relationships'];
+          const domainOrder = [TIER2_DOMAINS.SLEEP, TIER2_DOMAINS.RUMINATION, TIER2_DOMAINS.WORK, TIER2_DOMAINS.RELATIONSHIPS];
           const currentIndex = domainOrder.indexOf(currentDomain);
 
           if (currentIndex > 0) {

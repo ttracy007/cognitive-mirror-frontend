@@ -1,6 +1,7 @@
 // TIER 3 QUESTION BUCKET
 // Priority and limiting belief questions that synthesize everything learned
 // These questions help identify what matters most and what's holding them back
+import { VOICE_IDS } from '../shared/onboarding-constants';
 
 const tier3Questions = [
   {
@@ -31,9 +32,9 @@ const tier3Questions = [
     type: 'multiple_choice',
     required: true,
     options: [
-      { value: 'tony', text: 'A swift kick in the ass' },
-      { value: 'clara', text: 'A soft touch that\'s mindful of your feelings' },
-      { value: 'marcus', text: 'Marcus Aurelius' }
+      { value: VOICE_IDS.TONY, text: 'A swift kick in the ass' },
+      { value: VOICE_IDS.CLARA, text: 'A soft touch that\'s mindful of your feelings' },
+      { value: VOICE_IDS.MARCUS, text: 'Marcus Aurelius' }
     ],
     reveals: ['advice_preference', 'communication_style', 'voice_selection']
   }
