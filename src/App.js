@@ -1141,9 +1141,9 @@ const App = () => {
 
                 // Map onboarding voice to app voice format
                 const voiceMapping = {
-                  'marcus_aurelius': 'marcus',
+                  'marcus': 'marcus',
                   'clara': 'therapist',
-                  'tony_d': 'frank'
+                  'tony': 'frank'
                 };
                 const mappedVoice = voiceMapping[data.selected_voice] || 'therapist';
                 console.log('[App] Setting voice from stored data:', data.selected_voice, '→', mappedVoice);
@@ -1377,43 +1377,36 @@ return (
           </button>
 
           {/* Testing button for onboarding */}
-          {process.env.NODE_ENV === 'development' && (
-            <button
-              className="logout-btn"
-              onClick={() => {
-                // Clear any local onboarding state
-                const userId = session?.user?.id;
-                if (userId) {
-                  localStorage.removeItem(`onboarding_responses_${userId}`);
-                  localStorage.removeItem(`onboarding_step_${userId}`);
-                  localStorage.removeItem(`onboarding_question_index_${userId}`);
-                  localStorage.removeItem(`onboarding_selected_voice_${userId}`);
-                  localStorage.removeItem(`onboarding_detected_priority_${userId}`);
-                  localStorage.removeItem(`onboarding_detected_patterns_${userId}`);
-                  localStorage.removeItem(`onboarding_golden_keys_${userId}`);
-                  localStorage.removeItem(`onboarding_tier1_responses_${userId}`);
-                }
-                // Also clear old non-user-specific keys
-                localStorage.removeItem('onboarding_responses');
-                localStorage.removeItem('onboarding_step');
-                localStorage.removeItem('onboarding_question_index');
-                localStorage.removeItem('onboarding_selected_voice');
-                localStorage.removeItem('onboarding_detected_priority');
+          <button
+            className="logout-btn"
+            onClick={() => {
+              // Clear local storage for fresh test
+              const userId = session?.user?.id;
+              if (userId) {
+                // Clear all onboarding-related localStorage
+                localStorage.removeItem(`onboarding_responses_${userId}`);
+                localStorage.removeItem(`onboarding_step_${userId}`);
+                localStorage.removeItem(`onboarding_question_index_${userId}`);
+                localStorage.removeItem(`onboarding_selected_voice_${userId}`);
+                localStorage.removeItem(`onboarding_detected_priority_${userId}`);
+                localStorage.removeItem(`onboarding_detected_patterns_${userId}`);
+                localStorage.removeItem(`onboarding_golden_keys_${userId}`);
+                localStorage.removeItem(`onboarding_tier1_responses_${userId}`);
+              }
 
-                // Set testing mode and show onboarding
-                setIsTestingOnboarding(true);
-                setShowOnboarding(true);
-              }}
-              style={{
-                marginLeft: '10px',
-                backgroundColor: '#4a90e2',
-                border: 'none'
-              }}
-              title="Test the refined onboarding flow"
-            >
-              🧪 Test Onboarding
-            </button>
-          )}
+              // Show onboarding
+              setIsTestingOnboarding(true);
+              setShowOnboarding(true);
+            }}
+            style={{
+              marginLeft: '10px',
+              backgroundColor: '#4a90e2',
+              border: 'none'
+            }}
+            title="Retake onboarding to update your voice and preferences"
+          >
+            🔄 Retake Onboarding
+          </button>
 
           {/* Reset Onboarding button (dev mode only) */}
           {process.env.NODE_ENV === 'development' && (

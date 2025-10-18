@@ -124,10 +124,12 @@ return (
 
 function getToneStyle(tone) {
   switch (tone.toLowerCase()) {
+    case 'tony':
     case 'frank':
       return { backgroundColor: '#fff3e0', borderColor: '#fb8c00', label: 'Tony' };
     case 'marcus':
       return { backgroundColor: '#e8f5e9', borderColor: '#388e3c', label: 'Marcus' };
+    case 'clara':
     case 'therapist':
       return { backgroundColor: '#e0f7f6', borderColor: '#673ab7', label: 'Clara' };
     case 'movies':
