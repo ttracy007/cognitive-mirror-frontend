@@ -16,6 +16,9 @@
     "start": "HOST=0.0.0.0 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:components": "react-scripts test tests/components",
+    "test:integration": "react-scripts test tests/integration",
+    "test:watch": "react-scripts test --watch",
     "eject": "react-scripts eject"
   },
   "browserslist": {
