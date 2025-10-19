@@ -156,7 +156,7 @@ const Tier2Container = ({ userId, onComplete, onBack }) => {
 
       const payload = {
         [FIELD_NAMES.USER_ID]: userId,
-        [FIELD_NAMES.TIER2_RESPONSES]: domainResponses,
+        domainResponses: domainResponses,
         [FIELD_NAMES.TIER2_GOLDEN_KEYS]: goldenKeys
       };
 
