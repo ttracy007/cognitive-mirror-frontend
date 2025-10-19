@@ -667,7 +667,7 @@ const OnboardingContainer = ({ onComplete }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          [FIELD_NAMES.USER_ID_CAMEL]: userId,
+          [FIELD_NAMES.USER_ID]: userId,
           [FIELD_NAMES.RESPONSES]: tier1Responses,
           detected_patterns: detectedPatterns,
           skipped_at: null, // TODO: Add tier1SkippedAt state if needed
@@ -735,7 +735,7 @@ const OnboardingContainer = ({ onComplete }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          [FIELD_NAMES.USER_ID_CAMEL]: userId,
+          [FIELD_NAMES.USER_ID]: userId,
           [FIELD_NAMES.RESPONSES]: tier3Responses
         })
       });
