@@ -8,7 +8,16 @@ export default function ChatBubble({ entry, isMostRecent = false, styleVariant =
   const userId = entry[FIELD_NAMES.USER_ID];
   const showFeedback = !isUser && !!entry.response_text;
   const isInsight = entry.entry_type === 'insight';
-  const style = getVoiceStyle(entry[FIELD_NAMES.TONE_MODE] || VOICE_IDS.FRANK);
+  // Voice preview debugging (temporary)
+  if (entry.entry_type === 'voice_preview') {
+    console.log('🔍 VOICE DEBUG:', {
+      entryToneMode: entry[FIELD_NAMES.TONE_MODE],
+      entryType: entry.entry_type,
+      fallbackUsed: !entry[FIELD_NAMES.TONE_MODE]
+    });
+  }
+
+  const style = getVoiceStyle(entry[FIELD_NAMES.TONE_MODE] || VOICE_IDS.TONY);
   const isUserEntry = !entry.response_text && !isInsight;
 
   // Removed console spam for debugging
