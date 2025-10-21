@@ -22,8 +22,7 @@ import {
   FIELD_NAMES,
   getVoiceStyle,
   getVoiceName,
-  getVoiceDescription,
-  mapVoiceForApp
+  getVoiceDescription
 } from './shared/onboarding-constants'; 
 
 const App = () => {
@@ -1142,13 +1141,13 @@ const App = () => {
                 const data = await response.json();
                 console.log('[App] Retrieved stored voice preview:', data);
 
-                // Map onboarding voice to app voice format
-                const mappedVoice = mapVoiceForApp(data[FIELD_NAMES.SELECTED_VOICE]);
-                console.log('[App] Setting voice from stored data:', data[FIELD_NAMES.SELECTED_VOICE], '→', mappedVoice);
+                // Use voice directly (no mapping needed - unified voice names)
+                const selectedVoice = data[FIELD_NAMES.SELECTED_VOICE];
+                console.log('[App] Setting voice from stored data:', selectedVoice);
 
                 // Set the selected voice
-                setForcedTone(mappedVoice);
-                setToneDescription(getVoiceDescription(mappedVoice));
+                setForcedTone(selectedVoice);
+                setToneDescription(getVoiceDescription(selectedVoice));
 
                 // Add stored voice preview to timeline
                 if (data.voice_preview && data.voice_preview.text) {
@@ -1157,8 +1156,8 @@ const App = () => {
                   // Set as latest response to show immediately
                   setLatestResponse({
                     text: data.voice_preview.text,
-                    tone: mappedVoice,
-                    toneName: toneName(mappedVoice),
+                    tone: selectedVoice,
+                    toneName: toneName(selectedVoice),
                     timestamp: data.voice_preview.timestamp || new Date().toISOString()
                   });
                   setShowLatestResponse(true);
@@ -1177,13 +1176,13 @@ const App = () => {
           // Handle legacy onboarding data if provided (fallback)
           else if (onboardingData && onboardingData.selectedVoice) {
             console.log('[App] Using legacy onboarding data');
-            // Map onboarding voice to app voice format
-            const mappedVoice = mapVoiceForApp(onboardingData.selectedVoice);
-            console.log('[App] Setting voice from onboarding:', onboardingData.selectedVoice, '→', mappedVoice);
+            // Use voice directly (no mapping needed - unified voice names)
+            const selectedVoice = onboardingData.selectedVoice;
+            console.log('[App] Setting voice from onboarding:', selectedVoice);
 
             // Set the selected voice
-            setForcedTone(mappedVoice);
-            setToneDescription(getVoiceDescription(mappedVoice));
+            setForcedTone(selectedVoice);
+            setToneDescription(getVoiceDescription(selectedVoice));
 
             // If we have a voice preview, add it as the first timeline entry
             if (onboardingData.voicePreview && onboardingData.voicePreview.text) {
@@ -1192,8 +1191,8 @@ const App = () => {
               // Set as latest response to show immediately
               setLatestResponse({
                 text: onboardingData.voicePreview.text,
-                tone: mappedVoice,
-                toneName: toneName(mappedVoice),
+                tone: selectedVoice,
+                toneName: toneName(selectedVoice),
                 timestamp: new Date().toISOString()
               });
               setShowLatestResponse(true);
