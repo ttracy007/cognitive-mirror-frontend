@@ -278,13 +278,12 @@ const tier1Questions = [
   {
     id: 'q21_problem_solving_spiral',
     category: 'personality',
-    question: "When you can't figure something out:",
+    question: "When you can't figure something out, you:",
     options: [
-      { value: 'calm', text: 'Keep trying calmly until I get it' },
-      { value: 'spiral_genius', text: 'Spiral into "I\'m a worthless failure" → solve it → "I should win a Nobel Prize for this"' },
-      { value: 'frustrated_sane', text: 'Get frustrated but stay relatively sane about it' },
-      { value: 'give_up', text: 'Give up and move on' },
-      { value: 'attacked', text: 'This is a very specific question and I feel attacked' }
+      { value: 'keep_trying_calmly', text: 'Keep trying calmly until I get it' },
+      { value: 'fail_worthless_brilliant', text: 'Fail repeatedly, think I\'m worthless, then solve it and feel brilliant' },
+      { value: 'stop_and_hope', text: 'Stop trying and hope it resolves itself' },
+      { value: 'figure_everything_out', text: 'I figure everything out' }
     ],
     reveals: ['emotional_dysregulation', 'all_or_nothing_thinking', 'self_worth_volatility', 'perfectionism']
   }
@@ -351,9 +350,9 @@ function detectPatterns(tier1Responses) {
   if (tier1Responses.q8_social_battery === 'replay') patterns.rumination += 2;
 
   // Emotional dysregulation / all-or-nothing cluster
-  if (tier1Responses.q21_problem_solving_spiral === 'spiral_genius') patterns.emotional_dysregulation += 3;
-  if (tier1Responses.q21_problem_solving_spiral === 'spiral_genius') patterns.all_or_nothing_thinking += 2;
-  if (tier1Responses.q21_problem_solving_spiral === 'spiral_genius') patterns.perfectionism += 1;
+  if (tier1Responses.q21_problem_solving_spiral === 'fail_worthless_brilliant') patterns.emotional_dysregulation += 3;
+  if (tier1Responses.q21_problem_solving_spiral === 'fail_worthless_brilliant') patterns.all_or_nothing_thinking += 2;
+  if (tier1Responses.q21_problem_solving_spiral === 'fail_worthless_brilliant') patterns.perfectionism += 1;
 
   return patterns;
 }

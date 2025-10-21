@@ -22,33 +22,29 @@ const ScaleInput = ({ question, scale, onAnswer, defaultValue }) => {
       <p className="scale-question">{question}</p>
 
       <div className="scale-container">
-        <div className="scale-buttons">
+        <div className="scale-buttons-with-labels">
           {range.map(value => (
-            <button
-              key={value}
-              className={`scale-button ${selectedValue === value ? 'selected' : ''}`}
-              onClick={() => handleSelect(value)}
-            >
-              {value}
-            </button>
+            <div key={value} className="scale-button-container">
+              <button
+                className={`scale-button ${selectedValue === value ? 'selected' : ''}`}
+                onClick={() => handleSelect(value)}
+              >
+                {value}
+              </button>
+              {labels && labels[value] && (
+                <span className="scale-inline-label">
+                  {labels[value]}
+                </span>
+              )}
+            </div>
           ))}
         </div>
 
-        {labels && (
+        {/* Keep legacy min/max labels for scales without inline labels */}
+        {labels && !Object.keys(labels).some(key => parseInt(key) > min && parseInt(key) < max) && (
           <div className="scale-labels">
             <span className="scale-label-left">{labels[min]}</span>
             <span className="scale-label-right">{labels[max]}</span>
-          </div>
-        )}
-
-        {/* Show intermediate labels if they exist */}
-        {labels && Object.keys(labels).length > 2 && (
-          <div className="scale-labels-detailed">
-            {Object.entries(labels).map(([value, label]) => (
-              <div key={value} className="scale-label-item">
-                <strong>{value}:</strong> {label}
-              </div>
-            ))}
           </div>
         )}
       </div>

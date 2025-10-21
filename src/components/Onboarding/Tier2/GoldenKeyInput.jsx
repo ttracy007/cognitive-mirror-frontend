@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const GoldenKeyInput = ({ question, placeholder, minWords = 40, onSubmit, defaultValue }) => {
+const GoldenKeyInput = ({ question, placeholder, minWords = 40, onSubmit, defaultValue, hideQuestion = false }) => {
   const [text, setText] = useState(defaultValue || '');
   const [wordCount, setWordCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +58,7 @@ const GoldenKeyInput = ({ question, placeholder, minWords = 40, onSubmit, defaul
 
   return (
     <div className="golden-key-input">
-      <p className="golden-key-question">{question}</p>
+      {!hideQuestion && <p className="golden-key-question">{question}</p>}
 
       <div className="golden-key-textarea-container">
         <textarea

@@ -159,6 +159,20 @@
   margin: 20px 0;
 }
 
+.scale-buttons-with-labels {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.scale-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
 .scale-button {
   padding: 15px 8px;
   border: 2px solid #ddd;
@@ -169,6 +183,18 @@
   font-weight: 600;
   transition: all 0.2s ease;
   color: #666;
+  width: 100%;
+}
+
+.scale-inline-label {
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  line-height: 1.2;
+  font-weight: 400;
+  max-width: 100%;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 .scale-button:hover:not(.disabled) {
@@ -689,6 +715,25 @@
 
   .scale-buttons {
     grid-template-columns: repeat(5, 1fr);
+  }
+
+  .scale-buttons-with-labels {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .scale-button-container {
+    gap: 6px;
+  }
+
+  .scale-button {
+    padding: 12px 6px;
+    font-size: 14px;
+  }
+
+  .scale-inline-label {
+    font-size: 9px;
+    line-height: 1.1;
   }
 
   .domain-header {

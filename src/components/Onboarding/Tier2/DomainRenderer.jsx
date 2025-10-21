@@ -233,7 +233,6 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
   };
 
   const handleGoldenKeySubmit = (text, wordCount) => {
-
     const goldenKey = {
       domain: domainKey.replace('domain', '').replace(/\d+_/, ''), // Extract domain name
       text,
@@ -246,7 +245,6 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
       ...responses,
       [questions[currentQuestionIndex].id]: text
     };
-
 
     onComplete(domainKey, finalResponses, goldenKey);
   };
@@ -360,12 +358,13 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
         )}
 
 
-        {currentQuestion?.type === 'text_input' && currentQuestion.golden_key && currentQuestion.question && (
+        {currentQuestion?.type === 'text_input' && currentQuestion.golden_key && (
           <GoldenKeyInput
             question={resolveQuestionText(currentQuestion)}
             placeholder={resolvePlaceholderText(currentQuestion)}
             minWords={currentQuestion.min_words || 40}
             defaultValue={responses[currentQuestion.id] || ''}
+            hideQuestion={currentQuestion.hide_question || false}
             onSubmit={handleGoldenKeySubmit}
           />
         )}
