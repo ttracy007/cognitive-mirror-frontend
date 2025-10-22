@@ -23,6 +23,38 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
   const processQuestionLogic = useCallback((questionId, value) => {
     const currentQuestion = questions[currentQuestionIndex];
 
+    // For single choice questions: check option-specific logic FIRST
+    if (currentQuestion.type === 'single_choice') {
+      const selectedOption = currentQuestion.options?.find(opt => opt.value === value);
+      if (selectedOption?.next) {
+        if (selectedOption.next.startsWith('skip_to_')) {
+          onSkip(domainKey, selectedOption.next);
+          return;
+        } else if (selectedOption.next.startsWith('continue_')) {
+          // continue_q3c, etc. - find the target question
+          const targetQuestionId = selectedOption.next.replace('continue_', '');
+
+          // Find the question index by ID
+          const targetIndex = questions.findIndex(q => {
+            // Handle both direct ID match and partial suffix match
+            return q.id === targetQuestionId || q.id.includes(targetQuestionId);
+          });
+
+          if (targetIndex !== -1) {
+            setCurrentQuestionIndex(targetIndex);
+            setNavigationHistory(prev => [...prev, targetIndex]); // Add to navigation history
+            return;
+          } else {
+            // Fallback: advance to next question
+            const nextIndex = currentQuestionIndex + 1;
+            setCurrentQuestionIndex(nextIndex);
+            setNavigationHistory(prev => [...prev, nextIndex]); // Add to navigation history
+            return;
+          }
+        }
+      }
+    }
+
     // Check for logic field (works for both scale and single choice questions)
     if (currentQuestion?.logic && !Array.isArray(value)) {
       // For scale questions: check score ranges
@@ -46,39 +78,6 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
         } else if (action.startsWith('continue_')) {
           // continue_q3a_alt, continue_q3b, etc. - find the target question
           const targetQuestionId = action.replace('continue_', '');
-
-          // Find the question index by ID
-          const targetIndex = questions.findIndex(q => {
-            // Handle both direct ID match and partial suffix match
-            return q.id === targetQuestionId || q.id.includes(targetQuestionId);
-          });
-
-          if (targetIndex !== -1) {
-            setCurrentQuestionIndex(targetIndex);
-            setNavigationHistory(prev => [...prev, targetIndex]); // Add to navigation history
-            return;
-          } else {
-            // Fallback: advance to next question
-            const nextIndex = currentQuestionIndex + 1;
-            setCurrentQuestionIndex(nextIndex);
-            setNavigationHistory(prev => [...prev, nextIndex]); // Add to navigation history
-            return;
-          }
-        }
-      }
-    }
-
-    // Check for next action in single choice questions (fallback for option-specific logic)
-    if (currentQuestion.type === 'single_choice') {
-      const selectedOption = currentQuestion.options?.find(opt => opt.value === value);
-      if (selectedOption?.next) {
-
-        if (selectedOption.next.startsWith('skip_to_')) {
-          onSkip(domainKey, selectedOption.next);
-          return;
-        } else if (selectedOption.next.startsWith('continue_')) {
-          // continue_q3c, etc. - find the target question
-          const targetQuestionId = selectedOption.next.replace('continue_', '');
 
           // Find the question index by ID
           const targetIndex = questions.findIndex(q => {

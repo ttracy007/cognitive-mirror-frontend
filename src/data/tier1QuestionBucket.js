@@ -282,9 +282,10 @@ const tier1Questions = [
     options: [
       { value: 'keep_trying_calmly', text: 'Keep trying calmly until I get it' },
       { value: 'fail_worthless_brilliant', text: 'Fail repeatedly, think I\'m worthless, then solve it and feel brilliant' },
-      { value: 'figure_everything_out', text: 'I figure everything out' },
-      { value: 'skip_trigger', text: 'Enough with these questions. Let\'s move on.' }
+      { value: 'stop_hope_resolves', text: 'Stop trying and hope it resolves itself' },
+      { value: 'figure_everything_out', text: 'I figure everything out' }
     ],
+    force_choice_on: 'stop_hope_resolves',
     reveals: ['emotional_dysregulation', 'all_or_nothing_thinking', 'self_worth_volatility', 'perfectionism']
   }
 ];
