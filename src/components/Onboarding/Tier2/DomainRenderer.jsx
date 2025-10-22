@@ -23,8 +23,9 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
   const processQuestionLogic = useCallback((questionId, value) => {
     const currentQuestion = questions[currentQuestionIndex];
 
-    // Check for skip logic on scale questions (only for single values, not arrays)
+    // Check for logic field (works for both scale and single choice questions)
     if (currentQuestion?.logic && !Array.isArray(value)) {
+      // For scale questions: check score ranges
       const scoreRange = Object.keys(currentQuestion.logic).find(range => {
         if (range.includes('-')) {
           const [min, max] = range.split('-').map(Number);
@@ -33,9 +34,12 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
         return false;
       });
 
-      if (scoreRange) {
-        const action = currentQuestion.logic[scoreRange];
+      // For single choice questions: check direct value match
+      const directAction = currentQuestion.logic[value];
 
+      const action = directAction || (scoreRange ? currentQuestion.logic[scoreRange] : null);
+
+      if (action) {
         if (action.startsWith('skip_to_')) {
           onSkip(domainKey, action);
           return;
@@ -64,7 +68,7 @@ const DomainRenderer = ({ domain, domainKey, onComplete, onSkip, onBack }) => {
       }
     }
 
-    // Check for next action in single choice questions
+    // Check for next action in single choice questions (fallback for option-specific logic)
     if (currentQuestion.type === 'single_choice') {
       const selectedOption = currentQuestion.options?.find(opt => opt.value === value);
       if (selectedOption?.next) {
