@@ -1661,12 +1661,30 @@ return (
 
         {/* Timeline (outside the fixed container) */}
         <div className="chat-thread">
-          <JournalTimeline 
-            userId={session?.user?.id} 
-            refreshTrigger={refreshTrigger} 
+          <JournalTimeline
+            userId={session?.user?.id}
+            refreshTrigger={refreshTrigger}
             styleVariant={styleVariant}
             excludeLatestResponse={showLatestResponse && latestResponse ? latestEntry : null}
           />
+
+          {/* Floating Tap to Reflect Button within chat-thread for mobile */}
+          {isMobile && !inputExpanded && (
+            <div
+              className="chat-thread-floating-button"
+              onClick={() => {
+                console.log('✅ Expanding input from floating button');
+                setInputExpanded(true);
+              }}
+              onTouchStart={(e) => {
+                console.log('✅ Expanding input from floating button touch');
+                e.preventDefault();
+                setInputExpanded(true);
+              }}
+            >
+              ✍️ Tap to reflect...
+            </div>
+          )}
         </div>
 
         {/* Summary Viewer */}
